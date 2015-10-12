@@ -1,0 +1,6 @@
+pluginclassname=Fleximport
+pluginname=Fleximport
+origin=data-quest
+version=1.0
+description=Ein Grundplugin, um Veranstaltungen, Nutzer und Teilnehmerdaten zu importieren.
+studipMinVersion=3.2
