@@ -25,27 +25,9 @@ class Fleximport extends StudIPPlugin {
         return $liste;
     }
 
-    static public function getCSVDataFromFile($file_path) {
-        return self::CSV2Array(file_get_contents($file_path));
+    static public function getCSVDataFromFile($file_path, $delim = ';', $encl = '"', $optional = 1) {
+        return self::CSV2Array(file_get_contents($file_path), $delim, $encl, $optional);
     }
-
-    static public function reduceDiakritikaFromIso88591($text) {
-        $text = str_replace(array("ä","Ä","ö","Ö","ü","Ü","ß"), array('ae','Ae','oe','Oe','ue','Ue','ss'), $text);
-        $text = str_replace(array('À','Á','Â','Ã','Å','Æ'), 'A' , $text);
-        $text = str_replace(array('à','á','â','ã','å','æ'), 'a' , $text);
-        $text = str_replace(array('È','É','Ê','Ë'), 'E' , $text);
-        $text = str_replace(array('è','é','ê','ë'), 'e' , $text);
-        $text = str_replace(array('Ì','Í','Î','Ï'), 'I' , $text);
-        $text = str_replace(array('ì','í','î','ï'), 'i' , $text);
-        $text = str_replace(array('Ò','Ó','Õ','Ô','Ø'), 'O' , $text);
-        $text = str_replace(array('ò','ó','ô','õ','ø'), 'o' , $text);
-        $text = str_replace(array('Ù','Ú','Û'), 'U' , $text);
-        $text = str_replace(array('ù','ú','û'), 'u' , $text);
-        $text = str_replace(array('Ç','ç','Ð','Ñ','Ý','ñ','ý','ÿ'), array('C','c','D','N','Y','n','y','y') , $text);
-        return $text;
-    }
-
-
 
     public function __construct() {
         parent::__construct();

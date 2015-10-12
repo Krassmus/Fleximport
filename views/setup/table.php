@@ -19,13 +19,19 @@
 
     <label>
         <?= _("Import über") ?>
-        <select name="table[csv_upload]" onChange="jQuery('#server_settings').toggle(this.value <= 0);">
-            <option value="1"<?= $table['csv_upload'] || $table->isNew() ? " selected" : "" ?>><?= _("CSV-Datei") ?></option>
-            <option value="0"<?= !$table['csv_upload'] && !$table->isNew() ? " selected" : "" ?>><?= _("Datenbank") ?></option>
+        <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink');">
+            <option value="csv"<?= $table['source'] === "csv_upload" || $table->isNew() ? " selected" : "" ?>><?= _("CSV-Upload") ?></option>
+            <option value="csv_weblink"<?= $table['source'] === "csv_weblink" ? " selected" : "" ?>><?= _("CSV-Internetquelle") ?></option>
+            <option value="database"<?= !$table['source'] === "database" ? " selected" : "" ?>><?= _("Datenbank") ?></option>
         </select>
     </label>
 
-    <table id="server_settings" class="default nohover" style="<?= $table['csv_upload'] || $table->isNew() ? "display: none;" : "" ?>">
+    <label id="weblink_info" style="<?= $table['source'] !== "csv_weblink" ? "display: none;" : "" ?>">
+        <?= _("URL der CSV-Datei") ?>
+        <input type="text" name="table[tabledata][weblink][url]" value="<?= htmlReady($table['tabledata']['weblink']['url']) ?>">
+    </label>
+
+    <table id="server_settings" class="default nohover" style="<?= $table['source'] !== "database" ? "display: none;" : "" ?>">
         <tbody>
             <tr>
                 <td><label for="table_tabledata_server_type"><?= _("Datenbanktyp") ?></label></td>

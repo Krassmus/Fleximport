@@ -24,4 +24,9 @@ class SetupController extends PluginController {
         $this->redirect("import/overview");
     }
 
+    public function tablemapping_action($table_id)
+    {
+        $this->table = new FleximportTable($table_id);
+    }
+
 }

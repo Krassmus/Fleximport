@@ -36,15 +36,18 @@ class FleximportTable extends SimpleORMap {
 
     public function isInDatabase()
     {
-        if (!$this['csv_upload']) {
-            $this->fetchDataFromDatabase();
-            return true;
-        } else {
+        if ($this['source'] === "csv_upload") {
             $statement = DBManager::get()->prepare("
                     SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = :table
             ");
             $statement->execute(array('table' => $this['name']));
             return (bool) $statement->fetch();
+        } elseif ($this['source'] === "database") {
+            $this->fetchDataFromDatabase();
+            return true;
+        } elseif($this['source'] === "csv_weblink") {
+            $this->fetchDataFromWeblink();
+            return true;
         }
     }
 
@@ -114,6 +117,13 @@ class FleximportTable extends SimpleORMap {
         $this->createTable($output);
     }
 
+    public function fetchDataFromWeblink()
+    {
+        $output = $this->getCSVDataFromURL($this['tabledata']['weblink']['url'], ",");
+        $headline = array_shift($output);
+        $this->createTable($headline, $output);
+    }
+
     public function createTable($headers, $entries = array())
     {
         $db = DBManager::get();
@@ -153,8 +163,34 @@ class FleximportTable extends SimpleORMap {
         $text = str_replace(array('Ù','Ú','Û'), 'U' , $text);
         $text = str_replace(array('ù','ú','û'), 'u' , $text);
         $text = str_replace(array('Ç','ç','Ð','Ñ','Ý','ñ','ý','ÿ'), array('C','c','D','N','Y','n','y','y') , $text);
-    return $text;
-}
+        return $text;
+    }
+
+    private function CSV2Array($content, $delim = ';', $encl = '"', $optional = 1) {
+        if ($content[strlen($content)-1]!="\r" && $content[strlen($content)-1]!="\n")
+            $content .= "\r\n";
+
+        $reg = '/(('.$encl.')'.($optional?'?(?(2)':'(').
+            '[^'.$encl.']*'.$encl.'|[^'.$delim.'\r\n]*))('.$delim.
+            '|[\r\n]+)/smi';
+
+        preg_match_all($reg, $content, $treffer);
+        $linecount = 0;
+
+        for ($i = 0; $i < count($treffer[3]);$i++) {
+            $liste[$linecount][] = str_replace($encl.$encl, $encl, trim($treffer[1][$i],$encl));
+            if ($treffer[3][$i] != $delim) $linecount++;
+        }
+        return $liste;
+    }
+
+    private function getCSVDataFromFile($file_path, $delim = ';', $encl = '"', $optional = 1) {
+        return $this->CSV2Array(file_get_contents($file_path), $delim, $encl, $optional);
+    }
+
+    private function getCSVDataFromURL($file_path, $delim = ';', $encl = '"', $optional = 1) {
+        return $this->CSV2Array(studip_utf8decode(file_get_contents($file_path)), $delim, $encl, $optional);
+    }
 
     public function drop()
     {

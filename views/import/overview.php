@@ -23,12 +23,15 @@
                             <?= htmlReady($table['name']) ?>
                         </div>
                         <div class="caption-actions">
-                            <? if ($table['csv_upload']) : ?>
+                            <? if ($table['source'] === "csv_upload") : ?>
                                 <label style="cursor: pointer;" title="<?= _("CSV-Datei hochladen") ?>">
                                     <?= Assets::img("icons/20/blue/upload") ?>
                                     <input type="file" name="tableupload[<?= $table->getId() ?>]" onChange="jQuery(this).closest('form').submit();" style="display: none;">
                                 </label>
                             <? endif ?>
+                            <a href="<?= PluginEngine::getLink($plugin, array(), "setup/tablemapping/".$table->getId()) ?>" data-dialog title="<?= _("Datenmapping einstellen") ?>">
+                                <?= Assets::img("icons/20/blue/admin") ?>
+                            </a>
                             <a href="<?= PluginEngine::getLink($plugin, array(), "setup/table/".$table->getId()) ?>" data-dialog title="<?= _("Tabelleneinstellung bearbeiten") ?>">
                                 <?= Assets::img("icons/20/blue/admin") ?>
                             </a>
@@ -90,7 +93,7 @@
                     <?= htmlReady($table['name']) ?>
                 </h2>
 
-                <? if ($table['csv_upload']) : ?>
+                <? if ($table['source'] === "csv_weblink") : ?>
                     <label style="cursor: pointer;">
                         <?= Assets::img("icons/40/blue/upload", array('class' => "text-bottom")) ?>
                         <?= _("CSV-Datei hochladen") ?>
