@@ -197,4 +197,163 @@ class FleximportTable extends SimpleORMap {
         DBManager::get()->exec("DROP TABLE IF EXISTS `".addslashes($this['name'])."` ");
     }
 
+
+
+    public function doImport()
+    {
+        if (!$this['import_type']) {
+            return array();
+        }
+        $statement = DBManager::get()->prepare("
+            SELECT * FROM `".addslashes($this['name'])."`
+        ");
+        $statement->execute();
+        $protocol = array();
+        while ($line = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $error = $this->importLine($line);
+            if (is_string($error)) {
+                $protocol[] = $error;
+            }
+        }
+        return $protocol;
+    }
+
+    public function importLine($line)
+    {
+        $pluginname = $this['name'];
+        if (class_exists($pluginname)) {
+            $plugin = new $pluginname($this);
+        }
+        $classname = $this['import_type'];
+        if (!$classname) {
+            return;
+        }
+        $data = $this->getMappedData($line);
+        $pk = $this->getPrimaryKey($data);
+
+        $object = new $classname($pk);
+        $object->setData($data);
+
+        //Last chance to quit:
+        $error = $this->checkLine($line);
+        if ($error) {
+            return $error;
+        }
+
+        $object->store();
+
+        //Dynamic special fields:
+        switch ($classname) {
+            case "Course":
+                foreach ($data['fleximport_dozenten'] as $dozent_id) {
+                    $seminar = new Seminar($object->getId());
+                    $seminar->addMember($dozent_id, 'dozent');
+                }
+                if (!$data['fleximport_related_institutes']) {
+                    $data['fleximport_related_institutes'] = array($object['institut_id']);
+                } else if(!in_array($object['institut_id'], $data['fleximport_related_institutes'])) {
+                    $data['fleximport_related_institutes'][] = $object['institut_id'];
+                }
+                foreach ($data['fleximport_related_institutes'] as $institut_id) {
+                    $insert = DBManager::get()->prepare("
+                        INSERT IGNORE INTO seminar_inst
+                        SET seminar_id = :seminar_id,
+                            institut_id = :institut_id
+                    ");
+                    $insert->execute(array(
+                        'seminar_id' => $object->getId(),
+                        'institut_id' => $institut_id
+                    ));
+                }
+                break;
+        }
+
+        //Datafields:
+
+        if ($plugin) {
+            $plugin->afterUpdate($object);
+        }
+    }
+
+    public function checkLine($line)
+    {
+        $pluginname = $this['name'];
+        if (class_exists($pluginname)) {
+            $plugin = new $pluginname($this);
+        }
+        $classname = $this['import_type'];
+        if (!$classname) {
+            return array('found' => false);
+        }
+        $data = $this->getMappedData($line);
+        $pk = $this->getPrimaryKey($data);
+
+        $object = new $classname($pk);
+        $object->setData($data);
+
+        $output = array(
+            'found' => !$object->isNew(),
+            'errors' => ""
+        );
+
+        switch ($classname) {
+            case "Course":
+                if (!$data['fleximport_dozenten'] || count($data['fleximport_dozenten']) == 0) {
+                    if (!$plugin || !in_array("fleximport_dozenten", $plugin->fieldsToBeMapped())) {
+                        $output['errors'] .= "Dozent kann nicht gemapped werden. ";
+                    }
+                }
+                break;
+        }
+        if ($plugin) {
+            $output['errors'] .= $plugin->checkLine($line);
+        }
+
+        return $output;
+    }
+
+    protected function getMappedData($line)
+    {
+        $pluginname = $this['name'];
+        if (class_exists($pluginname)) {
+            $plugin = new $pluginname($this);
+        }
+        $classname = $this['import_type'];
+        $object = new $classname();
+        $table_metadata = $object->getTableMetadata();
+        $fields = array_keys($table_metadata['fields']);
+
+        //dynamic additional fields:
+        switch ($classname) {
+            case "Course":
+                $fields[] = "fleximport_dozenten";
+                break;
+        }
+
+        $data = array();
+        foreach ($fields as $field) {
+            if ($plugin && in_array($field, $plugin->fieldsToBeMapped())) {
+                $mapping = $plugin->mapField($field, $line);
+            }
+            $data[$field] = $plugin && ($mapping !== false)
+                ? $mapping
+                : $line[$field];
+        }
+        return $data;
+    }
+
+    protected function getPrimaryKey($data)
+    {
+        $classname = $this['import_type'];
+        $object = new $classname();
+        $table_metadata = $object->getTableMetadata();
+        $pk = $table_metadata['pk'];
+
+        $key = array();
+        foreach ($pk as $field) {
+            $key[] = $data[$field];
+        }
+        return $key;
+    }
+
 }

@@ -8,8 +8,9 @@ class InitPlugin extends Migration {
 	        CREATE TABLE IF NOT EXISTS `fleximport_tables` (
                 `table_id` varchar(32) NOT NULL,
                 `name` varchar(64) NOT NULL,
+                `import_type` VARCHAR(64) NOT NULL DEFAULT 'User',
                 `tabledata` text NULL,
-                `source` ENUM('csv_upload','csv_weblink','database') NOT NULL DEFAULT 'all',
+                `source` ENUM('csv_upload','csv_weblink','database') NOT NULL DEFAULT 'csv_upload',
                 `position` INT NOT NULL DEFAULT '1',
                 `display_lines` ENUM('all','onlybroken','ondemand') NOT NULL DEFAULT 'all',
                 `chdate` bigint(20) NOT NULL,

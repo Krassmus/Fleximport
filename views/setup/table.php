@@ -11,9 +11,10 @@
     <label>
         <?= _("Tabellentyp") ?>
         <select name="table[import_type]" onChange="jQuery('#coursespecials').toggle(this.value === 'course'); ">
-            <option value="user"<?= $table['import_type'] === "user" ? " selected" : "" ?>><?= _("Nutzerimport") ?></option>
-            <option value="course"<?= $table['import_type'] === "course" ? " selected" : "" ?>><?= _("Veranstaltungsimport") ?></option>
-            <option value="member"<?= $table['import_type'] === "member" ? " selected" : "" ?>><?= _("Teilnehmerimport") ?></option>
+            <option value="User"<?= $table['import_type'] === "User" ? " selected" : "" ?>><?= _("Nutzerimport") ?></option>
+            <option value="Course"<?= $table['import_type'] === "Course" ? " selected" : "" ?>><?= _("Veranstaltungsimport") ?></option>
+            <option value="CourseMember"<?= $table['import_type'] === "CourseMember" ? " selected" : "" ?>><?= _("Teilnehmerimport") ?></option>
+            <option value=""<?= !$table['import_type'] ? " selected" : "" ?>><?= _("Tabelle nicht importieren") ?></option>
         </select>
     </label>
 
@@ -89,6 +90,30 @@
             <option value="name"<?= $table['tabledata']['coursespecials']['id'] === "name" ? " selected" : "" ?>><?= _("Veranstaltungsname") ?></option>
         </select>
     </label>
+
+    <? if ($table->isInDatabase()) : ?>
+        <div>
+            <?= _("Nur folgende Spalten anzeigen") ?>
+            <ul>
+                <li>
+                    <label>
+                        <input type="checkbox" data-proxyfor="input.column_selector"<?= !$table['tabledata']['display_only_columns'] ? " checked" : "" ?>>
+                        <?= _("Alle") ?>
+                    </label>
+                </li>
+                <? foreach ($table->getTableHeader() as $column) : ?>
+                    <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
+                        <li>
+                            <label>
+                                <input type="checkbox" name="table[tabledata][display_only_columns][]" value="<?= htmlReady($column) ?>" class="column_selector"<?= !$table['tabledata']['display_only_columns'] || in_array($column, $table['tabledata']['display_only_columns']) ? " checked" : "" ?>>
+                                <?= htmlReady($column) ?>
+                            </label>
+                        </li>
+                    <? endif ?>
+                <? endforeach ?>
+            </ul>
+        </div>
+    <? endif ?>
 
     <div style="text-align: center" data-dialog-button>
         <?= \Studip\Button::create(_("Speichern")) ?>

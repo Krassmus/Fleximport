@@ -9,15 +9,17 @@
                     <div class="caption-container">
                         <div class="caption-content">
                             <? switch ($table['import_type']) {
-                                case "user":
+                                case "User":
                                     echo Assets::img("icons/20/black/person", array('class' => "text-bottom"));
                                     break;
-                                case "member":
-                                    echo Assets::img("icons/20/black/group", array('class' => "text-bottom"));
+                                case "CourseMember":
+                                    echo Assets::img("icons/20/black/group2", array('class' => "text-bottom"));
                                     break;
-                                case "course":
-                                default:
+                                case "Course":
                                     echo Assets::img("icons/20/black/seminar", array('class' => "text-bottom"));
+                                    break;
+                                default:
+                                    echo Assets::img("icons/20/black/doit", array('class' => "text-bottom", 'title' => $table['import_type'] ? sprintf(_("Es werden %s-Objekte importiert."), $table['import_type']) : _("Hilfstabelle wird nicht direkt importiert.")));
                                     break;
                             } ?>
                             <?= htmlReady($table['name']) ?>
@@ -30,7 +32,7 @@
                                 </label>
                             <? endif ?>
                             <a href="<?= PluginEngine::getLink($plugin, array(), "setup/tablemapping/".$table->getId()) ?>" data-dialog title="<?= _("Datenmapping einstellen") ?>">
-                                <?= Assets::img("icons/20/blue/admin") ?>
+                                <?= Assets::img("icons/20/blue/resources") ?>
                             </a>
                             <a href="<?= PluginEngine::getLink($plugin, array(), "setup/table/".$table->getId()) ?>" data-dialog title="<?= _("Tabelleneinstellung bearbeiten") ?>">
                                 <?= Assets::img("icons/20/blue/admin") ?>
@@ -45,9 +47,11 @@
 
                 <thead>
                     <tr>
+                        <th></th>
+                        <th></th>
                         <? $tableHeader = $table->getTableHeader() ?>
                         <? foreach ($tableHeader as $column) : ?>
-                            <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
+                            <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY" && (!$table['tabledata']['display_only_columns'] || in_array($column, $table['tabledata']['display_only_columns']))) : ?>
                                 <th><?= htmlReady($column) ?></th>
                             <? endif ?>
                         <? endforeach ?>
@@ -56,9 +60,20 @@
                 <tbody>
                     <? if ($table['display_lines'] !== "ondemand") : ?>
                         <? foreach ($table->fetchLines() as $line) : ?>
+                            <? $report = $table->checkLine($line) ?>
                             <tr>
+                                <td>
+                                    <? if ($report['found']) : ?>
+                                        <?= Assets::img("icons/20/black/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden und wirde geupdated"))) ?>
+                                    <? endif ?>
+                                </td>
+                                <td>
+                                    <? if ($report['errors']) : ?>
+                                        <?= Assets::img("icons/20/red/decline", array('title' => $report['errors'])) ?>
+                                    <? endif ?>
+                                </td>
                                 <? foreach ($tableHeader as $column) : ?>
-                                    <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
+                                    <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY" && (!$table['tabledata']['display_only_columns'] || in_array($column, $table['tabledata']['display_only_columns']))) : ?>
                                         <td><?= htmlReady($line[$column]) ?></td>
                                     <? endif ?>
                                 <? endforeach ?>

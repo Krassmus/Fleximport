@@ -45,6 +45,7 @@
                         <?= _("Spalte") ?>
                     </label>
                 </td>
+                <td></td>
             </tr>
         </tbody>
     </table>

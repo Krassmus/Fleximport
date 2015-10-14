@@ -14,6 +14,10 @@ class ImportController extends PluginController {
         if (Request::isPost()) {
             if (Request::submitted("start")) {
                 $protocol = array();
+                $this->tables = FleximportTable::findAll();
+                foreach ($this->tables as $table) {
+                    $table->doImport();
+                }
                 PageLayout::postMessage(MessageBox::success(_("Import wurde durchgeführt"), $protocol));
             } elseif ($_FILES['tableupload']) {
                 foreach ($_FILES['tableupload']['tmp_name'] as $table_id => $tmp_name) {

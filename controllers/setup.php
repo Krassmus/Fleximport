@@ -27,6 +27,14 @@ class SetupController extends PluginController {
     public function tablemapping_action($table_id)
     {
         $this->table = new FleximportTable($table_id);
+        $object_types = array(
+            'user' => "user",
+            'course' => "sem",
+            'member' => "usersemdata"
+        );
+        $this->datafields = Datafield::findBySQL("object_type = :object_type", array(
+            'object_type' => $object_types[$this->table['import_type']]
+        ));
     }
 
 }
