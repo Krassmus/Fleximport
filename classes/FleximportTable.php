@@ -54,9 +54,14 @@ class FleximportTable extends SimpleORMap {
     public function getTableHeader()
     {
         $statement = DBManager::get()->prepare("
-            SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = :table_name
+            SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = :table_name
+                AND TABLE_SCHEMA = :db_name
         ");
-        $statement->execute(array('table_name' => $this['name']));
+        $statement->execute(array(
+            'table_name' => $this['name'],
+            'db_name' => $GLOBALS['DB_STUDIP_DATABASE']
+        ));
         return $statement->fetchAll(PDO::FETCH_COLUMN, 0);
     }
 
@@ -131,7 +136,7 @@ class FleximportTable extends SimpleORMap {
         $create_sql = "CREATE TABLE `".addslashes($this['name'])."` (";
         $create_sql .= "`IMPORT_TABLE_PRIMARY_KEY` BIGINT NOT NULL AUTO_INCREMENT ";
         foreach ($headers as $key => $fieldname) {
-            $fieldname = $this->reduceDiakritikaFromIso88591($fieldname);
+            $fieldname = strtolower($this->reduceDiakritikaFromIso88591($fieldname));
             $create_sql .= ", ";
             $create_sql .= "`".addslashes($fieldname)."` TEXT NOT NULL";
         }
@@ -209,11 +214,13 @@ class FleximportTable extends SimpleORMap {
         ");
         $statement->execute();
         $protocol = array();
+        $count = 0;
         while ($line = $statement->fetch(PDO::FETCH_ASSOC)) {
             $error = $this->importLine($line);
             if (is_string($error)) {
                 $protocol[] = $error;
             }
+            $count++;
         }
         return $protocol;
     }
@@ -234,10 +241,12 @@ class FleximportTable extends SimpleORMap {
         $object = new $classname($pk);
         $object->setData($data);
 
+        //die();
+
         //Last chance to quit:
         $error = $this->checkLine($line);
-        if ($error) {
-            return $error;
+        if ($error && $error['errors']) {
+            return $error['errors'];
         }
 
         $object->store();
@@ -269,9 +278,32 @@ class FleximportTable extends SimpleORMap {
         }
 
         //Datafields:
+        $datafields = array();
+        switch ($classname) {
+            case "Course":
+                $datafields = Datafield::findBySQL("object_type = 'sem'");
+                break;
+            case "User":
+                $datafields = Datafield::findBySQL("object_type = 'user'");
+                break;
+            case "CourseMember":
+                $datafields = Datafield::findBySQL("object_type = 'usersemdata'");
+                break;
+        }
+        foreach ($datafields as $datafield) {
+            if (isset($data[$datafield['name']])) {
+                $entry = new DatafieldEntryModel(array(
+                    $datafield->getId(),
+                    $object->getId(),
+                    ""
+                ));
+                $entry['content'] = $data[$datafield['name']];
+                $entry->store();
+            }
+        }
 
         if ($plugin) {
-            $plugin->afterUpdate($object);
+            $plugin->afterUpdate($object, $line);
         }
     }
 
@@ -326,12 +358,23 @@ class FleximportTable extends SimpleORMap {
         //dynamic additional fields:
         switch ($classname) {
             case "Course":
+                foreach (Datafield::findBySQL("object_type = 'sem'") as $datafield) {
+                    $fields[] = $datafield['name'];
+                }
                 $fields[] = "fleximport_dozenten";
+                $fields[] = "fleximport_related_institutes";
+                break;
+            case "User":
+                foreach (Datafield::findBySQL("object_type = 'user'") as $datafield) {
+                    $fields[] = $datafield['name'];
+                }
                 break;
         }
 
         $data = array();
+
         foreach ($fields as $field) {
+            $mapping = false;
             if ($plugin && in_array($field, $plugin->fieldsToBeMapped())) {
                 $mapping = $plugin->mapField($field, $line);
             }
@@ -350,10 +393,13 @@ class FleximportTable extends SimpleORMap {
         $pk = $table_metadata['pk'];
 
         $key = array();
+
         foreach ($pk as $field) {
-            $key[] = $data[$field];
+            if ($data[$field]) {
+                $key[] = $data[$field];
+            }
         }
-        return $key;
+        return count($key) === count($pk) ? $key : null;
     }
 
 }

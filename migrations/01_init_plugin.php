@@ -6,7 +6,7 @@ class InitPlugin extends Migration {
 	public function up() {
 	    DBManager::get()->exec("
 	        CREATE TABLE IF NOT EXISTS `fleximport_tables` (
-                `table_id` varchar(32) NOT NULL,
+                `table_id` varchar(32) NOT NULL PRIMARY KEY,
                 `name` varchar(64) NOT NULL,
                 `import_type` VARCHAR(64) NOT NULL DEFAULT 'User',
                 `tabledata` text NULL,

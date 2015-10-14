@@ -5,14 +5,14 @@ class fleximport_kiron_courses extends FleximportPlugin {
     public function fieldsToBeMapped()
     {
         return array(
-            "Seminar_id",
-            "VeranstaltungsNummer",
+            "seminar_id",
+            "veranstaltungsnummer",
             "ects",
             "status",
             "start_time",
             "duration_time",
-            "Institut_id",
-            "description",
+            "institut_id",
+            "beschreibung",
             "fleximport_dozenten",
             "fleximport_related_institutes"
         );
@@ -24,15 +24,15 @@ class fleximport_kiron_courses extends FleximportPlugin {
      * to database NULL. Any other value will map to a string value.
      */
     public function mapField($field, $line) {
-        if ($field === "Seminar_id") {
-            $course = Course::findOneBySQL("VeranstaltungsNummer = ?", array($line['Code']));
+        if ($field === "seminar_id") {
+            $course = Course::findOneBySQL("VeranstaltungsNummer = ?", array($line['code']));
             return $course ? $course->getId() : false;
         }
-        if ($field === "VeranstaltungsNummer") {
-            return $line['Code'];
+        if ($field === "veranstaltungsnummer") {
+            return $line['code'];
         }
         if ($field === "ects") {
-            return $line['CP'];
+            return $line['cp'];
         }
         if ($field === "status") {
             return 1;
@@ -48,66 +48,72 @@ class fleximport_kiron_courses extends FleximportPlugin {
         }
         if ($field === "fleximport_related_institutes") {
             $institut_ids = array();
-            if ($line['BUS']) {
+            if ($line['bus']) {
                 $institut_ids[] = "447ca2132c444d5a5f3f60b750890347";
             }
-            if ($line['ENG']) {
+            if ($line['eng']) {
                 $institut_ids[] = "f8d90c4d9ba5d5c26b452336f802f9e8";
             }
-            if ($line['ARC']) {
+            if ($line['arc']) {
                 $institut_ids[] = "d72bda6b371b372257eb69a6534a4c2a";
             }
-            if ($line['IT']) {
+            if ($line['it']) {
                 $institut_ids[] = "df2df4f4417167e31d2075e0ffdba2d7";
             }
-            if ($line['CUL']) {
+            if ($line['cul']) {
                 $institut_ids[] = "2512173ac41821dd16866b9073e432b7";
             }
-            if ($line['LANG']) {
+            if ($line['lang']) {
                 $institut_ids[] = "3422a1629c46b312e08987ed3f50e503";
             }
-            if ($line['STGE']) {
+            if ($line['stge']) {
                 $institut_ids[] = "6ee88d4a4ed229b02be74fc337a0100f";
             }
             return $institut_ids;
         }
-        if ($field === "Institut_id") {
-            if ($line['BUS']) {
+        if ($field === "institut_id") {
+            if ($line['bus']) {
                 return "447ca2132c444d5a5f3f60b750890347";
             }
-            if ($line['ENG']) {
+            if ($line['eng']) {
                 return "f8d90c4d9ba5d5c26b452336f802f9e8";
             }
-            if ($line['ARC']) {
+            if ($line['arc']) {
                 return "d72bda6b371b372257eb69a6534a4c2a";
             }
-            if ($line['IT']) {
+            if ($line['it']) {
                 return "df2df4f4417167e31d2075e0ffdba2d7";
             }
-            if ($line['CUL']) {
+            if ($line['cul']) {
                 return "2512173ac41821dd16866b9073e432b7";
             }
-            if ($line['LANG']) {
+            if ($line['lang']) {
                 return "3422a1629c46b312e08987ed3f50e503";
             }
-            if ($line['STGE']) {
+            if ($line['stge']) {
                 return "6ee88d4a4ed229b02be74fc337a0100f";
             }
             return "";
         }
-        if ($field === "description") {
-            if ($line['Start date']) {
-                $text = "Live course! Begins: ".$line['Start date']."\n\n";
+        if ($field === "beschreibung") {
+            if ($line['start date']) {
+                $text = "Live course! Begins: ".$line['start date']."\n\n";
             } else {
                 $text = "Course can be taken at any time.\n\n";
             }
-            $text .= "Level: ".$line['Level']."\n\n";
-            $text .= "Credits: ".$line['Level']."\n\n";
-            $text .= "Link: ".$line['Link']." \n\n";
-            $text .= "Units: ".$line['Weeks/Units']." (Units are like chapters of a book, they vary in length and work effort) \n\n";
-            $text .= "Description: ".$line['Description 1']."\n\n";
-            $text .= "Description: ".$line['Description 2']."\n\n";
-            $text .= "Description: ".$line['Description 3']."\n\n";
+            $text .= "Level: ".$line['level']."\n\n";
+            $text .= "Credits: ".$line['cp']."\n\n";
+            $text .= "Link: ".$line['link']." \n\n";
+            $text .= "Units: ".$line['weeks/units']." (Units are like chapters of a book, they vary in length and work effort) \n\n";
+            if ($line['description 1']) {
+                $text .= "Description: \n" . $line['description 1'] . "\n\n";
+            }
+            if ($line['description 2']) {
+                $text .= $line['description 2'] . "\n\n";
+            }
+            if ($line['description 3']) {
+                $text .= $line['description 3'] . "\n\n";
+            }
             return $text;
         }
         return false;
@@ -117,34 +123,38 @@ class fleximport_kiron_courses extends FleximportPlugin {
     {
         $errors = "";
 
+        if (!$line['code']) {
+            $errors .= "Keine Veranstaltungsnummer. ";
+        }
+
         $modulgruppen = array();
-        if ($line['BUS']) {
-            $modulgruppen[] = trim($line['BUS']);
+        if ($line['bus']) {
+            $modulgruppen[] = trim($line['bus']);
         }
-        if ($line['ENG']) {
-            $modulgruppen[] = trim($line['ENG']);
+        if ($line['eng']) {
+            $modulgruppen[] = trim($line['eng']);
         }
-        if ($line['ARC']) {
-            $modulgruppen[] = trim($line['ARC']);
+        if ($line['arc']) {
+            $modulgruppen[] = trim($line['arc']);
         }
-        if ($line['IT']) {
-            $modulgruppen[] = trim($line['IT']);
+        if ($line['it']) {
+            $modulgruppen[] = trim($line['it']);
         }
-        if ($line['CUL']) {
-            $modulgruppen[] = trim($line['CUL']);
+        if ($line['cul']) {
+            $modulgruppen[] = trim($line['cul']);
         }
-        if ($line['LANG']) {
-            $modulgruppen[] = trim($line['LANG']);
+        if ($line['lang']) {
+            $modulgruppen[] = trim($line['lang']);
         }
-        if ($line['STGE']) {
-            $modulgruppen[] = trim($line['STGE']);
+        if ($line['stge']) {
+            $modulgruppen[] = trim($line['stge']);
         }
         $number_groups = StudipStudyArea::countBySQL("info IN (?)", array($modulgruppen));
 
         if (!$number_groups) {
             $errors .= "Keine gültigen Modulgruppen festgelegt. ";
         }
-        if (!$line['Module']) {
+        if (!$line['module']) {
             $errors .= "Kein Modul festgelegt. ";
         }
         return $errors;
@@ -152,32 +162,32 @@ class fleximport_kiron_courses extends FleximportPlugin {
 
     public function afterUpdate(SimpleORMap $object, $line)
     {
-        $modulename = $line['Module'];
+        $modulename = $line['module'];
         $modulegroups = array();
-        if ($line['BUS']) {
-            $modulegroups[] = trim($line['BUS']);
+        if ($line['bus']) {
+            $modulegroups[] = trim($line['bus']);
         }
-        if ($line['ENG']) {
-            $modulegroups[] = trim($line['ENG']);
+        if ($line['eng']) {
+            $modulegroups[] = trim($line['eng']);
         }
-        if ($line['ARC']) {
-            $modulegroups[] = trim($line['ARC']);
+        if ($line['arc']) {
+            $modulegroups[] = trim($line['arc']);
         }
-        if ($line['IT']) {
-            $modulegroups[] = trim($line['IT']);
+        if ($line['it']) {
+            $modulegroups[] = trim($line['it']);
         }
-        if ($line['CUL']) {
-            $modulegroups[] = trim($line['CUL']);
+        if ($line['cul']) {
+            $modulegroups[] = trim($line['cul']);
         }
-        if ($line['LANG']) {
-            $modulegroups[] = trim($line['LANG']);
+        if ($line['lang']) {
+            $modulegroups[] = trim($line['lang']);
         }
-        if ($line['STGE']) {
-            $modulegroups[] = trim($line['STGE']);
+        if ($line['stge']) {
+            $modulegroups[] = trim($line['stge']);
         }
         $remove = DBManager::get()->prepare("
             DELETE FROM seminar_sem_tree
-            SET seminar_id = :seminar_id
+            WHERE seminar_id = :seminar_id
         ");
         $remove->execute(array(
             'seminar_id' => $object->getId()

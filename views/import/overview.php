@@ -64,7 +64,7 @@
                             <tr>
                                 <td>
                                     <? if ($report['found']) : ?>
-                                        <?= Assets::img("icons/20/black/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden und wirde geupdated"))) ?>
+                                        <?= Assets::img("icons/20/black/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden und wird geupdated"))) ?>
                                     <? endif ?>
                                 </td>
                                 <td>
