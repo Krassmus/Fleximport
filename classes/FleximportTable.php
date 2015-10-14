@@ -241,8 +241,6 @@ class FleximportTable extends SimpleORMap {
         $object = new $classname($pk);
         $object->setData($data);
 
-        //die();
-
         //Last chance to quit:
         $error = $this->checkLine($line);
         if ($error && $error['errors']) {
@@ -291,13 +289,15 @@ class FleximportTable extends SimpleORMap {
                 break;
         }
         foreach ($datafields as $datafield) {
-            if (isset($data[$datafield['name']])) {
+            $fieldname = strtolower($datafield['name']);
+
+            if (isset($data[$fieldname])) {
                 $entry = new DatafieldEntryModel(array(
                     $datafield->getId(),
                     $object->getId(),
                     ""
                 ));
-                $entry['content'] = $data[$datafield['name']];
+                $entry['content'] = $data[$fieldname];
                 $entry->store();
             }
         }
@@ -359,14 +359,14 @@ class FleximportTable extends SimpleORMap {
         switch ($classname) {
             case "Course":
                 foreach (Datafield::findBySQL("object_type = 'sem'") as $datafield) {
-                    $fields[] = $datafield['name'];
+                    $fields[] = strtolower($datafield['name']);
                 }
                 $fields[] = "fleximport_dozenten";
                 $fields[] = "fleximport_related_institutes";
                 break;
             case "User":
                 foreach (Datafield::findBySQL("object_type = 'user'") as $datafield) {
-                    $fields[] = $datafield['name'];
+                    $fields[] = strtolower($datafield['name']);
                 }
                 break;
         }
@@ -374,7 +374,7 @@ class FleximportTable extends SimpleORMap {
         $data = array();
 
         foreach ($fields as $field) {
-            $mapping = false;
+            $mapping = false; //important: false means no mapping, null means mapping to database null
             if ($plugin && in_array($field, $plugin->fieldsToBeMapped())) {
                 $mapping = $plugin->mapField($field, $line);
             }
