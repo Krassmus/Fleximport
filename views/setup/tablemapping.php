@@ -108,6 +108,21 @@
         </tbody>
     </table>
 
+    <h2><?= _("Folgende Felder bei Updates ignorieren") ?></h2>
+    <ul>
+        <? foreach ($table->getTargetFields() as $fieldname) : ?>
+            <li>
+                <label>
+                    <input type="checkbox" name="tabledata[ignoreonupdate][]"
+                           value="<?= htmlReady($fieldname) ?>"<?= in_array($fieldname, (array) $table['tabledata']['ignoreonupdate']) ? " checked" : "" ?>>
+                    <?= htmlReady($fieldname) ?>
+                </label>
+            </li>
+        <? endforeach ?>
+    </ul>
+
+
+
     <div style="text-align: center;" data-dialog-button>
         <?= \Studip\Button::create(_("Speichern")) ?>
     </div>
