@@ -2,6 +2,9 @@
 
 class FleximportTable extends SimpleORMap {
 
+    protected $sorm_metadata = array();
+    protected $plugin = null;
+
     static public function findAll()
     {
         return self::findBySQL("1=1 ORDER BY position ASC, name ASC");
@@ -36,9 +39,9 @@ class FleximportTable extends SimpleORMap {
 
     public function isInDatabase()
     {
-        if ($this['source'] === "csv_upload") {
+        if (in_array($this['source'], array("csv_upload", "extern"))) {
             $statement = DBManager::get()->prepare("
-                    SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = :table
+                SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = :table
             ");
             $statement->execute(array('table' => $this['name']));
             return (bool) $statement->fetch();
@@ -227,10 +230,7 @@ class FleximportTable extends SimpleORMap {
 
     public function importLine($line)
     {
-        $pluginname = $this['name'];
-        if (class_exists($pluginname)) {
-            $plugin = new $pluginname($this);
-        }
+        $plugin = $this->getPlugin();
         $classname = $this['import_type'];
         if (!$classname) {
             return;
@@ -309,16 +309,14 @@ class FleximportTable extends SimpleORMap {
 
     public function checkLine($line)
     {
-        $pluginname = $this['name'];
-        if (class_exists($pluginname)) {
-            $plugin = new $pluginname($this);
-        }
+        $plugin = $this->getPlugin();
         $classname = $this['import_type'];
         if (!$classname) {
             return array('found' => false);
         }
         $data = $this->getMappedData($line);
         $pk = $this->getPrimaryKey($data);
+
 
         $object = new $classname($pk);
         $object->setData($data);
@@ -346,17 +344,11 @@ class FleximportTable extends SimpleORMap {
 
     protected function getMappedData($line)
     {
-        $pluginname = $this['name'];
-        if (class_exists($pluginname)) {
-            $plugin = new $pluginname($this);
-        }
-        $classname = $this['import_type'];
-        $object = new $classname();
-        $table_metadata = $object->getTableMetadata();
-        $fields = array_keys($table_metadata['fields']);
+        $plugin = $this->getPlugin();
+        $fields = $this->getTargetFields();
 
         //dynamic additional fields:
-        switch ($classname) {
+        switch ($this['import_type']) {
             case "Course":
                 foreach (Datafield::findBySQL("object_type = 'sem'") as $datafield) {
                     $fields[] = strtolower($datafield['name']);
@@ -378,28 +370,73 @@ class FleximportTable extends SimpleORMap {
             if ($plugin && in_array($field, $plugin->fieldsToBeMapped())) {
                 $mapping = $plugin->mapField($field, $line);
             }
-            $data[$field] = $plugin && ($mapping !== false)
-                ? $mapping
-                : $line[$field];
+            if ($mapping !== false) {
+                $data[$field] = $mapping;
+            } else {
+                if ($this['tabledata']['simplematching'][$field]['column']) {
+                    if ($this['tabledata']['simplematching'][$field]['column'] === "static value") {
+                        //use a static value
+                        $data[$field] = $this['tabledata']['simplematching'][$field]['static'];
+                    } else {
+                        //use a matched column
+                        $data[$field] = $line[$this['tabledata']['simplematching'][$field]['column']];
+                    }
+                } else {
+                    //just use a field with the same name if there is one
+                    $data[$field] = $line[$field];
+                }
+            }
         }
         return $data;
     }
 
     protected function getPrimaryKey($data)
     {
-        $classname = $this['import_type'];
-        $object = new $classname();
-        $table_metadata = $object->getTableMetadata();
-        $pk = $table_metadata['pk'];
-
         $key = array();
 
-        foreach ($pk as $field) {
+        foreach ($this->getTargetPK() as $field) {
             if ($data[$field]) {
                 $key[] = $data[$field];
             }
         }
-        return count($key) === count($pk) ? $key : null;
+        return count($key) === count($this->getTargetPK()) ? $key : null;
+    }
+
+    public function getTargetFields()
+    {
+        if (count($this->sorm_metadata) === 0) {
+            $classname = $this['import_type'];
+            $object = new $classname();
+            $this->sorm_metadata = $object->getTableMetadata();
+        }
+        return array_keys($this->sorm_metadata['fields']);
+    }
+
+    public function getTargetPK()
+    {
+        if (count($this->sorm_metadata) === 0) {
+            $classname = $this['import_type'];
+            $object = new $classname();
+            $this->sorm_metadata = $object->getTableMetadata();
+        }
+        return $this->sorm_metadata['pk'];
+    }
+
+    public function getPlugin() {
+        $pluginname = $pluginname = $this['name'];
+        if (!$this->plugin && class_exists($pluginname)) {
+            $this->plugin = new $pluginname($this);
+        }
+        return $this->plugin;
+    }
+
+    public function fieldsToBeDynamicallyMapped()
+    {
+        if ($this->getPlugin()) {
+            return $this->getPlugin()->fieldsToBeMapped();
+        } else {
+            return array();
+        }
     }
 
 }

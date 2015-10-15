@@ -9,21 +9,26 @@
     </label>
 
     <label>
-        <?= _("Tabellentyp") ?>
-        <select name="table[import_type]" onChange="jQuery('#coursespecials').toggle(this.value === 'course'); ">
+        <?= _("Zweck der Tabelle") ?>
+        <select name="table[import_type]" onChange="jQuery('#coursespecials').toggle(this.value === 'Course'); jQuery('#other_import_type').toggle(this.value === 'other'); ">
             <option value="User"<?= $table['import_type'] === "User" ? " selected" : "" ?>><?= _("Nutzerimport") ?></option>
             <option value="Course"<?= $table['import_type'] === "Course" ? " selected" : "" ?>><?= _("Veranstaltungsimport") ?></option>
             <option value="CourseMember"<?= $table['import_type'] === "CourseMember" ? " selected" : "" ?>><?= _("Teilnehmerimport") ?></option>
-            <option value=""<?= !$table['import_type'] ? " selected" : "" ?>><?= _("Tabelle nicht importieren") ?></option>
+            <option value=""<?= !$table['import_type'] && !$table->isNew() ? " selected" : "" ?>><?= _("Tabelle nicht importieren") ?></option>
+            <option value="other"<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course")) ? " selected" : "" ?>><?= _("SORM-Objekt") ?></option>
         </select>
+        <div id="other_import_type" style="<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course")) ? "" : "display: none; " ?>">
+            <input type="text" name="other_import_type" value="<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course")) ? htmlReady($table['import_type']) : "" ?>" placeholder="<?= _("Name der SORM-Klasse") ?>">
+        </div>
     </label>
 
     <label>
         <?= _("Import über") ?>
         <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink');">
-            <option value="csv"<?= $table['source'] === "csv_upload" || $table->isNew() ? " selected" : "" ?>><?= _("CSV-Upload") ?></option>
+            <option value="csv_upload"<?= $table['source'] === "csv_upload" || $table->isNew() ? " selected" : "" ?>><?= _("CSV-Upload") ?></option>
             <option value="csv_weblink"<?= $table['source'] === "csv_weblink" ? " selected" : "" ?>><?= _("CSV-Internetquelle") ?></option>
             <option value="database"<?= !$table['source'] === "database" ? " selected" : "" ?>><?= _("Datenbank") ?></option>
+            <option value="extern"<?= !$table['source'] === "extern" ? " selected" : "" ?>><?= _("Externes Tool") ?></option>
         </select>
     </label>
 

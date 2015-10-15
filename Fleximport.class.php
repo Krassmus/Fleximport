@@ -8,9 +8,6 @@ foreach (scandir(__DIR__."/plugins") as $plugin) {
     }
 }
 
-//require_once dirname(__file__)."/ImportPlugin.class.php";
-//require_once dirname(__file__)."/classes/NSI_VeranstaltungTable.class.php";
-
 class Fleximport extends StudIPPlugin {
 
     static public function CSV2Array($content, $delim = ';', $encl = '"', $optional = 1) {
@@ -48,6 +45,11 @@ class Fleximport extends StudIPPlugin {
     }
 
     protected function getDisplayName() {
-        return _("Veranstaltungsimport");
+        return _("Fleximport");
+    }
+
+    public function triggerImport()
+    {
+
     }
 }

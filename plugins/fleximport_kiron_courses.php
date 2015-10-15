@@ -6,11 +6,7 @@ class fleximport_kiron_courses extends FleximportPlugin {
     {
         return array(
             "seminar_id",
-            "veranstaltungsnummer",
-            "ects",
-            "status",
             "start_time",
-            "duration_time",
             "institut_id",
             "beschreibung",
             "fleximport_dozenten",
@@ -25,23 +21,15 @@ class fleximport_kiron_courses extends FleximportPlugin {
      */
     public function mapField($field, $line) {
         if ($field === "seminar_id") {
-            $course = Course::findOneBySQL("VeranstaltungsNummer = ?", array($line['code']));
-            return $course ? $course->getId() : false;
-        }
-        if ($field === "veranstaltungsnummer") {
-            return $line['code'];
-        }
-        if ($field === "ects") {
-            return $line['cp'];
-        }
-        if ($field === "status") {
-            return 1;
+            if ($line['code']) {
+                $course = Course::findOneBySQL("VeranstaltungsNummer = ?", array($line['code']));
+                return $course ? $course->getId() : false;
+            } else {
+                return false;
+            }
         }
         if ($field === "start_time") {
             return Semester::findCurrent()->beginn;
-        }
-        if ($field === "duration_time") {
-            return -1;
         }
         if ($field === "fleximport_dozenten") {
             return array("316aa8de6b4abda391de08caebe6ca3d");
@@ -98,15 +86,19 @@ class fleximport_kiron_courses extends FleximportPlugin {
         if ($field === "beschreibung") {
             if ($line['start date']) {
                 $text = "Live course! Begins: ".$line['start date']."\n\n";
+                /*  $text = "(Note that some live courses can still be started after the starting date. Please inform yourself thorougly about all relevant deadlines, as they differ from course to course) \n\n"; */
             } else {
-                $text = "Course can be taken at any time.\n\n";
+                $text = "This course can be taken at any time.\n\n";
             }
             $text .= "Level: ".$line['level']."\n\n";
             $text .= "Credits: ".$line['cp']."\n\n";
-            $text .= "Link: ".$line['link']." \n\n";
-            $text .= "Units: ".$line['weeks/units']." (Units are like chapters of a book, they vary in length and work effort) \n\n";
+            $text .= "Link: ".$line['link']." \n";
+            $text .= "(Remember to only use your @kiron-ohe.com user account!) \n\n";
+
+            $text .= "Units: ".$line['weeks/units']."\n";
+            $text .= "(Note that units are like chapters of a book, they vary in length and work effort, but help you understand the structure) \n\n";
             if ($line['description 1']) {
-                $text .= "Description: \n" . $line['description 1'] . "\n\n";
+                $text .= "About the course: \n" . $line['description 1'] . "\n\n";
             }
             if ($line['description 2']) {
                 $text .= $line['description 2'] . "\n\n";
@@ -162,6 +154,9 @@ class fleximport_kiron_courses extends FleximportPlugin {
 
     public function afterUpdate(SimpleORMap $object, $line)
     {
+        //We need to set up the module-tree here.
+        //First we remove all entries and then we re-enter the current
+        //connections to the module-tree.
         $modulename = $line['module'];
         $modulegroups = array();
         if ($line['bus']) {

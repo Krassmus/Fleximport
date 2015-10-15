@@ -9,7 +9,12 @@ class SetupController extends PluginController {
         PageLayout::setTitle($table_id ? _("Tabelleneinstellung bearbeiten") : _("Tabelle hinzufügen"));
         $this->table = new FleximportTable($table_id);
         if (Request::isPost()) {
-            $this->table->setData(Request::getArray("table"));
+            $data = Request::getArray("table");
+            $data['tabledata'] = array_merge($this->table['tabledata'], $data['tabledata']);
+            $this->table->setData($data);
+            if ($this->table['import_type'] === "other") {
+                $this->table['import_type'] = Request::get("other_import_type");
+            }
             $this->table->store();
             PageLayout::postMessage(MessageBox::success(_("Daten wurden gespeichert.")));
         }
@@ -26,14 +31,22 @@ class SetupController extends PluginController {
 
     public function tablemapping_action($table_id)
     {
+        PageLayout::setTitle(_("Datenmapping einstellen"));
         $this->table = new FleximportTable($table_id);
-        $object_types = array(
-            'user' => "user",
-            'course' => "sem",
-            'member' => "usersemdata"
+        if (Request::isPost()) {
+            $tabledata = Request::getArray("tabledata");
+            $tabledata = array_merge($this->table['tabledata'], $tabledata);
+            $this->table['tabledata'] = $tabledata;
+            $this->table->store();
+            PageLayout::postMessage(MessageBox::success(_("Daten wurden gespeichert.")));
+        }
+        $datafield_object_types = array(
+            'User' => "user",
+            'Course' => "sem",
+            'CourseMember' => "usersemdata"
         );
         $this->datafields = Datafield::findBySQL("object_type = :object_type", array(
-            'object_type' => $object_types[$this->table['import_type']]
+            'object_type' => $datafield_object_types[$this->table['import_type']]
         ));
     }
 

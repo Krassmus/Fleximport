@@ -4,7 +4,7 @@
 
     <? foreach ($tables as $table) : ?>
         <? if ($table->isInDatabase()) : ?>
-            <table class="default">
+            <table class="default" style="margin-bottom: 50px;">
                 <caption>
                     <div class="caption-container">
                         <div class="caption-content">
@@ -17,6 +17,9 @@
                                     break;
                                 case "Course":
                                     echo Assets::img("icons/20/black/seminar", array('class' => "text-bottom"));
+                                    break;
+                                case "":
+                                    echo Assets::img("icons/20/black/remove-circle", array('class' => "text-bottom"));
                                     break;
                                 default:
                                     echo Assets::img("icons/20/black/doit", array('class' => "text-bottom", 'title' => $table['import_type'] ? sprintf(_("Es werden %s-Objekte importiert."), $table['import_type']) : _("Hilfstabelle wird nicht direkt importiert.")));
@@ -32,7 +35,7 @@
                                 </label>
                             <? endif ?>
                             <a href="<?= PluginEngine::getLink($plugin, array(), "setup/tablemapping/".$table->getId()) ?>" data-dialog title="<?= _("Datenmapping einstellen") ?>">
-                                <?= Assets::img("icons/20/blue/resources") ?>
+                                <?= Assets::img("icons/20/blue/group") ?>
                             </a>
                             <a href="<?= PluginEngine::getLink($plugin, array(), "setup/table/".$table->getId()) ?>" data-dialog title="<?= _("Tabelleneinstellung bearbeiten") ?>">
                                 <?= Assets::img("icons/20/blue/admin") ?>
@@ -64,7 +67,11 @@
                             <tr>
                                 <td>
                                     <? if ($report['found']) : ?>
-                                        <?= Assets::img("icons/20/black/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden und wird geupdated"))) ?>
+                                        <? if ($report['errors']) : ?>
+                                            <?= Assets::img("icons/20/grey/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden"))) ?>
+                                        <? else :?>
+                                            <?= Assets::img("icons/20/black/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden und wird geupdated"))) ?>
+                                        <? endif ?>
                                     <? endif ?>
                                 </td>
                                 <td>
@@ -83,7 +90,7 @@
                 </tbody>
             </table>
         <? else : ?>
-            <div>
+            <div style="margin-bottom: 50px;">
                 <div style="float: right;">
                     <a href="<?= PluginEngine::getLink($plugin, array(), "setup/table/".$table->getId()) ?>" data-dialog>
                         <?= Assets::img("icons/20/blue/admin") ?>
@@ -94,21 +101,26 @@
                 </div>
                 <h2>
                     <? switch ($table['import_type']) {
-                        case "user":
+                        case "User":
                             echo Assets::img("icons/20/black/person", array('class' => "text-bottom"));
                             break;
-                        case "member":
-                            echo Assets::img("icons/20/black/group", array('class' => "text-bottom"));
+                        case "CourseMember":
+                            echo Assets::img("icons/20/black/group2", array('class' => "text-bottom"));
                             break;
-                        case "course":
-                        default:
+                        case "Course":
                             echo Assets::img("icons/20/black/seminar", array('class' => "text-bottom"));
+                            break;
+                        case "":
+                            echo Assets::img("icons/20/black/remove-circle", array('class' => "text-bottom"));
+                            break;
+                        default:
+                            echo Assets::img("icons/20/black/doit", array('class' => "text-bottom", 'title' => $table['import_type'] ? sprintf(_("Es werden %s-Objekte importiert."), $table['import_type']) : _("Hilfstabelle wird nicht direkt importiert.")));
                             break;
                     } ?>
                     <?= htmlReady($table['name']) ?>
                 </h2>
 
-                <? if ($table['source'] === "csv_weblink") : ?>
+                <? if ($table['source'] === "csv_upload") : ?>
                     <label style="cursor: pointer;">
                         <?= Assets::img("icons/40/blue/upload", array('class' => "text-bottom")) ?>
                         <?= _("CSV-Datei hochladen") ?>

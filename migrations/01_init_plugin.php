@@ -10,7 +10,7 @@ class InitPlugin extends Migration {
                 `name` varchar(64) NOT NULL,
                 `import_type` VARCHAR(64) NOT NULL DEFAULT 'User',
                 `tabledata` text NULL,
-                `source` ENUM('csv_upload','csv_weblink','database') NOT NULL DEFAULT 'csv_upload',
+                `source` ENUM('csv_upload','csv_weblink','database', 'extern') NOT NULL DEFAULT 'csv_upload',
                 `position` INT NOT NULL DEFAULT '1',
                 `display_lines` ENUM('all','onlybroken','ondemand') NOT NULL DEFAULT 'all',
                 `chdate` bigint(20) NOT NULL,
