@@ -35,12 +35,12 @@ class Fleximport extends StudIPPlugin {
     public function __construct() {
         parent::__construct();
         if ($GLOBALS['perm']->have_perm("root")) {
-            $navigation = new AutoNavigation($this->getDisplayName(), PluginEngine::getURL($this, array(), 'import/overview'));
-            Navigation::addItem('/start/courseimport', $navigation);
-            Navigation::addItem('/courseimport', $navigation);
+            $navigation = new Navigation($this->getDisplayName(), PluginEngine::getURL($this, array(), 'import/overview'));
+            Navigation::addItem('/start/fleximport', $navigation);
+            Navigation::addItem('/fleximport', $navigation);
 
-            $navigation = new AutoNavigation(_("Import"), PluginEngine::getURL($this, array(), 'import/overview'));
-            Navigation::addItem('/courseimport/overview', $navigation);
+            $navigation = new Navigation(_("Import"), PluginEngine::getURL($this, array(), 'import/overview'));
+            Navigation::addItem('/fleximport/overview', $navigation);
         }
     }
 

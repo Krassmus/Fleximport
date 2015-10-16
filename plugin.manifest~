@@ -1,6 +1,0 @@
-pluginclassname=NSI_Import
-pluginname=NSI_Import
-origin=data-quest
-version=1.1
-description=Ein Grundplugin, um alle möglichen Dinge über eine CVS-Datei zu importieren.
-studipMinVersion=2.5

@@ -4,6 +4,12 @@ require_once 'app/controllers/plugin_controller.php';
 
 class ImportController extends PluginController {
 
+    function before_filter(&$action, &$args)
+    {
+        parent::before_filter($action, $args);
+        Navigation::activateItem("/fleximport/overview");
+    }
+
     public function overview_action()
     {
         $this->tables = FleximportTable::findAll();
@@ -31,6 +37,19 @@ class ImportController extends PluginController {
 
         }
         $this->redirect("import/overview");
+    }
+
+    public function targetdetails_action($id)
+    {
+        $this->table = FleximportTable::findOneByName(Request::get("table"));
+        $this->line = $this->table->getLine($id);
+        $this->data = $this->table->getMappedData($this->line);
+
+        $pk = $this->table->getPrimaryKey($this->data);
+        $classname = $this->table['import_type'];
+        if ($classname) {
+            $this->object = new $classname($pk);
+        }
     }
 
 }

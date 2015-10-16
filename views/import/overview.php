@@ -67,11 +67,13 @@
                             <tr>
                                 <td>
                                     <? if ($report['found']) : ?>
-                                        <? if ($report['errors']) : ?>
-                                            <?= Assets::img("icons/20/grey/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden"))) ?>
-                                        <? else :?>
-                                            <?= Assets::img("icons/20/black/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden und wird geupdated"))) ?>
-                                        <? endif ?>
+                                        <a href="<?= PluginEngine::getLink($plugin, array('table' => $table['name']), "import/targetdetails/".$line['IMPORT_TABLE_PRIMARY_KEY']) ?>" data-dialog>
+                                            <? if ($report['errors']) : ?>
+                                                <?= Assets::img("icons/20/lightblue/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden"))) ?>
+                                            <? else :?>
+                                                <?= Assets::img("icons/20/blue/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden und wird geupdated"))) ?>
+                                            <? endif ?>
+                                        </a>
                                     <? endif ?>
                                 </td>
                                 <td>

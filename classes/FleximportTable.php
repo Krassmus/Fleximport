@@ -228,6 +228,17 @@ class FleximportTable extends SimpleORMap {
         return $protocol;
     }
 
+    public function getLine($id)
+    {
+        $statement = DBManager::get()->prepare("
+            SELECT *
+            FROM `".addslashes($this['name'])."`
+            WHERE IMPORT_TABLE_PRIMARY_KEY = :id
+        ");
+        $statement->execute(array('id' => $id));
+        return $statement->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function importLine($line)
     {
         $plugin = $this->getPlugin();
@@ -235,16 +246,25 @@ class FleximportTable extends SimpleORMap {
         if (!$classname) {
             return;
         }
-        $data = $this->getMappedData($line);
-        $pk = $this->getPrimaryKey($data);
-
-        $object = new $classname($pk);
-        $object->setData($data);
-
         //Last chance to quit:
         $error = $this->checkLine($line);
         if ($error && $error['errors']) {
             return $error['errors'];
+        }
+
+        $data = $this->getMappedData($line);
+        $pk = $this->getPrimaryKey($data);
+
+        $object = new $classname($pk);
+        if (!$object->isNew()) {
+            foreach ($this['tabledata']['ignoreonupdate'] as $fieldname) {
+                unset($data[$fieldname]);
+            }
+        }
+        foreach ($data as $fieldname => $value) {
+            if (($value !== false) && in_array($fieldname, $this->getTargetFields())) {
+                $object[$fieldname] = $value;
+            }
         }
 
         $object->store();
@@ -252,10 +272,13 @@ class FleximportTable extends SimpleORMap {
         //Dynamic special fields:
         switch ($classname) {
             case "Course":
+                //fleximport_dozenten
                 foreach ($data['fleximport_dozenten'] as $dozent_id) {
                     $seminar = new Seminar($object->getId());
                     $seminar->addMember($dozent_id, 'dozent');
                 }
+
+                //fleximport_related_institutes
                 if (!$data['fleximport_related_institutes']) {
                     $data['fleximport_related_institutes'] = array($object['institut_id']);
                 } else if(!in_array($object['institut_id'], $data['fleximport_related_institutes'])) {
@@ -342,7 +365,7 @@ class FleximportTable extends SimpleORMap {
         return $output;
     }
 
-    protected function getMappedData($line)
+    public function getMappedData($line)
     {
         $plugin = $this->getPlugin();
         $fields = $this->getTargetFields();
@@ -383,14 +406,17 @@ class FleximportTable extends SimpleORMap {
                     }
                 } else {
                     //just use a field with the same name if there is one
-                    $data[$field] = $line[$field];
+                    if (isset($line[$field])) {
+                        $data[$field] = $line[$field];
+                    }
+                    //else no mapping, don't even overwrite old value.
                 }
             }
         }
         return $data;
     }
 
-    protected function getPrimaryKey($data)
+    public function getPrimaryKey($data)
     {
         $key = array();
 

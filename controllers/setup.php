@@ -4,6 +4,12 @@ require_once 'app/controllers/plugin_controller.php';
 
 class SetupController extends PluginController {
 
+    function before_filter(&$action, &$args)
+    {
+        parent::before_filter($action, $args);
+        Navigation::activateItem("/fleximport/overview");
+    }
+
     public function table_action($table_id = null)
     {
         PageLayout::setTitle($table_id ? _("Tabelleneinstellung bearbeiten") : _("Tabelle hinzufügen"));
