@@ -267,6 +267,10 @@ class FleximportTable extends SimpleORMap {
             }
         }
 
+        if ($plugin) {
+            $plugin->beforeUpdate($object, $line);
+        }
+
         $object->store();
 
         //Dynamic special fields:

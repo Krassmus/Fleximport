@@ -2,6 +2,16 @@
 
 class fleximport_kiron_courses extends FleximportPlugin {
 
+    static protected $module_institutes = array(
+        //fieldname => institut_id
+        "bus" => "447ca2132c444d5a5f3f60b750890347",
+        "arc" => "f8d90c4d9ba5d5c26b452336f802f9e8",
+        "it" => "df2df4f4417167e31d2075e0ffdba2d7",
+        "cul" => "2512173ac41821dd16866b9073e432b7",
+        "lang" => "3422a1629c46b312e08987ed3f50e503",
+        "stge" => "6ee88d4a4ed229b02be74fc337a0100f"
+    );
+
     public function fieldsToBeMapped()
     {
         return array(
@@ -23,50 +33,18 @@ class fleximport_kiron_courses extends FleximportPlugin {
         }
         if ($field === "fleximport_related_institutes") {
             $institut_ids = array();
-            if ($line['bus']) {
-                $institut_ids[] = "447ca2132c444d5a5f3f60b750890347";
-            }
-            if ($line['eng']) {
-                $institut_ids[] = "f8d90c4d9ba5d5c26b452336f802f9e8";
-            }
-            if ($line['arc']) {
-                $institut_ids[] = "d72bda6b371b372257eb69a6534a4c2a";
-            }
-            if ($line['it']) {
-                $institut_ids[] = "df2df4f4417167e31d2075e0ffdba2d7";
-            }
-            if ($line['cul']) {
-                $institut_ids[] = "2512173ac41821dd16866b9073e432b7";
-            }
-            if ($line['lang']) {
-                $institut_ids[] = "3422a1629c46b312e08987ed3f50e503";
-            }
-            if ($line['stge']) {
-                $institut_ids[] = "6ee88d4a4ed229b02be74fc337a0100f";
+            foreach (self::$module_institutes as $studyarea => $institut_id) {
+                if ($line[$studyarea]) {
+                    $institut_ids[] = $institut_id;
+                }
             }
             return $institut_ids;
         }
         if ($field === "institut_id") {
-            if ($line['bus']) {
-                return "447ca2132c444d5a5f3f60b750890347";
-            }
-            if ($line['eng']) {
-                return "f8d90c4d9ba5d5c26b452336f802f9e8";
-            }
-            if ($line['arc']) {
-                return "d72bda6b371b372257eb69a6534a4c2a";
-            }
-            if ($line['it']) {
-                return "df2df4f4417167e31d2075e0ffdba2d7";
-            }
-            if ($line['cul']) {
-                return "2512173ac41821dd16866b9073e432b7";
-            }
-            if ($line['lang']) {
-                return "3422a1629c46b312e08987ed3f50e503";
-            }
-            if ($line['stge']) {
-                return "6ee88d4a4ed229b02be74fc337a0100f";
+            foreach (self::$module_institutes as $studyarea => $institut_id) {
+                if ($line[$studyarea]) {
+                    return $institut_id;
+                }
             }
             return "";
         }
@@ -107,26 +85,10 @@ class fleximport_kiron_courses extends FleximportPlugin {
         }
 
         $modulgruppen = array();
-        if ($line['bus']) {
-            $modulgruppen[] = trim($line['bus']);
-        }
-        if ($line['eng']) {
-            $modulgruppen[] = trim($line['eng']);
-        }
-        if ($line['arc']) {
-            $modulgruppen[] = trim($line['arc']);
-        }
-        if ($line['it']) {
-            $modulgruppen[] = trim($line['it']);
-        }
-        if ($line['cul']) {
-            $modulgruppen[] = trim($line['cul']);
-        }
-        if ($line['lang']) {
-            $modulgruppen[] = trim($line['lang']);
-        }
-        if ($line['stge']) {
-            $modulgruppen[] = trim($line['stge']);
+        foreach (self::$module_institutes as $studyarea => $institut_id) {
+            if ($line[$studyarea]) {
+                $modulgruppen[] = trim($line[$studyarea]);
+            }
         }
         $number_groups = StudipStudyArea::countBySQL("info IN (?)", array($modulgruppen));
 
@@ -146,26 +108,10 @@ class fleximport_kiron_courses extends FleximportPlugin {
         //connections to the module-tree.
         $modulename = $line['module'];
         $modulegroups = array();
-        if ($line['bus']) {
-            $modulegroups[] = trim($line['bus']);
-        }
-        if ($line['eng']) {
-            $modulegroups[] = trim($line['eng']);
-        }
-        if ($line['arc']) {
-            $modulegroups[] = trim($line['arc']);
-        }
-        if ($line['it']) {
-            $modulegroups[] = trim($line['it']);
-        }
-        if ($line['cul']) {
-            $modulegroups[] = trim($line['cul']);
-        }
-        if ($line['lang']) {
-            $modulegroups[] = trim($line['lang']);
-        }
-        if ($line['stge']) {
-            $modulegroups[] = trim($line['stge']);
+        foreach (self::$module_institutes as $studyarea => $institut_id) {
+            if ($line[$studyarea]) {
+                $modulegroups[] = trim($studyarea);
+            }
         }
         $remove = DBManager::get()->prepare("
             DELETE FROM seminar_sem_tree

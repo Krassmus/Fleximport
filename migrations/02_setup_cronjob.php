@@ -13,7 +13,7 @@ class SetupCronjob extends Migration {
 
         $query = "INSERT IGNORE INTO `cronjobs_tasks`
                     (`task_id`, `filename`, `class`, `active`)
-                  VALUES (:task_id, :filename, :class, 0)";
+                  VALUES (:task_id, :filename, :class, 1)";
         $task_statement = DBManager::get()->prepare($query);
 
         $query = "INSERT IGNORE INTO `cronjobs_schedules`

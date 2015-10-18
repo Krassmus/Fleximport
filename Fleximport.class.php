@@ -1,9 +1,9 @@
 <?php
 
 require_once __DIR__."/classes/FleximportTable.php";
-require_once __DIR__."/plugins/FleximportPlugin.abstract.php";
+require_once __DIR__ . "/classes/FleximportPlugin.abstract.php";
 foreach (scandir(__DIR__."/plugins") as $plugin) {
-    if (!in_array($plugin, array(".", "..", "FleximportPlugin.abstract.php"))) {
+    if (!in_array($plugin, array(".", ".."))) {
         require_once __DIR__."/plugins/".$plugin;
     }
 }
@@ -50,6 +50,11 @@ class Fleximport extends StudIPPlugin {
 
     public function triggerImport()
     {
-
+        foreach (FleximportTable::findAll() as $table) {
+            $table->isInDatabase();
+        }
+        foreach (FleximportTable::findAll() as $table) {
+            $table->doImport();
+        }
     }
 }
