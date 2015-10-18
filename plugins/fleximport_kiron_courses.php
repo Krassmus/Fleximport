@@ -5,11 +5,9 @@ class fleximport_kiron_courses extends FleximportPlugin {
     public function fieldsToBeMapped()
     {
         return array(
-            "seminar_id",
             "start_time",
             "institut_id",
             "beschreibung",
-            "fleximport_dozenten",
             "fleximport_related_institutes"
         );
     }
@@ -20,19 +18,8 @@ class fleximport_kiron_courses extends FleximportPlugin {
      * to database NULL. Any other value will map to a string value.
      */
     public function mapField($field, $line) {
-        if ($field === "seminar_id") {
-            if ($line['code']) {
-                $course = Course::findOneBySQL("VeranstaltungsNummer = ?", array($line['code']));
-                return $course ? $course->getId() : false;
-            } else {
-                return false;
-            }
-        }
         if ($field === "start_time") {
             return Semester::findCurrent()->beginn;
-        }
-        if ($field === "fleximport_dozenten") {
-            return array("316aa8de6b4abda391de08caebe6ca3d");
         }
         if ($field === "fleximport_related_institutes") {
             $institut_ids = array();

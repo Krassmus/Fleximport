@@ -15,7 +15,7 @@ class InitPlugin extends Migration {
                 `display_lines` ENUM('all','onlybroken','ondemand') NOT NULL DEFAULT 'all',
                 `chdate` bigint(20) NOT NULL,
                 `mkdate` bigint(20) NOT NULL
-            ) ENGINE=InnoDB
+            )
 	    ");
 	}
 	

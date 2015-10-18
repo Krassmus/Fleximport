@@ -10,7 +10,7 @@
 
     <label>
         <?= _("Zweck der Tabelle") ?>
-        <select name="table[import_type]" onChange="jQuery('#coursespecials').toggle(this.value === 'Course'); jQuery('#other_import_type').toggle(this.value === 'other'); ">
+        <select name="table[import_type]" onChange="jQuery('#other_import_type').toggle(this.value === 'other'); ">
             <option value="User"<?= $table['import_type'] === "User" ? " selected" : "" ?>><?= _("Nutzerimport") ?></option>
             <option value="Course"<?= $table['import_type'] === "Course" ? " selected" : "" ?>><?= _("Veranstaltungsimport") ?></option>
             <option value="CourseMember"<?= $table['import_type'] === "CourseMember" ? " selected" : "" ?>><?= _("Teilnehmerimport") ?></option>
@@ -86,15 +86,6 @@
             </tr>
         </tbody>
     </table>
-
-    <label id="coursespecials" style="<?= $table['import_type'] !== "course" ? "display: none;" : "" ?> ">
-        <?= _("Eindeutiger Identifizierer für ein Update") ?>
-        <select name="table[tabledata][coursespecials][id]">
-            <option value=""><?= _("Kein Update") ?></option>
-            <option value="veranstaltungsnummer"<?= $table['tabledata']['coursespecials']['id'] === "veranstaltungsnummer" ? " selected" : "" ?>><?= _("Veranstaltungsnummer") ?></option>
-            <option value="name"<?= $table['tabledata']['coursespecials']['id'] === "name" ? " selected" : "" ?>><?= _("Veranstaltungsname") ?></option>
-        </select>
-    </label>
 
     <? if ($table->isInDatabase()) : ?>
         <div>

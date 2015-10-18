@@ -351,9 +351,18 @@ class FleximportTable extends SimpleORMap {
 
         switch ($classname) {
             case "Course":
-                if (!$data['fleximport_dozenten'] || count($data['fleximport_dozenten']) == 0) {
-                    if (!$plugin || !in_array("fleximport_dozenten", $plugin->fieldsToBeMapped())) {
-                        $output['errors'] .= "Dozent kann nicht gemapped werden. ";
+                if (!$data['fleximport_dozenten'] || !count($data['fleximport_dozenten'])) {
+                    $output['errors'] .= "Dozent kann nicht gemapped werden. ";
+                } else {
+                    $exist = false;
+                    foreach ((array) $data['fleximport_dozenten'] as $dozent_id) {
+                        if (User::find($dozent_id)) {
+                            $exist = true;
+                            break;
+                        }
+                    }
+                    if (!$exist) {
+                        $output['errors'] .= "Angegebene Dozenten sind nicht im System vorhanden. ";
                     }
                 }
                 break;
@@ -410,6 +419,67 @@ class FleximportTable extends SimpleORMap {
                         $data[$field] = $line[$field];
                     }
                     //else no mapping, don't even overwrite old value.
+                }
+            }
+        }
+        //special mapping
+        if (in_array($this['import_type'], array("Course", "CourseMember")) && !$data['seminar_id']) {
+            if ($this['tabledata']['simplematching']["seminar_id"]['column'] === "fleximport_map_from_veranstaltungsnummer") {
+                $course = Course::findOneByVeranstaltungsnummer(
+                    $data['veranstaltungsnummer'] ?: $line['veranstaltungsnummer']
+                );
+                if ($course) {
+                    $data['seminar_id'] = $course->getId();
+                }
+            }
+            if ($this['tabledata']['simplematching']["seminar_id"]['column'] === "fleximport_map_from_name") {
+                $course = Course::findOneByName(
+                    $data['name'] ?: $line['name']
+                );
+                if ($course) {
+                    $data['seminar_id'] = $course->getId();
+                }
+            }
+
+            if ($this['tabledata']['simplematching']["fleximport_dozenten"]['column'] && !in_array("fleximport_dozenten", $this->fieldsToBeDynamicallyMapped())) {
+                $data['fleximport_dozenten'] = (array) preg_split("/\s+/", $data['fleximport_dozenten'], null, PREG_SPLIT_NO_EMPTY);
+
+                switch ($this['tabledata']['simplematching']["fleximport_dozenten"]['format']) {
+                    case "user_id":
+                        $data['fleximport_dozenten'] = array_map(function ($user_id) {
+                            $user = User::find($user_id);
+                            if ($user) {
+                                return $user->getId();
+                            } else {
+                                return null;
+                            }
+                        }, $data['fleximport_dozenten']);
+                        break;
+                    case "username":
+                        $data['fleximport_dozenten'] = array_map("get_userid", $data['fleximport_dozenten']);
+                        break;
+                    case "email":
+                        $data['fleximport_dozenten'] = array_map(function ($email) {
+                            $user = User::findOneByEmail($email);
+                            if ($user) {
+                                return $user->getId();
+                            } else {
+                                return null;
+                            }
+                        }, $data['fleximport_dozenten']);
+                        break;
+                    default:
+                        //map by datafield
+                        $datafield_id = $this['tabledata']['simplematching']["fleximport_dozenten"]['format'];
+                        foreach ($data['fleximport_dozenten'] as $key => $value) {
+                            $entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND content = ?", array($datafield_id, $value));
+                            if ($entry) {
+                                $data['fleximport_dozenten'] = $entry['range_id'];
+                            } else {
+                                unset($data['fleximport_dozenten'][$key]);
+                            }
+                        }
+                        break;
                 }
             }
         }
