@@ -3,7 +3,7 @@
 require_once __DIR__."/classes/FleximportTable.php";
 require_once __DIR__ . "/classes/FleximportPlugin.abstract.php";
 foreach (scandir(__DIR__."/plugins") as $plugin) {
-    if (!in_array($plugin, array(".", ".."))) {
+    if ($plugin[0] !== "." && substr($plugin, -4) === ".php") {
         require_once __DIR__."/plugins/".$plugin;
     }
 }

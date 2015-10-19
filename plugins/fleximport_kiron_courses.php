@@ -49,7 +49,7 @@ class fleximport_kiron_courses extends FleximportPlugin {
             return "";
         }
         if ($field === "beschreibung") {
-            if ($line['start date']) {
+            if ($line['start date'] && (strtolower($line['start date']) !== "x")) {
                 $text = "Live course! Begins: ".$line['start date']."\n\n";
                 /*  $text = "(Note that some live courses can still be started after the starting date. Please inform yourself thorougly about all relevant deadlines, as they differ from course to course) \n\n"; */
             } else {

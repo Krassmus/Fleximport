@@ -486,6 +486,18 @@ class FleximportTable extends SimpleORMap {
                         break;
                 }
             }
+
+            if ($this['tabledata']['simplematching']["start_time"]['column'] === "fleximport_current_semester") {
+                $semester = Semester::findCurrent();
+                if ($semester) {
+                    $data['start_time'] = $semester->beginn;
+                }
+            } elseif ($this['tabledata']['simplematching']["start_time"]['column'] === "fleximport_next_semester") {
+                $semester = Semester::findNext();
+                if ($semester) {
+                    $data['start_time'] = $semester->beginn;
+                }
+            }
         }
         return $data;
     }

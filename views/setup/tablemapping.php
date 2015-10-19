@@ -50,6 +50,14 @@
                                 <option value="fleximport_map_from_name"<?= $table['tabledata']['simplematching']['seminar_id']['column'] === "fleximport_map_from_name" ? " selected" : "" ?>>
                                     <?= _("Von Veranstaltungsname ermitteln") ?>
                                 </option>
+                                <? if ($fieldname === "start_time") : ?>
+                                    <option value="fleximport_current_semester"<?= $table['tabledata']['simplematching']['start_time']['column'] === "fleximport_current_semester" ? " selected" : "" ?>>
+                                        <?= _("Aktuelles Semester") ?>
+                                    </option>
+                                    <option value="fleximport_next_semester"<?= $table['tabledata']['simplematching']['start_time']['column'] === "fleximport_next_semester" ? " selected" : "" ?>>
+                                        <?= _("Kommendes Semester") ?>
+                                    </option>
+                                <? endif ?>
                             <? endif ?>
                         <? endif ?>
                     </select>
