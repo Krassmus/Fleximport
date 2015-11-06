@@ -359,6 +359,22 @@ class FleximportTable extends SimpleORMap {
                     ));
                 }
             }
+            $insert_folder = DBManager::get()->prepare("
+                INSERT IGNORE INTO folder
+                SET folder_id = MD5(CONCAT(:seminar_id, 'allgemeine_dateien')),
+                range_id = :seminar_id,
+                user_id = :user_id,
+                name = :name,
+                description = :description,
+                mkdate = UNIX_TIMESTAMP(),
+                chdate = UNIX_TIMESTAMP()
+            ");
+            $insert_folder->execute(array(
+                'seminar_id' => $object->getId(),
+                'user_id' => $GLOBALS['user']->id,
+                'name' => _("Allgemeiner Dateiordner"),
+                'description' => _("Ablage für allgemeine Ordner und Dokumente der Veranstaltung")
+            ));
         }
 
         if ($plugin && !$object->isNew()) {
