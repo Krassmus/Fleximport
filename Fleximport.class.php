@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__."/classes/FleximportTable.php";
+require_once __DIR__."/classes/FleximportConfig.php";
 require_once __DIR__ . "/classes/FleximportPlugin.abstract.php";
 foreach (scandir(__DIR__."/plugins") as $plugin) {
     if ($plugin[0] !== "." && substr($plugin, -4) === ".php") {
@@ -41,6 +42,9 @@ class Fleximport extends StudIPPlugin {
 
             $navigation = new Navigation(_("Import"), PluginEngine::getURL($this, array(), 'import/overview'));
             Navigation::addItem('/fleximport/overview', $navigation);
+
+            $navigation = new Navigation(_("Konfiguration"), PluginEngine::getURL($this, array(), 'config/overview'));
+            Navigation::addItem('/fleximport/config', $navigation);
         }
     }
 

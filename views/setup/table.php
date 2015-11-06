@@ -22,15 +22,17 @@
         </div>
     </label>
 
-    <label>
-        <?= _("Import über") ?>
-        <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink');">
-            <option value="csv_upload"<?= $table['source'] === "csv_upload" || $table->isNew() ? " selected" : "" ?>><?= _("CSV-Upload") ?></option>
-            <option value="csv_weblink"<?= $table['source'] === "csv_weblink" ? " selected" : "" ?>><?= _("CSV-Internetquelle") ?></option>
-            <option value="database"<?= !$table['source'] === "database" ? " selected" : "" ?>><?= _("Datenbank") ?></option>
-            <option value="extern"<?= !$table['source'] === "extern" ? " selected" : "" ?>><?= _("Externes Tool") ?></option>
-        </select>
-    </label>
+    <? if ($table->isNew() || !$table->getPlugin() || !$table->getPlugin()->customImportEnabled()) : ?>
+        <label>
+            <?= _("Import über") ?>
+            <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink');">
+                <option value="csv_upload"<?= $table['source'] === "csv_upload" || $table->isNew() ? " selected" : "" ?>><?= _("CSV-Upload") ?></option>
+                <option value="csv_weblink"<?= $table['source'] === "csv_weblink" ? " selected" : "" ?>><?= _("CSV-Internetquelle") ?></option>
+                <option value="database"<?= !$table['source'] === "database" ? " selected" : "" ?>><?= _("Datenbank") ?></option>
+                <option value="extern"<?= !$table['source'] === "extern" ? " selected" : "" ?>><?= _("Externes Tool") ?></option>
+            </select>
+        </label>
+    <? endif ?>
 
     <label id="weblink_info" style="<?= $table['source'] !== "csv_weblink" ? "display: none;" : "" ?>">
         <?= _("URL der CSV-Datei") ?>

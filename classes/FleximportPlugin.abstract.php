@@ -22,6 +22,23 @@ abstract class FleximportPlugin {
     }
 
     /**
+     * Returns whether this plugins handles the import
+     * @return bool
+     */
+    public function customImportEnabled()
+    {
+        return false;
+    }
+
+    /**
+     * You can specify a custom data-source.
+     * @return bool
+     */
+    public function fetchData()
+    {
+    }
+
+    /**
      * Indicates which fields will be mapped. Returns an array of string fieldnames. These are the
      * fieldnames of the target table like seminare - not of the source-table, where you get your data from.
      * Note that this list can also contain some dynamic fielnames like fleximport_dozenten .

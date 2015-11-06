@@ -18,38 +18,39 @@
             <? $dynamically_mapped = in_array($fieldname, $table->fieldsToBeDynamicallyMapped()) ?>
             <tr style="<?= $dynamically_mapped ? "opacity: 0.5;" : "" ?>" class="<?= $dynamically_mapped ? "dynamically_mapped" : "" ?>">
                 <td>
-                    <? if ($dynamically_mapped) : ?>
+                    <? if (!$dynamically_mapped) : ?>
                     <label for="simplematching_<?= htmlReady($fieldname) ?>">
                     <? endif ?>
                         <?= htmlReady($fieldname) ?>
-                    <? if ($dynamically_mapped) : ?>
+                    <? if (!$dynamically_mapped) : ?>
                     </label>
                     <? endif ?>
                 </td>
                 <td>
                     <? if ($dynamically_mapped) : ?>
-                        <?= _("Wird von einem Plugin dynamisch gemapped") ?>
+                        <?= _("Wird vom Plugin dynamisch gemapped") ?>
                     <? else : ?>
-                    <select name="tabledata[simplematching][<?= htmlReady($fieldname) ?>][column]"
-                            id="simplematching_<?= htmlReady($fieldname) ?>"
-                            onClick="jQuery('#simplematching_<?= htmlReady($fieldname) ?>_static').toggle(this.value === 'static value');">
-                        <option value="" title="<?= _("Wert wird nicht gemapped") ?>"></option>
-                        <option value="static value"<?= $table['tabledata']['simplematching'][$fieldname]['column'] === "static value" ? " selected" : "" ?>>[<?= _("Fester Eintrag") ?>]</option>
-                        <? foreach ($table->getTableHeader() as $header) : ?>
-                            <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
-                            <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching'][$fieldname]['column'] ? " selected" : "" ?>>
-                                <?= htmlReady($header) ?>
-                            </option>
-                            <? endif ?>
-                        <? endforeach ?>
-                        <? if (in_array($table['import_type'], (array) array("Course", "CourseMember"))) : ?>
-                            <? if ($fieldname === "seminar_id") : ?>
-                                <option value="fleximport_map_from_veranstaltungsnummer"<?= $table['tabledata']['simplematching']['seminar_id']['column'] === "fleximport_map_from_veranstaltungsnummer" ? " selected" : "" ?>>
-                                    <?= _("Von Veranstaltungsnummer ermitteln") ?>
+                        <select name="tabledata[simplematching][<?= htmlReady($fieldname) ?>][column]"
+                                id="simplematching_<?= htmlReady($fieldname) ?>"
+                                onClick="jQuery('#simplematching_<?= htmlReady($fieldname) ?>_static').toggle(this.value === 'static value');">
+                            <option value="" title="<?= _("Wert wird nicht gemapped") ?>"></option>
+                            <option value="static value"<?= $table['tabledata']['simplematching'][$fieldname]['column'] === "static value" ? " selected" : "" ?>>[<?= _("Fester Eintrag") ?>]</option>
+                            <? foreach ($table->getTableHeader() as $header) : ?>
+                                <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
+                                <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching'][$fieldname]['column'] ? " selected" : "" ?>>
+                                    <?= htmlReady($header) ?>
                                 </option>
-                                <option value="fleximport_map_from_name"<?= $table['tabledata']['simplematching']['seminar_id']['column'] === "fleximport_map_from_name" ? " selected" : "" ?>>
-                                    <?= _("Von Veranstaltungsname ermitteln") ?>
-                                </option>
+                                <? endif ?>
+                            <? endforeach ?>
+                            <? if (in_array($table['import_type'], (array) array("Course", "CourseMember"))) : ?>
+                                <? if ($fieldname === "seminar_id") : ?>
+                                    <option value="fleximport_map_from_veranstaltungsnummer"<?= $table['tabledata']['simplematching']['seminar_id']['column'] === "fleximport_map_from_veranstaltungsnummer" ? " selected" : "" ?>>
+                                        <?= _("Von Veranstaltungsnummer ermitteln") ?>
+                                    </option>
+                                    <option value="fleximport_map_from_name"<?= $table['tabledata']['simplematching']['seminar_id']['column'] === "fleximport_map_from_name" ? " selected" : "" ?>>
+                                        <?= _("Von Veranstaltungsname ermitteln") ?>
+                                    </option>
+                                <? endif ?>
                                 <? if ($fieldname === "start_time") : ?>
                                     <option value="fleximport_current_semester"<?= $table['tabledata']['simplematching']['start_time']['column'] === "fleximport_current_semester" ? " selected" : "" ?>>
                                         <?= _("Aktuelles Semester") ?>
@@ -59,17 +60,31 @@
                                     </option>
                                 <? endif ?>
                             <? endif ?>
+                        </select>
+                        <div id="simplematching_<?= htmlReady($fieldname) ?>_static" style="<?= $table['tabledata']['simplematching'][$fieldname]['column'] !== "static value" ? "display: none;" : "" ?>">
+                            <input type="text"
+                                   name="tabledata[simplematching][<?= htmlReady($fieldname) ?>][static]"
+                                   value="<?= htmlReady($table['tabledata']['simplematching'][$fieldname]['static']) ?>">
+                        </div>
+
+                        <? if (($table['import_type'] === "Course") && ($fieldname === "institut_id")) : ?>
+                            <div class="format" id="simplematching_<?= htmlReady($fieldname) ?>_format">
+                                <select name="tabledata[simplematching][<?= htmlReady($fieldname) ?>][format]">
+                                    <option value=""><?= _("Format: Institut_id") ?></option>
+                                    <option value="name"<?= $table['tabledata']['simplematching'][$fieldname]['format'] === "name" ? " selected" : "" ?>><?= _("Format: Name") ?></option>
+                                    <? foreach (Datafield::findBySQL("object_type = 'inst' ORDER BY name") as $datafield) : ?>
+                                        <option value="<?= $datafield->getId() ?>"<?= $table['tabledata']['simplematching'][$fieldname]['format'] === $datafield->getId() ? " selected" : "" ?>>
+                                            <?= htmlReady(_("Format: ").$datafield['name']) ?>
+                                        </option>
+                                    <? endforeach ?>
+                                </select>
+                            </div>
                         <? endif ?>
-                    </select>
-                    <div id="simplematching_<?= htmlReady($fieldname) ?>_static" style="<?= $table['tabledata']['simplematching'][$fieldname]['column'] !== "static value" ? "display: none;" : "" ?>">
-                        <input type="text"
-                               name="tabledata[simplematching][<?= htmlReady($fieldname) ?>][static]"
-                               value="<?= htmlReady($table['tabledata']['simplematching'][$fieldname]['static']) ?>">
-                    </div>
                     <? endif ?>
                 </td>
             </tr>
         <? endforeach ?>
+
         <? if ($table['import_type'] === "Course") : ?>
             <? $dynamically_mapped = in_array("fleximport_dozenten", $table->fieldsToBeDynamicallyMapped()) ?>
             <tr style="<?= $dynamically_mapped ? "opacity: 0.5;" : "" ?>" class="<?= $dynamically_mapped ? "dynamically_mapped" : "" ?>">
@@ -97,14 +112,42 @@
                     </div>
                     <div id="simplematching_fleximport_dozenten_format" style="<?= !$table['tabledata']['simplematching']['fleximport_dozenten']['column'] || $table['tabledata']['simplematching']['fleximport_dozenten']['column'] === "static value" ? "display: none;" : "" ?>">
                         <select name="tabledata[simplematching][fleximport_dozenten][format]">
-                            <option value="user_id"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['column'] === "user_id" ? " selected" : "" ?>><?= _("Format: user_ids (mit Leerzeichen getrennt)") ?></option>
-                            <option value="username"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['column'] === "username" ? " selected" : "" ?>><?= _("Format: Nutzernamen (mit Leerzeichen getrennt)") ?></option>
-                            <option value="email"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['column'] === "email" ? " selected" : "" ?>><?= _("Format: Emails (mit Leerzeichen getrennt)") ?></option>
+                            <option value="user_id"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['format'] === "user_id" ? " selected" : "" ?>><?= _("Format: user_ids (mit Leerzeichen getrennt)") ?></option>
+                            <option value="username"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['format'] === "username" ? " selected" : "" ?>><?= _("Format: Nutzernamen (mit Leerzeichen getrennt)") ?></option>
+                            <option value="email"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['format'] === "email" ? " selected" : "" ?>><?= _("Format: Emails (mit Leerzeichen getrennt)") ?></option>
                             <? foreach (Datafield::findBySQL("object_type = 'user'") as $datafield) : ?>
-                                <option value="<?= htmlReady($datafield->getId()) ?>"><?= htmlReady(sprintf(_("Format: %s (mit Leerzeichen getrennt)"), $datafield['name'])) ?></option>
+                                <option value="<?= htmlReady($datafield->getId()) ?>"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['format'] === $datafield->getId() ? " selected" : "" ?>><?= htmlReady(sprintf(_("Format: %s (mit Leerzeichen getrennt)"), $datafield['name'])) ?></option>
                             <? endforeach ?>
                         </select>
                     </div>
+                    <? endif ?>
+                </td>
+            </tr>
+
+            <? $dynamically_mapped = in_array("fleximport_studyarea", $table->fieldsToBeDynamicallyMapped()) ?>
+            <tr style="<?= $dynamically_mapped ? "opacity: 0.5;" : "" ?>" class="<?= $dynamically_mapped ? "dynamically_mapped" : "" ?>">
+                <td>fleximport_studyarea</td>
+                <td>
+                    <? if ($dynamically_mapped) : ?>
+                        <?= _("Wird von einem Plugin dynamisch gemapped") ?>
+                    <? else : ?>
+                        <select name="<?= _("tabledata[simplematching][fleximport_studyarea][column]") ?>" onChange="jQuery('#simplematching_fleximport_studyarea_static').toggle(this.value === 'static value'); jQuery('#simplematching_fleximport_studyarea_format').toggle(this.value && (this.value !== 'static value')); ">
+                            <option value="" title="<?= _("Wert wird nicht gemapped") ?>"></option>
+                            <option value="static value"<?= $table['tabledata']['simplematching']['fleximport_studyarea']['column'] === "static value" ? " selected" : "" ?>>[<?= _("Fester Eintrag") ?>]</option>
+                            <? foreach ($table->getTableHeader() as $header) : ?>
+                                <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
+                                    <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching']['fleximport_studyarea']['column'] ? " selected" : "" ?>>
+                                        <?= htmlReady($header) ?>
+                                    </option>
+                                <? endif ?>
+                            <? endforeach ?>
+                        </select>
+                        <div id="simplematching_fleximport_studyarea_static" style="<?= $table['tabledata']['simplematching']['fleximport_dozenten']['column'] !== "static value" ? "display: none;" : "" ?>">
+                            <input type="text"
+                                   name="tabledata[simplematching][fleximport_studyarea][static]"
+                                   value="<?= htmlReady($table['tabledata']['simplematching']['fleximport_studyarea']['static']) ?>"
+                                   placeholder="<?= _("semikolonseparierte sem_tree_ids") ?>">
+                        </div>
                     <? endif ?>
                 </td>
             </tr>

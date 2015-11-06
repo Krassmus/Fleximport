@@ -39,19 +39,26 @@ class FleximportTable extends SimpleORMap {
 
     public function isInDatabase()
     {
-        if (in_array($this['source'], array("csv_upload", "extern"))) {
-            $statement = DBManager::get()->prepare("
-                SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = :table
-            ");
-            $statement->execute(array('table' => $this['name']));
-            return (bool) $statement->fetch();
-        } elseif ($this['source'] === "database") {
-            $this->fetchDataFromDatabase();
-            return true;
-        } elseif($this['source'] === "csv_weblink") {
-            $this->fetchDataFromWeblink();
+        $plugin = $this->getPlugin();
+        if (!$plugin || !$plugin->customImportEnabled()) {
+            if (in_array($this['source'], array("csv_upload", "extern"))) {
+                $statement = DBManager::get()->prepare("
+                    SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = :table
+                ");
+                $statement->execute(array('table' => $this['name']));
+                return (bool)$statement->fetch();
+            } elseif ($this['source'] === "database") {
+                $this->fetchDataFromDatabase();
+                return true;
+            } elseif ($this['source'] === "csv_weblink") {
+                $this->fetchDataFromWeblink();
+                return true;
+            }
+        } else {
+            $plugin->fetchData();
             return true;
         }
+        return false;
     }
 
     public function getTableHeader()
@@ -158,7 +165,7 @@ class FleximportTable extends SimpleORMap {
         }
     }
 
-    private function reduceDiakritikaFromIso88591($text) {
+    public function reduceDiakritikaFromIso88591($text) {
         $text = str_replace(array("ä","Ä","ö","Ö","ü","Ü","ß"), array('ae','Ae','oe','Oe','ue','Ue','ss'), $text);
         $text = str_replace(array('À','Á','Â','Ã','Å','Æ'), 'A' , $text);
         $text = str_replace(array('à','á','â','ã','å','æ'), 'a' , $text);
@@ -174,7 +181,7 @@ class FleximportTable extends SimpleORMap {
         return $text;
     }
 
-    private function CSV2Array($content, $delim = ';', $encl = '"', $optional = 1) {
+    public function CSV2Array($content, $delim = ';', $encl = '"', $optional = 1) {
         if ($content[strlen($content)-1]!="\r" && $content[strlen($content)-1]!="\n")
             $content .= "\r\n";
 
@@ -192,11 +199,11 @@ class FleximportTable extends SimpleORMap {
         return $liste;
     }
 
-    private function getCSVDataFromFile($file_path, $delim = ';', $encl = '"', $optional = 1) {
+    public function getCSVDataFromFile($file_path, $delim = ';', $encl = '"', $optional = 1) {
         return $this->CSV2Array(file_get_contents($file_path), $delim, $encl, $optional);
     }
 
-    private function getCSVDataFromURL($file_path, $delim = ';', $encl = '"', $optional = 1) {
+    public function getCSVDataFromURL($file_path, $delim = ';', $encl = '"', $optional = 1) {
         return $this->CSV2Array(studip_utf8decode(file_get_contents($file_path)), $delim, $encl, $optional);
     }
 
@@ -257,7 +264,7 @@ class FleximportTable extends SimpleORMap {
 
         $object = new $classname($pk);
         if (!$object->isNew()) {
-            foreach ($this['tabledata']['ignoreonupdate'] as $fieldname) {
+            foreach ((array) $this['tabledata']['ignoreonupdate'] as $fieldname) {
                 unset($data[$fieldname]);
             }
         }
@@ -329,7 +336,32 @@ class FleximportTable extends SimpleORMap {
             }
         }
 
-        if ($plugin) {
+        if ($classname === "Course") {
+            //Studienbereiche:
+            $remove = DBManager::get()->prepare("
+                DELETE FROM seminar_sem_tree
+                WHERE seminar_id = :seminar_id
+            ");
+            $remove->execute(array(
+                'seminar_id' => $object->getId()
+            ));
+
+            if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$data['status']]['class']]['bereiche']) {
+                foreach ($data['fleximport_studyarea'] as $sem_tree_id) {
+                    $insert = DBManager::get()->prepare("
+                        INSERT IGNORE INTO seminar_sem_tree
+                        SET sem_tree_id = :sem_tree_id,
+                            seminar_id = :seminar_id
+                    ");
+                    $insert->execute(array(
+                        'sem_tree_id' => $sem_tree_id,
+                        'seminar_id' => $object->getId()
+                    ));
+                }
+            }
+        }
+
+        if ($plugin && !$object->isNew()) {
             $plugin->afterUpdate($object, $line);
         }
     }
@@ -338,39 +370,64 @@ class FleximportTable extends SimpleORMap {
     {
         $plugin = $this->getPlugin();
         $classname = $this['import_type'];
-        if (!$classname) {
-            return array('found' => false);
-        }
-        $data = $this->getMappedData($line);
-        $pk = $this->getPrimaryKey($data);
-
-
-        $object = new $classname($pk);
-        $object->setData($data);
 
         $output = array(
-            'found' => !$object->isNew(),
+            'found' => false,
             'errors' => ""
         );
 
-        switch ($classname) {
-            case "Course":
-                if (!$data['fleximport_dozenten'] || !count($data['fleximport_dozenten'])) {
-                    $output['errors'] .= "Dozent kann nicht gemapped werden. ";
-                } else {
-                    $exist = false;
-                    foreach ((array) $data['fleximport_dozenten'] as $dozent_id) {
-                        if (User::find($dozent_id)) {
-                            $exist = true;
-                            break;
+        if ($classname) {
+            $data = $this->getMappedData($line);
+            $pk = $this->getPrimaryKey($data);
+
+            $object = new $classname($pk);
+            if (!$object->isNew()) {
+                $output['found'] = true;
+            }
+            $object->setData($data);
+
+            switch ($classname) {
+                case "Course":
+                    if (!$data['fleximport_dozenten'] || !count($data['fleximport_dozenten'])) {
+                        $output['errors'] .= "Dozent kann nicht gemapped werden. ";
+                    } else {
+                        $exist = false;
+                        foreach ((array)$data['fleximport_dozenten'] as $dozent_id) {
+                            if (User::find($dozent_id)) {
+                                $exist = true;
+                                break;
+                            }
+                        }
+                        if (!$exist) {
+                            $output['errors'] .= "Angegebene Dozenten sind nicht im System vorhanden. ";
                         }
                     }
-                    if (!$exist) {
-                        $output['errors'] .= "Angegebene Dozenten sind nicht im System vorhanden. ";
+
+                    if (!$data['institut_id'] || !Institute::find($data['institut_id'])) {
+                        $output['errors'] .= "Keine gültige Heimateinrichtung. ";
                     }
-                }
-                break;
+
+                    if ($data['status']) {
+                        if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$data['status']]['class']]['bereiche']) {
+                            $found = false;
+                            foreach ((array)$data['fleximport_studyarea'] as $sem_tree_id) {
+                                if (StudipStudyArea::find($sem_tree_id)) {
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if (!$found) {
+                                $output['errors'] .= "Keine (korrekten) Studienbereiche definiert. ";
+                            }
+                        }
+                    } else {
+                        $output['errors'] .= "Kein Veranstaltungstyp definiert. ";
+                    }
+
+                    break;
+            }
         }
+
         if ($plugin) {
             $output['errors'] .= $plugin->checkLine($line);
         }
@@ -391,6 +448,7 @@ class FleximportTable extends SimpleORMap {
                 }
                 $fields[] = "fleximport_dozenten";
                 $fields[] = "fleximport_related_institutes";
+                $fields[] = "fleximport_studyarea";
                 break;
             case "User":
                 foreach (Datafield::findBySQL("object_type = 'user'") as $datafield) {
@@ -428,6 +486,7 @@ class FleximportTable extends SimpleORMap {
         }
         //special mapping
         if (in_array($this['import_type'], array("Course", "CourseMember")) && !$data['seminar_id']) {
+            //Map seminar_id :
             if ($this['tabledata']['simplematching']["seminar_id"]['column'] === "fleximport_map_from_veranstaltungsnummer") {
                 $course = Course::findOneByVeranstaltungsnummer(
                     $data['veranstaltungsnummer'] ?: $line['veranstaltungsnummer']
@@ -437,14 +496,13 @@ class FleximportTable extends SimpleORMap {
                 }
             }
             if ($this['tabledata']['simplematching']["seminar_id"]['column'] === "fleximport_map_from_name") {
-                $course = Course::findOneByName(
-                    $data['name'] ?: $line['name']
-                );
+                $course = Course::findOneBySQL("name = ? ", array($data['name']));
                 if ($course) {
                     $data['seminar_id'] = $course->getId();
                 }
             }
 
+            //Map dozenten:
             if ($this['tabledata']['simplematching']["fleximport_dozenten"]['column'] && !in_array("fleximport_dozenten", $this->fieldsToBeDynamicallyMapped())) {
                 $data['fleximport_dozenten'] = (array) preg_split("/\s+/", $data['fleximport_dozenten'], null, PREG_SPLIT_NO_EMPTY);
 
@@ -478,7 +536,7 @@ class FleximportTable extends SimpleORMap {
                         foreach ($data['fleximport_dozenten'] as $key => $value) {
                             $entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND content = ?", array($datafield_id, $value));
                             if ($entry) {
-                                $data['fleximport_dozenten'] = $entry['range_id'];
+                                $data['fleximport_dozenten'][$key] = $entry['range_id'];
                             } else {
                                 unset($data['fleximport_dozenten'][$key]);
                             }
@@ -487,6 +545,46 @@ class FleximportTable extends SimpleORMap {
                 }
             }
 
+            //Map Institute:
+            if ($this['tabledata']['simplematching']["institut_id"]['format']) {
+                if ($this['tabledata']['simplematching']["institut_id"]['format'] === "name") {
+                    $institut = Institute::findOneBySQL($data['institut_id']);
+                    if ($institut) {
+                        $data['institut_id'] = $institut->getId();
+                    } else {
+                        $data['institut_id'] = null;
+                    }
+                } else {
+                    $entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND content = ?", array(
+                        $this['tabledata']['simplematching']["institut_id"]['format'],
+                        $data['institut_id']
+                    ));
+                    if ($entry) {
+                        $data['institut_id'] = $entry['range_id'];
+                    } else {
+                        $data['institut_id'] = null;
+                    }
+                }
+            }
+
+            //Map Studienbereiche
+            if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column'] && !in_array("fleximport_studyarea", $this->fieldsToBeDynamicallyMapped())) {
+                if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column'] === "static value") {
+                    $data['fleximport_studyarea'] = (array) explode(";", $this['tabledata']['simplematching']["fleximport_studyarea"]['static']);
+                } else {
+                    $data['fleximport_studyarea'] = (array) explode(";", $data['fleximport_studyarea']);
+                    $study_areas = array();
+                    foreach ($data['fleximport_studyarea'] as $key => $name) {
+                        foreach (StudipStudyArea::findBySQL("name = ?", array($name)) as $study_area) {
+                            $study_areas[] = $study_area->getId();
+                        }
+                    }
+                    $data['fleximport_studyarea'] = $study_areas;
+                }
+            }
+
+
+            //Map start_time
             if ($this['tabledata']['simplematching']["start_time"]['column'] === "fleximport_current_semester") {
                 $semester = Semester::findCurrent();
                 if ($semester) {
@@ -516,12 +614,16 @@ class FleximportTable extends SimpleORMap {
 
     public function getTargetFields()
     {
-        if (count($this->sorm_metadata) === 0) {
-            $classname = $this['import_type'];
-            $object = new $classname();
-            $this->sorm_metadata = $object->getTableMetadata();
+        $classname = $this['import_type'];
+        if ($classname) {
+            if (count($this->sorm_metadata) === 0) {
+                $object = new $classname();
+                $this->sorm_metadata = $object->getTableMetadata();
+            }
+            return array_keys($this->sorm_metadata['fields']);
+        } else {
+            return array();
         }
-        return array_keys($this->sorm_metadata['fields']);
     }
 
     public function getTargetPK()
