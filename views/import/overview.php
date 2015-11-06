@@ -10,16 +10,16 @@
                         <div class="caption-content">
                             <? switch ($table['import_type']) {
                                 case "User":
-                                    echo Assets::img("icons/20/black/person", array('class' => "text-bottom"));
+                                    echo Assets::img("icons/20/black/person", array('class' => "text-bottom", 'title' => _("Es werden Nutzer import.")));
                                     break;
                                 case "CourseMember":
-                                    echo Assets::img("icons/20/black/group2", array('class' => "text-bottom"));
+                                    echo Assets::img("icons/20/black/group2", array('class' => "text-bottom", 'title' => _("Es werden Teilnehmer an veranstaltungen import.")));
                                     break;
                                 case "Course":
-                                    echo Assets::img("icons/20/black/seminar", array('class' => "text-bottom"));
+                                    echo Assets::img("icons/20/black/seminar", array('class' => "text-bottom", 'title' => _("Es werden Veranstaltungen import.")));
                                     break;
                                 case "":
-                                    echo Assets::img("icons/20/black/remove-circle", array('class' => "text-bottom"));
+                                    echo Assets::img("icons/20/black/remove-circle", array('class' => "text-bottom", 'title' => _("Dies ist eine Hilfstabelle und wird nicht für sich importiert.")));
                                     break;
                                 default:
                                     echo Assets::img("icons/20/black/doit", array('class' => "text-bottom", 'title' => $table['import_type'] ? sprintf(_("Es werden %s-Objekte importiert."), $table['import_type']) : _("Hilfstabelle wird nicht direkt importiert.")));

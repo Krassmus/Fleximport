@@ -500,6 +500,7 @@ class FleximportTable extends SimpleORMap {
                 }
             }
         }
+
         //special mapping
         if (in_array($this['import_type'], array("Course", "CourseMember")) && !$data['seminar_id']) {
             //Map seminar_id :
@@ -580,6 +581,19 @@ class FleximportTable extends SimpleORMap {
                     } else {
                         $data['institut_id'] = null;
                     }
+                }
+            }
+
+            //Map sem_type:
+            if ($this['tabledata']['simplematching']["status"]['format']) {
+                if ($this['tabledata']['simplematching']["status"]['format'] === "name") {
+                    $sem_type_id = null;
+                    foreach ($GLOBALS['SEM_TYPE'] as $id => $sem_type) {
+                        if ($sem_type['name'] === $data['status']) {
+                            $sem_type_id = $id;
+                        }
+                    }
+                    $data['status'] = $sem_type_id;
                 }
             }
 
