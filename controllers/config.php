@@ -13,6 +13,11 @@ class ConfigController extends PluginController {
     public function overview_action()
     {
         $this->configs = FleximportConfig::all();
+        $this->possibleConfigs = array();
+        foreach (FleximportTable::findAll() as $table) {
+            $this->possibleConfigs = array_merge($this->possibleConfigs, $table->neededConfigs());
+        }
+        $this->possibleConfigs = array_unique($this->possibleConfigs);
     }
 
     public function edit_action() {

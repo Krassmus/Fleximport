@@ -2,6 +2,15 @@
 
 class fleximport_semiro_participant_import extends FleximportPlugin {
 
+    public function neededConfigs()
+    {
+        return array(
+            "SEMIRO_SOAP_PARTICIPANTS_WSDL",
+            "SEMIRO_SOAP_PASSWORD",
+            "SEMIRO_USER_DATAFIELD_NAME"
+        );
+    }
+
     public function customImportEnabled()
     {
         return true;

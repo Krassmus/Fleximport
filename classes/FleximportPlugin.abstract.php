@@ -22,6 +22,15 @@ abstract class FleximportPlugin {
     }
 
     /**
+     * Returns an array of names of config-parameters.
+     * @return array of strings
+     */
+    public function neededConfigs()
+    {
+        return array();
+    }
+
+    /**
      * Returns whether this plugins handles the import
      * @return bool
      */

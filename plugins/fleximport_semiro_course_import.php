@@ -7,6 +7,15 @@ class fleximport_semiro_course_import extends FleximportPlugin {
         return true;
     }
 
+    public function neededConfigs()
+    {
+        return array(
+            "SEMIRO_SOAP_COURSE_WSDL",
+            "SEMIRO_SOAP_PASSWORD",
+            "SEMIRO_USER_DATAFIELD_NAME"
+        );
+    }
+
     /**
      * You can specify a custom import.
      * @return bool

@@ -683,4 +683,13 @@ class FleximportTable extends SimpleORMap {
         }
     }
 
+    public function neededConfigs()
+    {
+        if ($this->getPlugin()) {
+            return $this->getPlugin()->neededConfigs();
+        } else {
+            return array();
+        }
+    }
+
 }

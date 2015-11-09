@@ -1,3 +1,4 @@
+<? $already_configs = array() ?>
 <form action="<?= PluginEngine::getLink($plugin, array(), "config/edit") ?>" method="post" class="default">
     <table class="default">
         <thead>
@@ -14,6 +15,17 @@
                     </td>
                     <td>
                         <input type="text" name="configs[<?= htmlReady($name) ?>][value]" value="<?= htmlReady($value) ?>" style="width: calc(100% - 20px);">
+                    </td>
+                </tr>
+                <? $already_configs[] = $name ?>
+            <? endforeach ?>
+            <? foreach (array_diff($possibleConfigs, $already_configs) as $config_name) : ?>
+                <tr>
+                    <td>
+                        <input type="text" name="configs[<?= htmlReady($config_name) ?>][name]" value="<?= htmlReady($config_name) ?>" style="width: calc(100% - 20px);">
+                    </td>
+                    <td>
+                        <input type="text" name="configs[<?= htmlReady($config_name) ?>][value]" value="" style="width: calc(100% - 20px);">
                     </td>
                 </tr>
             <? endforeach ?>
