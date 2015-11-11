@@ -20,7 +20,8 @@ class ConfigController extends PluginController {
         $this->possibleConfigs = array_unique($this->possibleConfigs);
     }
 
-    public function edit_action() {
+    public function edit_action()
+    {
         if (Request::isPost()) {
             $configs = Request::getArray("configs");
             foreach ($configs as $name => $data) {

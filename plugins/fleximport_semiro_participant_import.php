@@ -48,14 +48,19 @@ class fleximport_semiro_participant_import extends FleximportPlugin {
             "TEILNEHMERGRUPPE"
         );
 
+        $fields = array();
+
         $doc = new DOMDocument();
         $doc->loadXML(studip_utf8decode($result->return));
         $seminar_data = array();
         foreach ($doc->getElementsByTagName("teilnehmer") as $seminar) {
             $seminar_data_row = array();
-            foreach ($fields as $attribute) {
-                foreach ($seminar->getElementsByTagName(strtoupper($attribute)) as $valueNode) {
-                    $seminar_data_row[] = studip_utf8decode(trim($valueNode->nodeValue));
+            foreach ($seminar->childNodes as $attribute) {
+                if ($attribute->tagName) {
+                    if (!in_array(studip_utf8decode(trim($attribute->tagName)), $fields)) {
+                        $fields[] = studip_utf8decode(trim($attribute->tagName));
+                    }
+                    $seminar_data_row[] = studip_utf8decode(trim($attribute->nodeValue));
                 }
             }
             $seminar_data[] = $seminar_data_row;
@@ -65,6 +70,10 @@ class fleximport_semiro_participant_import extends FleximportPlugin {
 
     public function checkLine($line) {
         $errors = "";
+
+        if (!FleximportTable::findOneByName("fleximport_semiro_course_import")) {
+            return "Tabelle fleximport_semiro_course_import existiert nicht. ";
+        }
 
         if (!$line['id_teilnehmer']) {
             $errors .= "Teilnehmer hat keine id_teilnehmer. ";

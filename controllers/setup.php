@@ -17,6 +17,7 @@ class SetupController extends PluginController {
         if (Request::isPost()) {
             $data = Request::getArray("table");
             $data['tabledata'] = array_merge($this->table['tabledata'], $data['tabledata']);
+            $data['synchronization'] = $data['synchronization'] ? 1 : 0;
             $this->table->setData($data);
             if ($this->table['import_type'] === "other") {
                 $this->table['import_type'] = Request::get("other_import_type");

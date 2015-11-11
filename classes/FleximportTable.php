@@ -4,6 +4,7 @@ class FleximportTable extends SimpleORMap {
 
     protected $sorm_metadata = array();
     protected $plugin = null;
+    protected $already_fetched = false;
 
     static public function findAll()
     {
@@ -39,26 +40,45 @@ class FleximportTable extends SimpleORMap {
 
     public function isInDatabase()
     {
-        $plugin = $this->getPlugin();
-        if (!$plugin || !$plugin->customImportEnabled()) {
-            if (in_array($this['source'], array("csv_upload", "extern"))) {
-                $statement = DBManager::get()->prepare("
-                    SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = :table
-                ");
-                $statement->execute(array('table' => $this['name']));
-                return (bool)$statement->fetch();
-            } elseif ($this['source'] === "database") {
-                $this->fetchDataFromDatabase();
-                return true;
-            } elseif ($this['source'] === "csv_weblink") {
-                $this->fetchDataFromWeblink();
-                return true;
-            }
-        } else {
-            $plugin->fetchData();
-            return true;
+        $this->fetchData();
+
+        $statement = DBManager::get()->prepare("
+            SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = :table
+                AND TABLE_SCHEMA = :db_name
+        ");
+        $statement->execute(array(
+            'table' => $this['name'],
+            'db_name' => $GLOBALS['DB_STUDIP_DATABASE']
+        ));
+        $is_in_db = $statement->fetch();
+        return (bool) $is_in_db;
+    }
+
+    public function fetchData()
+    {
+        if ($this->already_fetched) {
+            return;
         }
-        return false;
+        $this->already_fetched = true;
+        try {
+            $plugin = $this->getPlugin();
+            if (!$plugin || !$plugin->customImportEnabled()) {
+                if (in_array($this['source'], array("csv_upload", "extern"))) {
+                    return;
+                } elseif ($this['source'] === "database") {
+                    $this->fetchDataFromDatabase();
+                    return;
+                } elseif ($this['source'] === "csv_weblink") {
+                    $this->fetchDataFromWeblink();
+                    return;
+                }
+            } else {
+                $plugin->fetchData();
+            }
+        } catch (Exception $e) {
+            PageLayout::postMessage(MessageBox::error(sprintf(_("Konnte Tabelle '%s' nicht mit Daten befüllen."), $this['name'])));
+        }
     }
 
     public function getTableHeader()
@@ -224,13 +244,37 @@ class FleximportTable extends SimpleORMap {
         ");
         $statement->execute();
         $protocol = array();
+        $item_ids = array();
         $count = 0;
         while ($line = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $error = $this->importLine($line);
-            if (is_string($error)) {
-                $protocol[] = $error;
+            $output = $this->importLine($line);
+            if ($output['errors']) {
+                $protocol[] = $output['errors'];
+            }
+            if ($output['pk']) {
+                $item_ids[] = is_array($output['pk']) ? implode("-", $output['pk']) : $output['pk'];
             }
             $count++;
+        }
+        if ($this['synchronization']) {
+            $import_type = $this['import_type'];
+            $items = FleximportMappedItem::findBySQL(
+                "import_type = :import_type AND item_id NOT IN (:ids)",
+                array(
+                    'import_type' => $this['import_type'],
+                    'ids' => $item_ids
+                )
+            );
+            foreach ($items as $item) {
+                if (class_exists($import_type)) {
+                    $pk = strpos() !== false
+                        ? explode("-", $item['item_id'])
+                        : $item['item_id'];
+                    $object = new $import_type($pk);
+                    $object->delete();
+                }
+                $item->delete();
+            }
         }
         return $protocol;
     }
@@ -261,12 +305,17 @@ class FleximportTable extends SimpleORMap {
 
         $data = $this->getMappedData($line);
         $pk = $this->getPrimaryKey($data);
+        $output = array();
 
         $object = new $classname($pk);
         if (!$object->isNew()) {
+            $output['found'] = true;
+            $output['pk'] = $pk;
             foreach ((array) $this['tabledata']['ignoreonupdate'] as $fieldname) {
                 unset($data[$fieldname]);
             }
+        } else {
+            $output['found'] = false;
         }
         foreach ($data as $fieldname => $value) {
             if (($value !== false) && in_array($fieldname, $this->getTargetFields())) {
@@ -380,6 +429,7 @@ class FleximportTable extends SimpleORMap {
         if ($plugin && !$object->isNew()) {
             $plugin->afterUpdate($object, $line);
         }
+        return $output;
     }
 
     public function checkLine($line)
@@ -389,6 +439,7 @@ class FleximportTable extends SimpleORMap {
 
         $output = array(
             'found' => false,
+            'pk' => null,
             'errors' => ""
         );
 
@@ -399,6 +450,7 @@ class FleximportTable extends SimpleORMap {
             $object = new $classname($pk);
             if (!$object->isNew()) {
                 $output['found'] = true;
+                $output['pk'] = $pk;
             }
             $object->setData($data);
 

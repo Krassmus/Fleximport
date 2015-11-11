@@ -67,14 +67,19 @@ class fleximport_semiro_course_import extends FleximportPlugin {
             //"VORNAME_DOZENT"
         );
 
+        $fields = array();
+
         $doc = new DOMDocument();
         $doc->loadXML(studip_utf8decode($result->return));
         $seminar_data = array();
         foreach ($doc->getElementsByTagName("seminar") as $seminar) {
             $seminar_data_row = array();
-            foreach ($fields as $attribute) {
-                foreach ($seminar->getElementsByTagName(strtoupper($attribute)) as $valueNode) {
-                    $seminar_data_row[] = studip_utf8decode(trim($valueNode->nodeValue));
+            foreach ($seminar->childNodes as $attribute) {
+                if ($attribute->tagName) {
+                    if (!in_array(studip_utf8decode(trim($attribute->tagName)), $fields)) {
+                        $fields[] = studip_utf8decode(trim($attribute->tagName));
+                    }
+                    $seminar_data_row[] = studip_utf8decode(trim($attribute->nodeValue));
                 }
             }
             $seminar_data[] = $seminar_data_row;
@@ -131,13 +136,32 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                 ");
                 $statement->execute(array($teilnehmergruppe));
                 $ids = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
+                $messaging = new messaging();
                 foreach ($ids as $id_teilnehmer) {
                     $entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND content = ? ", array(
                         $datafield->getId(),
                         $id_teilnehmer
                     ));
                     if ($entry) {
+                        $was_member = CourseMember::findOneBySQL("seminar_id = ? AND user_id = ?", array(
+                            $object->getId(),
+                            $entry['range_id']
+                        ));
                         $seminar->addMember($entry['range_id']);
+                        if (!$was_member) {
+                            $message = sprintf(_('Sie wurden von Semiro als TeilnehmerIn in die Veranstaltung **%s** eingetragen.'), $seminar->name);
+                            $messaging->insert_message(
+                                $message,
+                                get_username($entry['range_id']),
+                                '____%system%____',
+                                FALSE,
+                                FALSE,
+                                '1',
+                                FALSE,
+                                sprintf('%s %s', _('Systemnachricht:'), _('Eintragung in Veranstaltung')),
+                                TRUE
+                            );
+                        }
                     }
                 }
             }

@@ -9,7 +9,7 @@ foreach (scandir(__DIR__."/plugins") as $plugin) {
     }
 }
 
-class Fleximport extends StudIPPlugin {
+class Fleximport extends StudIPPlugin implements SystemPlugin {
 
     static public function CSV2Array($content, $delim = ';', $encl = '"', $optional = 1) {
         if ($content[strlen($content)-1]!="\r" && $content[strlen($content)-1]!="\n")

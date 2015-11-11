@@ -89,6 +89,11 @@
         </tbody>
     </table>
 
+    <label>
+        <input type="checkbox" name="table[synchronization]" value="1"<?= $table['synchronization'] ? " checked" : "" ?>>
+        <?= _("Synchronisierung (Importierte Objekte werden beim Update gelöscht, wenn sie beim Update nicht mit mehr bertücksichtigt werden)") ?>
+    </label>
+
     <? if ($table->isInDatabase()) : ?>
         <div>
             <?= _("Nur folgende Spalten anzeigen") ?>
