@@ -7,7 +7,8 @@ class fleximport_semiro_participant_import extends FleximportPlugin {
         return array(
             "SEMIRO_SOAP_PARTICIPANTS_WSDL",
             "SEMIRO_SOAP_PASSWORD",
-            "SEMIRO_USER_DATAFIELD_NAME"
+            "SEMIRO_USER_DATAFIELD_NAME",
+            "SEMIRO_DILP_KENNUNG_FIELD"
         );
     }
 
@@ -75,8 +76,13 @@ class fleximport_semiro_participant_import extends FleximportPlugin {
             return "Tabelle fleximport_semiro_course_import existiert nicht. ";
         }
 
-        if (!$line['id_teilnehmer']) {
-            $errors .= "Teilnehmer hat keine id_teilnehmer. ";
+        $dilp_kennung_feld = FleximportConfig::get("SEMIRO_DILP_KENNUNG_FIELD");
+        if (!$dilp_kennung_feld) {
+            $dilp_kennung_feld = "dilp_teilnehmer";
+        }
+
+        if (!$line[$dilp_kennung_feld]) {
+            $errors .= "Teilnehmer hat keinen Wert für '$dilp_kennung_feld''. ";
         } else {
             $datafield = Datafield::findOneByName(FleximportConfig::get("SEMIRO_USER_DATAFIELD_NAME"));
             if (!$datafield) {
@@ -84,7 +90,7 @@ class fleximport_semiro_participant_import extends FleximportPlugin {
             } else {
                 $entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND content = ? ", array(
                     $datafield->getId(),
-                    $line['id_teilnehmer']
+                    $line[$dilp_kennung_feld]
                 ));
                 if (!$entry || !User::find($entry['range_id'])) {
                     $errors .= "Nutzer konnte nicht durch id_teilnehmer identifiziert werden. ";

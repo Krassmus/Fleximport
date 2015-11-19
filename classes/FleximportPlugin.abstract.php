@@ -82,10 +82,11 @@ abstract class FleximportPlugin {
 
     /**
      * Just a callback do do some additional work before the plain import happens.
-     * @param SimpleORMap $object : the new and already stored object.
+     * @param SimpleORMap $object : the not yet stored object.
      * @param array $line : the current dataline that is going to be processed
+     * @param array $mappeddata : the mapped values
      */
-    public function beforeUpdate(SimpleORMap $object, $line)
+    public function beforeUpdate(SimpleORMap $object, $line, $mappeddata)
     {
     }
 

@@ -2,6 +2,8 @@
 
 class fleximport_semiro_course_import extends FleximportPlugin {
 
+    private $new_dozenten = array();
+
     public function customImportEnabled()
     {
         return true;
@@ -122,21 +124,58 @@ class fleximport_semiro_course_import extends FleximportPlugin {
         return false;
     }
 
+    public function beforeUpdate($object, $line, $mappeddata)
+    {
+        foreach ($mappeddata as $data) {
+            foreach ($data['fleximport_dozenten'] as $dozent_id) {
+                if ($object->isNew()) {
+                    $this->new_dozenten[] = $dozent_id;
+                } else {
+                    $coursemember = CourseMember::find(array($object->getId(), $dozent_id));
+                    if (!$coursemember || ($coursemember['status'] !== "dozent")) {
+                        $this->new_dozenten[] = $dozent_id;
+                    }
+                }
+            }
+        }
+    }
+
     public function afterUpdate($object, $line)
     {
+        $messaging = new messaging();
+        //Email an Dozenten:
+        foreach ((array) $this->new_dozenten as $user_id) {
+            $message = sprintf(_('Sie wurden von Semiro als DozentIn in die Veranstaltung **%s** eingetragen.'), $object->name);
+            $messaging->insert_message(
+                $message,
+                get_username($user_id),
+                '____%system%____',
+                FALSE,
+                FALSE,
+                '1',
+                FALSE,
+                sprintf('%s %s', _('Systemnachricht:'), _('Eintragung in Veranstaltung')),
+                TRUE
+            );
+        }
+
+
         $teilnehmergruppe = $line['teilnehmergruppe'];
         if ($teilnehmergruppe) {
             $seminar = new Seminar($object->getId());
             $datafield = Datafield::findOneByName(FleximportConfig::get("SEMIRO_USER_DATAFIELD_NAME"));
+            $dilp_kennung_feld = FleximportConfig::get("SEMIRO_DILP_KENNUNG_FIELD");
+            if (!$dilp_kennung_feld) {
+                $dilp_kennung_feld = "dilp_teilnehmer";
+            }
             if ($datafield) {
                 $statement = DBManager::get()->prepare("
-                    SELECT id_teilnehmer
+                    SELECT `".addslashes($dilp_kennung_feld)."`
                     FROM fleximport_semiro_participant_import
                     WHERE teilnehmergruppe = ?
                 ");
                 $statement->execute(array($teilnehmergruppe));
                 $ids = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
-                $messaging = new messaging();
                 foreach ($ids as $id_teilnehmer) {
                     $entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND content = ? ", array(
                         $datafield->getId(),
@@ -161,6 +200,20 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                                 sprintf('%s %s', _('Systemnachricht:'), _('Eintragung in Veranstaltung')),
                                 TRUE
                             );
+                        }
+                        //Zu Statusgruppe hinzufügen:
+                        $gruppe = Statusgruppen::findOneBySQL("range_id = ? AND name = ?", array(
+                            $object->getId(),
+                            $teilnehmergruppe
+                        ));
+                        if (!$gruppe) {
+                            $gruppe = new Statusgruppen();
+                            $gruppe['range_id'] = $object->getId();
+                            $gruppe['name'] = $teilnehmergruppe;
+                            $gruppe->store();
+                        }
+                        if (!$gruppe->isMember($entry['range_id'])) {
+                            $gruppe->addUser($entry['range_id']);
                         }
                     }
                 }

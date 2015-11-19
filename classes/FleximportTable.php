@@ -324,7 +324,7 @@ class FleximportTable extends SimpleORMap {
         }
 
         if ($plugin) {
-            $plugin->beforeUpdate($object, $line);
+            $plugin->beforeUpdate($object, $line, $data);
         }
 
         $object->store();
