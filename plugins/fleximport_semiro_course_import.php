@@ -14,7 +14,8 @@ class fleximport_semiro_course_import extends FleximportPlugin {
         return array(
             "SEMIRO_SOAP_COURSE_WSDL",
             "SEMIRO_SOAP_PASSWORD",
-            "SEMIRO_USER_DATAFIELD_NAME"
+            "SEMIRO_USER_DATAFIELD_NAME",
+            "SEMIRO_DILP_KENNUNG_FIELD"
         );
     }
 
