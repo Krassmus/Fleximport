@@ -248,10 +248,10 @@ class FleximportTable extends SimpleORMap {
         $count = 0;
         while ($line = $statement->fetch(PDO::FETCH_ASSOC)) {
             $output = $this->importLine($line);
-            if ($output['errors']) {
+            if (isset($output['errors'])) {
                 $protocol[] = $output['errors'];
             }
-            if ($output['pk']) {
+            if (isset($output['pk'])) {
                 $item_ids[] = is_array($output['pk']) ? implode("-", $output['pk']) : $output['pk'];
             }
             $count++;
@@ -262,12 +262,13 @@ class FleximportTable extends SimpleORMap {
                 "import_type = :import_type AND item_id NOT IN (:ids)",
                 array(
                     'import_type' => $this['import_type'],
-                    'ids' => $item_ids
+                    'ids' => $item_ids ?: ""
                 )
             );
+
             foreach ($items as $item) {
                 if (class_exists($import_type)) {
-                    $pk = strpos() !== false
+                    $pk = strpos($item['item_id'], "-") !== false
                         ? explode("-", $item['item_id'])
                         : $item['item_id'];
                     $object = new $import_type($pk);
@@ -275,10 +276,22 @@ class FleximportTable extends SimpleORMap {
                 }
                 $item->delete();
             }
+            foreach ($item_ids as $item_id) {
+                $mapped = FleximportMappedItem::findbyItemId($item_id, $this['import_type']) ?: new FleximportMappedItem();
+                $mapped['import_type'] = $this['import_type'];
+                $mapped['item_id'] = $item_id;
+                $mapped['chdate'] = time();
+                $mapped->store();
+            }
         }
         return $protocol;
     }
 
+    /**
+     * Returns the line for the given id as an associative array.
+     * @param integer $id
+     * @return array : the data of the line.
+     */
     public function getLine($id)
     {
         $statement = DBManager::get()->prepare("
@@ -290,17 +303,22 @@ class FleximportTable extends SimpleORMap {
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Imports a line of the table into the Stud.IP database if the check returns no errors.
+     * @param array $line : array of fields
+     * @return array : array('found' => true|false, 'errors' => "Error message", 'pk' => "primary key")
+     */
     public function importLine($line)
     {
         $plugin = $this->getPlugin();
         $classname = $this['import_type'];
         if (!$classname) {
-            return;
+            return array();
         }
         //Last chance to quit:
         $error = $this->checkLine($line);
         if ($error && $error['errors']) {
-            return $error['errors'];
+            return $error;
         }
 
         $data = $this->getMappedData($line);
@@ -328,6 +346,8 @@ class FleximportTable extends SimpleORMap {
         }
 
         $object->store();
+
+        $output['pk'] = (array) $object->getId();
 
         //Dynamic special fields:
         switch ($classname) {

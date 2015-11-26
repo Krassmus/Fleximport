@@ -44,32 +44,6 @@ class fleximport_semiro_course_import extends FleximportPlugin {
             throw new Exception("SOAP-error: " . $result->faultstring);
         }
 
-        $fields = array(
-            "ANMELDEMODUS",
-            //"ANREDE_DOZENT",
-            //"BETEILIGTE_EINRICHTUNGEN",
-            //"DAUER",
-            "DILP_DOZENT",
-            "DOZENT",
-            //"EMAIL_DOZENT",
-            "ENDTERMIN",
-            "HEIMAT_EINRICHTUNG",
-            "ID_DOZENT",
-            "KATEGORIE",
-            //"NACHNAME_DOZENT",
-            "NAME_VERANSTALTUNG",
-            "SCHULUNGSART",
-            "STARTTERMIN",
-            "STUDIENBEREICH",
-            "TEILNEHMERGRUPPE",
-            "TITEL_DOZENT",
-            //"TURNUS",
-            //"TYP_VERANSTALTUNG",
-            "UNTERTITEL",
-            "VERANSTALTUNGSNUMMER",
-            //"VORNAME_DOZENT"
-        );
-
         $fields = array();
 
         $doc = new DOMDocument();
@@ -127,15 +101,13 @@ class fleximport_semiro_course_import extends FleximportPlugin {
 
     public function beforeUpdate($object, $line, $mappeddata)
     {
-        foreach ($mappeddata as $data) {
-            foreach ($data['fleximport_dozenten'] as $dozent_id) {
-                if ($object->isNew()) {
+        foreach ($mappeddata['fleximport_dozenten'] as $dozent_id) {
+            if ($object->isNew()) {
+                $this->new_dozenten[] = $dozent_id;
+            } else {
+                $coursemember = CourseMember::find(array($object->getId(), $dozent_id));
+                if (!$coursemember || ($coursemember['status'] !== "dozent")) {
                     $this->new_dozenten[] = $dozent_id;
-                } else {
-                    $coursemember = CourseMember::find(array($object->getId(), $dozent_id));
-                    if (!$coursemember || ($coursemember['status'] !== "dozent")) {
-                        $this->new_dozenten[] = $dozent_id;
-                    }
                 }
             }
         }
@@ -216,6 +188,7 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                         if (!$gruppe->isMember($entry['range_id'])) {
                             $gruppe->addUser($entry['range_id']);
                         }
+                        $gruppe->updateFolder(true);
                     }
                 }
             }

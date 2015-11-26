@@ -42,13 +42,6 @@ class fleximport_semiro_participant_import extends FleximportPlugin {
             throw new Exception("SOAP-error: ".$result->faultstring);
         }
 
-        $fields = array(
-            "EMAIL_TEILNEHMER",
-            "ID_TEILNEHMER",
-            "TEILNEHMER",
-            "TEILNEHMERGRUPPE"
-        );
-
         $fields = array();
 
         $doc = new DOMDocument();
@@ -114,7 +107,4 @@ class fleximport_semiro_participant_import extends FleximportPlugin {
 
         return $errors;
     }
-
-
-
 }

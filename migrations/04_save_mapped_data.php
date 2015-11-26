@@ -12,6 +12,7 @@ class SaveMappedData extends Migration {
                 `mkdate` bigint(20) NOT NULL,
                 `chdate` bigint(20) NOT NULL,
                 PRIMARY KEY (`mapping_id`),
+                UNIQUE KEY unique_items (`import_type`, `item_id`),
                 KEY `import_type` (`import_type`),
                 KEY `item_id` (`item_id`)
             )
