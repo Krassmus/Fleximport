@@ -15,7 +15,8 @@ class fleximport_semiro_course_import extends FleximportPlugin {
             "SEMIRO_SOAP_COURSE_WSDL",
             "SEMIRO_SOAP_PASSWORD",
             "SEMIRO_USER_DATAFIELD_NAME",
-            "SEMIRO_DILP_KENNUNG_FIELD"
+            "SEMIRO_DILP_KENNUNG_FIELD",
+            "SEMIRO_SEND_MESSAGES"
         );
     }
 
@@ -115,21 +116,23 @@ class fleximport_semiro_course_import extends FleximportPlugin {
 
     public function afterUpdate($object, $line)
     {
-        $messaging = new messaging();
-        //Email an Dozenten:
-        foreach ((array) $this->new_dozenten as $user_id) {
-            $message = sprintf(_('Sie wurden von Semiro als DozentIn in die Veranstaltung **%s** eingetragen.'), $object->name);
-            $messaging->insert_message(
-                $message,
-                get_username($user_id),
-                '____%system%____',
-                FALSE,
-                FALSE,
-                '1',
-                FALSE,
-                sprintf('%s %s', _('Systemnachricht:'), _('Eintragung in Veranstaltung')),
-                TRUE
-            );
+        if (FleximportConfig::get("SEMIRO_SEND_MESSAGES")) {
+            $messaging = new messaging();
+            //Email an Dozenten:
+            foreach ((array) $this->new_dozenten as $user_id) {
+                $message = sprintf(_('Sie wurden von Semiro als DozentIn in die Veranstaltung **%s** eingetragen.'), $object->name);
+                $messaging->insert_message(
+                    $message,
+                    get_username($user_id),
+                    '____%system%____',
+                    FALSE,
+                    FALSE,
+                    '1',
+                    FALSE,
+                    sprintf('%s %s', _('Systemnachricht:'), _('Eintragung in Veranstaltung')),
+                    TRUE
+                );
+            }
         }
 
 
@@ -160,7 +163,7 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                             $entry['range_id']
                         ));
                         $seminar->addMember($entry['range_id']);
-                        if (!$was_member) {
+                        if (!$was_member && FleximportConfig::get("SEMIRO_SEND_MESSAGES")) {
                             $message = sprintf(_('Sie wurden von Semiro als TeilnehmerIn in die Veranstaltung **%s** eingetragen.'), $seminar->name);
                             $messaging->insert_message(
                                 $message,
