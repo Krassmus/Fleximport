@@ -62,8 +62,7 @@ class FleximportTable extends SimpleORMap {
         }
         $this->already_fetched = true;
         try {
-            $plugin = $this->getPlugin();
-            if (!$plugin || !$plugin->customImportEnabled()) {
+            if (!$this->customImportEnabled()) {
                 if (in_array($this['source'], array("csv_upload", "extern"))) {
                     return;
                 } elseif ($this['source'] === "database") {
@@ -74,11 +73,17 @@ class FleximportTable extends SimpleORMap {
                     return;
                 }
             } else {
-                $plugin->fetchData();
+                $this->getPlugin()->fetchData();
             }
         } catch (Exception $e) {
             PageLayout::postMessage(MessageBox::error(sprintf(_("Konnte Tabelle '%s' nicht mit Daten befüllen."), $this['name'])));
         }
+    }
+
+    public function customImportEnabled()
+    {
+        $plugin = $this->getPlugin();
+        return $plugin && $plugin->customImportEnabled();
     }
 
     public function getTableHeader()

@@ -195,7 +195,7 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                         }
                         $gruppe->updateFolder(true);
 
-                        $item_id = $entry['range_id']."-".$line['teilnehmergruppe'];
+                        $item_id = $entry['range_id']."-".$object->getId();
                         if (!in_array($item_id, $imported_items)) {
                             $mapped = FleximportMappedItem::findbyItemId($item_id, "fleximport_semiro_participant_import") ?: new FleximportMappedItem();
                             $mapped['import_type'] = "fleximport_semiro_participant_import";
@@ -207,22 +207,22 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                     }
                 }
             }
-        }
-        $items = FleximportMappedItem::findBySQL(
-            "import_type = :import_type AND item_id NOT IN (:ids)",
-            array(
-                'import_type' => "fleximport_semiro_participant_import",
-                'ids' => $imported_items ?: ""
-            )
-        );
+            $items = FleximportMappedItem::findBySQL(
+                "import_type = :import_type AND item_id NOT IN (:ids)",
+                array(
+                    'import_type' => "fleximport_semiro_participant_import",
+                    'ids' => $imported_items ?: ""
+                )
+            );
 
-        foreach ($items as $item) {
-            list($user_id, $teilnehmergruppe) = explode("-", $item['item_id'], 2);
-
-            $item->delete();
+            foreach ($items as $item) {
+                list($user_id, $seminar_id) = explode("-", $item['item_id'], 2);
+                if ($object->getId() === $seminar_id) {
+                    $seminar->deleteMember($user_id);
+                    $item->delete();
+                }
+            }
         }
     }
-
-
-
 }
+

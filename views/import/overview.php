@@ -28,7 +28,7 @@
                             <?= htmlReady($table['name']) ?>
                         </div>
                         <div class="caption-actions">
-                            <? if ($table['source'] === "csv_upload") : ?>
+                            <? if ($table['source'] === "csv_upload" && !$table->customImportEnabled()) : ?>
                                 <label style="cursor: pointer;" title="<?= _("CSV-Datei hochladen") ?>">
                                     <?= Assets::img("icons/20/blue/upload") ?>
                                     <input type="file" name="tableupload[<?= $table->getId() ?>]" onChange="jQuery(this).closest('form').submit();" style="display: none;">
