@@ -139,7 +139,7 @@ class fleximport_semiro_course_import extends FleximportPlugin {
 
         $teilnehmergruppe = $line['teilnehmergruppe'];
         $imported_items = array();
-        if ($teilnehmergruppe) {
+        if ($teilnehmergruppe && $object->getId()) {
             $seminar = new Seminar($object->getId());
             $datafield = Datafield::findOneByName(FleximportConfig::get("SEMIRO_USER_DATAFIELD_NAME"));
             $dilp_kennung_feld = FleximportConfig::get("SEMIRO_DILP_KENNUNG_FIELD");
@@ -193,7 +193,16 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                         if (!$gruppe->isMember($entry['range_id'])) {
                             $gruppe->addUser($entry['range_id']);
                         }
-                        $gruppe->updateFolder(true);
+                        //$gruppe->updateFolder(true);
+                        if (!$gruppe->hasFolder()) {
+                            create_folder(
+                                (_("Dateiordner der Gruppe:") . ' ' . $teilnehmergruppe),
+                                (_("Ablage für Ordner und Dokumente dieser Gruppe")),
+                                $gruppe->id,
+                                15,
+                                $object->getId()
+                            );
+                        }
 
                         $item_id = $entry['range_id']."-".$object->getId();
                         if (!in_array($item_id, $imported_items)) {
