@@ -13,8 +13,9 @@ foreach (scandir(__DIR__."/plugins") as $plugin) {
 class Fleximport extends StudIPPlugin implements SystemPlugin {
 
     static public function CSV2Array($content, $delim = ';', $encl = '"', $optional = 1) {
-        if ($content[strlen($content)-1]!="\r" && $content[strlen($content)-1]!="\n")
+        if (($content[strlen($content) - 1] != "\r") && ($content[strlen($content) - 1] != "\n")) {
             $content .= "\r\n";
+        }
 
         $reg = '/(('.$encl.')'.($optional?'?(?(2)':'(').
             '[^'.$encl.']*'.$encl.'|[^'.$delim.'\r\n]*))('.$delim.

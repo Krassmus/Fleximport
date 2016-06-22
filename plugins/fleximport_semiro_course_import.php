@@ -73,7 +73,8 @@ class fleximport_semiro_course_import extends FleximportPlugin {
     }
 
     /**
-     * @param string $field: name of the field of target table (not the imported table!) like
+     * @param string $field: name of the field of target table (not the imported table!)
+     * @param array $line : all other data from that line.
      * @return mixed: if no mapping should apply map to false. null maps
      * to database NULL. Any other value will map to a string value.
      */
@@ -204,10 +205,10 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                             );
                         }
 
-                        $item_id = $entry['range_id']."-".$object->getId();
+                        $item_id = $entry['range_id'];
                         if (!in_array($item_id, $imported_items)) {
-                            $mapped = FleximportMappedItem::findbyItemId($item_id, "fleximport_semiro_participant_import") ?: new FleximportMappedItem();
-                            $mapped['import_type'] = "fleximport_semiro_participant_import";
+                            $mapped = FleximportMappedItem::findbyItemId($item_id, "fleximport_semiro_participant_import_".$object->getId()) ?: new FleximportMappedItem();
+                            $mapped['import_type'] = "fleximport_semiro_participant_import_".$object->getId();
                             $mapped['item_id'] = $item_id;
                             $mapped['chdate'] = time();
                             $mapped->store();
@@ -219,17 +220,15 @@ class fleximport_semiro_course_import extends FleximportPlugin {
             $items = FleximportMappedItem::findBySQL(
                 "import_type = :import_type AND item_id NOT IN (:ids)",
                 array(
-                    'import_type' => "fleximport_semiro_participant_import",
+                    'import_type' => "fleximport_semiro_participant_import_".$object->getId(),
                     'ids' => $imported_items ?: ""
                 )
             );
 
             foreach ($items as $item) {
-                list($user_id, $seminar_id) = explode("-", $item['item_id'], 2);
-                if ($object->getId() === $seminar_id) {
-                    $seminar->deleteMember($user_id);
-                    $item->delete();
-                }
+                $user_id = $item['item_id'];
+                $seminar->deleteMember($user_id);
+                $item->delete();
             }
         }
     }
