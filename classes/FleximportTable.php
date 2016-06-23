@@ -476,9 +476,12 @@ class FleximportTable extends SimpleORMap {
         );
 
         if ($classname) {
-            $data = $this->getMappedData($line);
-            $pk = $this->getPrimaryKey($data);
-
+            try {
+                $data = $this->getMappedData($line);
+                $pk = $this->getPrimaryKey($data);
+            } catch (Exception $e) {
+                return array('errors' => "Tabellenmapping ist vermutlich falsch konfiguriert: ".$e->getMessage()." ".$e->getTraceAsString());
+            }
             $object = new $classname($pk);
             if (!$object->isNew()) {
                 $output['found'] = true;
@@ -649,7 +652,7 @@ class FleximportTable extends SimpleORMap {
             //Map Institute:
             if ($this['tabledata']['simplematching']["institut_id"]['format']) {
                 if ($this['tabledata']['simplematching']["institut_id"]['format'] === "name") {
-                    $institut = Institute::findOneBySQL($data['institut_id']);
+                    $institut = Institute::findOneBySQL("Name = ?", array($data['institut_id']));
                     if ($institut) {
                         $data['institut_id'] = $institut->getId();
                     } else {

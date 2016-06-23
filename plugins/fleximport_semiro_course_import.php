@@ -207,8 +207,9 @@ class fleximport_semiro_course_import extends FleximportPlugin {
 
                         $item_id = $entry['range_id'];
                         if (!in_array($item_id, $imported_items)) {
-                            $mapped = FleximportMappedItem::findbyItemId($item_id, "fleximport_semiro_participant_import_".$object->getId()) ?: new FleximportMappedItem();
-                            $mapped['import_type'] = "fleximport_semiro_participant_import_".$object->getId();
+                            $import_type = "semiro_participant_import_".$object->getId();
+                            $mapped = FleximportMappedItem::findbyItemId($item_id, $import_type) ?: new FleximportMappedItem();
+                            $mapped['import_type'] = $import_type;
                             $mapped['item_id'] = $item_id;
                             $mapped['chdate'] = time();
                             $mapped->store();
@@ -220,7 +221,7 @@ class fleximport_semiro_course_import extends FleximportPlugin {
             $items = FleximportMappedItem::findBySQL(
                 "import_type = :import_type AND item_id NOT IN (:ids)",
                 array(
-                    'import_type' => "fleximport_semiro_participant_import_".$object->getId(),
+                    'import_type' => "semiro_participant_import_".$object->getId(),
                     'ids' => $imported_items ?: ""
                 )
             );
