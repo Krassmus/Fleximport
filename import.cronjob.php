@@ -7,7 +7,7 @@ class FleximportJob extends CronJob
      */
     public static function getName()
     {
-        return _('Führt Fleximport aus.');
+        return _('Fleximport');
     }
 
     /**
@@ -24,6 +24,8 @@ class FleximportJob extends CronJob
      */
     public function setUp()
     {
+        ini_set("memory_limit","1024M"); //won't work with suhosin
+        $GLOBALS['FLEXIMPORT_IS_CRONJOB'] = true;
         require_once dirname(__file__)."/Fleximport.class.php";
     }
 

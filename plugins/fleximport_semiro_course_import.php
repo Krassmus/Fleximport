@@ -139,6 +139,7 @@ class fleximport_semiro_course_import extends FleximportPlugin {
 
 
         $teilnehmergruppe = $line['teilnehmergruppe'];
+        $import_type = "semiro_participant_import_".$object->getId()."_".md5($teilnehmergruppe);
         $imported_items = array();
         if ($teilnehmergruppe && $object->getId()) {
             $seminar = new Seminar($object->getId());
@@ -154,8 +155,9 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                     WHERE teilnehmergruppe = ?
                 ");
                 $statement->execute(array($teilnehmergruppe));
-                $ids = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
-                foreach ($ids as $id_teilnehmer) {
+                while ($id_teilnehmer = $statement->fetch(PDO::FETCH_COLUMN, 0)) {
+                //$ids = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
+                //foreach ($ids as $id_teilnehmer) {
                     $entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND content = ? ", array(
                         $datafield->getId(),
                         $id_teilnehmer
@@ -207,7 +209,6 @@ class fleximport_semiro_course_import extends FleximportPlugin {
 
                         $item_id = $entry['range_id'];
                         if (!in_array($item_id, $imported_items)) {
-                            $import_type = "semiro_participant_import_".$object->getId();
                             $mapped = FleximportMappedItem::findbyItemId($item_id, $import_type) ?: new FleximportMappedItem();
                             $mapped['import_type'] = $import_type;
                             $mapped['item_id'] = $item_id;
@@ -221,14 +222,33 @@ class fleximport_semiro_course_import extends FleximportPlugin {
             $items = FleximportMappedItem::findBySQL(
                 "import_type = :import_type AND item_id NOT IN (:ids)",
                 array(
-                    'import_type' => "semiro_participant_import_".$object->getId(),
+                    'import_type' => $import_type,
                     'ids' => $imported_items ?: ""
                 )
             );
 
             foreach ($items as $item) {
                 $user_id = $item['item_id'];
-                $seminar->deleteMember($user_id);
+                //check if user is in another group of this course
+                $statement = DBManager::get()->prepare("
+                    SELECT 1
+                    FROM fleximport_semiro_participant_import
+                        INNER JOIN fleximport_semiro_course_import ON (fleximport_semiro_course_import.teilnehmergruppe = fleximport_semiro_participant_import.teilnehmergruppe)
+                    WHERE `".addslashes($dilp_kennung_feld)."` = :user_dilp
+                        AND fleximport_semiro_course_import.name_veranstaltung = :name
+                ");
+                $dilp_entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND range_id = ? ", array(
+                    $datafield->getId(),
+                    $user_id
+                ));
+                $statement->execute(array(
+                    'user_dilp' => $dilp_entry['content'],
+                    'name' => $object['name']
+                ));
+                $is_still_in_course = $statement->fetch(PDO::FETCH_COLUMN, 0);
+                if (!$is_still_in_course) {
+                    $seminar->deleteMember($user_id);
+                }
                 $item->delete();
             }
         }

@@ -251,6 +251,7 @@ class FleximportTable extends SimpleORMap {
         $protocol = array();
         $item_ids = array();
         $count = 0;
+        $count_successful = 0;
         while ($line = $statement->fetch(PDO::FETCH_ASSOC)) {
             $output = $this->importLine($line);
             if (isset($output['errors'])) {
@@ -260,6 +261,12 @@ class FleximportTable extends SimpleORMap {
                 $item_ids[] = is_array($output['pk']) ? implode("-", $output['pk']) : $output['pk'];
             }
             $count++;
+            if (!$output['errors']) {
+                $count_successful++;
+            }
+        }
+        if ($GLOBALS['FLEXIMPORT_IS_CRONJOB']) {
+            echo sprintf(_("%s von %s Datensätzen der Tabelle %s erfolgreich importiert."), $count_successful, $count, $this['name'])." \n";
         }
         if ($this['synchronization']) {
             $import_type = $this['import_type'];
