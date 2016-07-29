@@ -28,7 +28,7 @@ class ImportController extends PluginController {
             } elseif ($_FILES['tableupload']) {
                 foreach ($_FILES['tableupload']['tmp_name'] as $table_id => $tmp_name) {
                     $table = new FleximportTable($table_id);
-                    $output = $this->plugin->getCSVDataFromFile($tmp_name);
+                    $output = studip_utf8decode($this->plugin->getCSVDataFromFile($tmp_name));
                     $headline = array_shift($output);
                     $table->createTable($headline, $output);
                 }
@@ -37,6 +37,14 @@ class ImportController extends PluginController {
 
         }
         $this->redirect("import/overview");
+    }
+
+    public function showtable_action($table_id)
+    {
+        $this->table = new FleximportTable($table_id);
+        $this->limit = false;
+        $this->set_layout(null);
+        $this->render_template("import/_table.php");
     }
 
     public function targetdetails_action($id)

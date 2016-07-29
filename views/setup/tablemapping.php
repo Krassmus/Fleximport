@@ -58,6 +58,7 @@
                             <option value="user_id"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['format'] === "user_id" ? " selected" : "" ?>><?= _("Format: user_ids (mit Leerzeichen getrennt)") ?></option>
                             <option value="username"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['format'] === "username" ? " selected" : "" ?>><?= _("Format: Nutzernamen (mit Leerzeichen getrennt)") ?></option>
                             <option value="email"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['format'] === "email" ? " selected" : "" ?>><?= _("Format: Emails (mit Leerzeichen getrennt)") ?></option>
+                            <option value="fullname"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['format'] === "fullname" ? " selected" : "" ?>><?= _("Format: Vorname Nachname (mit Kommata getrennt)") ?></option>
                             <? foreach (Datafield::findBySQL("object_type = 'user'") as $datafield) : ?>
                                 <option value="<?= htmlReady($datafield->getId()) ?>"<?= $table['tabledata']['simplematching']['fleximport_dozenten']['format'] === $datafield->getId() ? " selected" : "" ?>><?= htmlReady(sprintf(_("Format: %s (mit Leerzeichen getrennt)"), $datafield['name'])) ?></option>
                             <? endforeach ?>

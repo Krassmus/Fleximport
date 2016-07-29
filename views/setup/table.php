@@ -1,7 +1,8 @@
-<form action="<?= PluginEngine::getLink($plugin, array(), "setup/table".($table->isNew() ? "" : "/".$table->getId())) ?>"
-      method="post"
-      class="studip_form"
-      data-dialog>
+<form
+    action="<?= PluginEngine::getLink($plugin, array(), "setup/table" . ($table->isNew() ? "" : "/" . $table->getId())) ?>"
+    method="post"
+    class="studip_form"
+    data-dialog xmlns="http://www.w3.org/1999/html">
 
     <label>
         <?= _("Tabellenname") ?>
@@ -25,11 +26,12 @@
     <? if ($table->isNew() || !$table->getPlugin() || !$table->getPlugin()->customImportEnabled()) : ?>
         <label>
             <?= _("Import über") ?>
-            <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink');">
+            <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink'); jQuery('#sqlview_info').toggle(this.value == 'sqlview');">
                 <option value="csv_upload"<?= $table['source'] === "csv_upload" || $table->isNew() ? " selected" : "" ?>><?= _("CSV-Upload") ?></option>
                 <option value="csv_weblink"<?= $table['source'] === "csv_weblink" ? " selected" : "" ?>><?= _("CSV-Internetquelle") ?></option>
-                <option value="database"<?= !$table['source'] === "database" ? " selected" : "" ?>><?= _("Datenbank") ?></option>
-                <option value="extern"<?= !$table['source'] === "extern" ? " selected" : "" ?>><?= _("Externes Tool") ?></option>
+                <option value="database"<?= $table['source'] === "database" ? " selected" : "" ?>><?= _("Datenbank") ?></option>
+                <option value="extern"<?= $table['source'] === "extern" ? " selected" : "" ?>><?= _("Externes Tool") ?></option>
+                <option value="sqlview"<?= $table['source'] === "sqlview" ? " selected" : "" ?>><?= _("SQL-View") ?></option>
             </select>
         </label>
     <? endif ?>
@@ -37,6 +39,11 @@
     <label id="weblink_info" style="<?= $table['source'] !== "csv_weblink" ? "display: none;" : "" ?>">
         <?= _("URL der CSV-Datei") ?>
         <input type="text" name="table[tabledata][weblink][url]" value="<?= htmlReady($table['tabledata']['weblink']['url']) ?>">
+    </label>
+
+    <label id="sqlview_info" style="<?= $table['source'] !== "sqlview" ? "display: none;" : "" ?>">
+        <?= _("SELECT-Statement") ?>
+        <textarea style="font-family: Monospace;" placeholder="SELECT * FROM ...." name="table[tabledata][sqlview][select]"><?= htmlReady($table['tabledata']['sqlview']['select']) ?></textarea>
     </label>
 
     <table id="server_settings" class="default nohover" style="<?= $table['source'] !== "database" ? "display: none;" : "" ?>">

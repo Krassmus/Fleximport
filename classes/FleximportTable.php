@@ -100,6 +100,15 @@ class FleximportTable extends SimpleORMap {
         return $statement->fetchAll(PDO::FETCH_COLUMN, 0);
     }
 
+    public function fetchCount()
+    {
+        $statement = DBManager::get()->prepare("
+            SELECT COUNT(*) FROM `".addslashes($this['name'])."`
+        ");
+        $statement->execute();
+        return $statement->fetch(PDO::FETCH_COLUMN);
+    }
+
     public function fetchLines()
     {
         $statement = DBManager::get()->prepare("
@@ -595,8 +604,22 @@ class FleximportTable extends SimpleORMap {
             }
         }
 
+
         //special mapping
-        if (in_array($this['import_type'], array("Course", "CourseMember")) && !$data['seminar_id']) {
+        if (($this['import_type'] === "Course") && !$data['seminar_id']) {
+            //Map start_time
+            if ($this['tabledata']['simplematching']["start_time"]['column'] === "fleximport_current_semester") {
+                $semester = Semester::findCurrent();
+                if ($semester) {
+                    $data['start_time'] = $semester->beginn;
+                }
+            } elseif ($this['tabledata']['simplematching']["start_time"]['column'] === "fleximport_next_semester") {
+                $semester = Semester::findNext();
+                if ($semester) {
+                    $data['start_time'] = $semester->beginn;
+                }
+            }
+
             //Map seminar_id :
             if ($this['tabledata']['simplematching']["seminar_id"]['column'] === "fleximport_map_from_veranstaltungsnummer") {
                 $course = Course::findOneByVeranstaltungsnummer(
@@ -612,10 +635,21 @@ class FleximportTable extends SimpleORMap {
                     $data['seminar_id'] = $course->getId();
                 }
             }
+            if ($this['tabledata']['simplematching']["seminar_id"]['column'] === "fleximport_map_from_veranstaltungsnummer_and_semester") {
+                $course = Course::findOneBySQL("name = ? AND start_time = ?", array($data['name'], $data['start_time']));
+                if ($course) {
+                    $data['seminar_id'] = $course->getId();
+                }
+            }
 
             //Map dozenten:
             if ($this['tabledata']['simplematching']["fleximport_dozenten"]['column'] && !in_array("fleximport_dozenten", $this->fieldsToBeDynamicallyMapped())) {
-                $data['fleximport_dozenten'] = (array) preg_split("/\s+/", $data['fleximport_dozenten'], null, PREG_SPLIT_NO_EMPTY);
+                $data['fleximport_dozenten'] = (array) preg_split(
+                    $this['tabledata']['simplematching']["fleximport_dozenten"]['format'] === "fullname" ? "/\s*,\s*/" : "/\s+/",
+                    $data['fleximport_dozenten'],
+                    null,
+                    PREG_SPLIT_NO_EMPTY
+                );
 
                 switch ($this['tabledata']['simplematching']["fleximport_dozenten"]['format']) {
                     case "user_id":
@@ -634,6 +668,17 @@ class FleximportTable extends SimpleORMap {
                     case "email":
                         $data['fleximport_dozenten'] = array_map(function ($email) {
                             $user = User::findOneByEmail($email);
+                            if ($user) {
+                                return $user->getId();
+                            } else {
+                                return null;
+                            }
+                        }, $data['fleximport_dozenten']);
+                        break;
+                    case "fullname":
+                        $data['fleximport_dozenten'] = array_map(function ($fullname) {
+                            list($vorname, $nachname) = (array) preg_split("/\s+/", $fullname, null, PREG_SPLIT_NO_EMPTY);
+                            $user = User::findOneBySQL("Vorname = ? AND Nachname = ? AND perms = 'dozent'", array($vorname, $nachname));
                             if ($user) {
                                 return $user->getId();
                             } else {
@@ -704,20 +749,6 @@ class FleximportTable extends SimpleORMap {
                         }
                     }
                     $data['fleximport_studyarea'] = $study_areas;
-                }
-            }
-
-
-            //Map start_time
-            if ($this['tabledata']['simplematching']["start_time"]['column'] === "fleximport_current_semester") {
-                $semester = Semester::findCurrent();
-                if ($semester) {
-                    $data['start_time'] = $semester->beginn;
-                }
-            } elseif ($this['tabledata']['simplematching']["start_time"]['column'] === "fleximport_next_semester") {
-                $semester = Semester::findNext();
-                if ($semester) {
-                    $data['start_time'] = $semester->beginn;
                 }
             }
         }

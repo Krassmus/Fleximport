@@ -21,6 +21,12 @@ class SetupController extends PluginController {
             $this->table->setData($data);
             if ($this->table['import_type'] === "other") {
                 $this->table['import_type'] = Request::get("other_import_type");
+            } elseif ($this->table['source'] === "sqlview" && $GLOBALS['perm']->have_perm("root")) {
+                DBManager::get()->exec("DROP VIEW IF EXISTS `".addslashes($data['name'])."`");
+                DBManager::get()->exec("DROP TABLE IF EXISTS `".addslashes($data['name'])."`");
+                DBManager::get()->exec("
+                    CREATE VIEW `".addslashes($data['name'])."` AS ".$data['tabledata']['sqlview']['select']."; 
+                ");
             }
             $this->table->store();
             PageLayout::postMessage(MessageBox::success(_("Daten wurden gespeichert.")));
