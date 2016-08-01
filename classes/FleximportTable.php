@@ -526,6 +526,10 @@ class FleximportTable extends SimpleORMap {
                         $output['errors'] .= "Keine gültige Heimateinrichtung. ";
                     }
 
+                    if (!Semester::findByTimestamp($data['start_time'])) {
+                        $output['errors'] .= "Semester wurde nicht gefunden. ";
+                    }
+
                     if ($data['status']) {
                         if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$data['status']]['class']]['bereiche']) {
                             $found = false;
@@ -618,6 +622,15 @@ class FleximportTable extends SimpleORMap {
                 if ($semester) {
                     $data['start_time'] = $semester->beginn;
                 }
+            } elseif ($this['tabledata']['simplematching']["start_time"]['format']) {
+                if ($this['tabledata']['simplematching']["start_time"]['format'] === "name") {
+                    $semester = Semester::findOneBySQL("name = ?", array($data['start_time']));
+                    if ($semester) {
+                        $data['start_time'] = $semester->beginn;
+                    } else {
+                        $data['start_time'] = null;
+                    }
+                } //else $data['start_time'] is already a unix-timestamp
             }
 
             //Map seminar_id :

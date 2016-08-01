@@ -1,4 +1,4 @@
-<? $limit = ($limit === false) || ($limit > 0) ? $limit : 100 ?>
+<? $limit = ($limit === false) || ($limit > 0) ? $limit : 50 ?>
 <? $count = $table->fetchCount() ?>
 <? $displayed_lines = 0 ?>
 <table class="default" style="margin-bottom: 50px;" id="<?= $table->getId() ?>">

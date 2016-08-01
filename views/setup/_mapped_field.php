@@ -66,6 +66,14 @@
                     </select>
                 </div>
             <? endif ?>
+            <? if (($table['import_type'] === "Course") && ($fieldname === "start_time")) : ?>
+                <div class="format" id="simplematching_<?= htmlReady($fieldname) ?>_format">
+                    <select name="tabledata[simplematching][<?= htmlReady($fieldname) ?>][format]">
+                        <option value=""><?= _("Format: Unix-Timestamp") ?></option>
+                        <option value="name"<?= $table['tabledata']['simplematching'][$fieldname]['format'] === "name" ? " selected" : "" ?>><?= _("Format: Name") ?></option>
+                    </select>
+                </div>
+            <? endif ?>
             <? if (($table['import_type'] === "Course") && ($fieldname === "status")) : ?>
                 <div class="format" id="simplematching_<?= htmlReady($fieldname) ?>_format">
                     <select name="tabledata[simplematching][<?= htmlReady($fieldname) ?>][format]">
