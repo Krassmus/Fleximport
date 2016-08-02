@@ -89,6 +89,8 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                         $cycle->end_hour = $matches[4];
                         $cycle->end_minute = $matches[5];
                         $cycle['weekday'] = $weekdays[$day];
+                        $cycle['week_offset'] = 0;
+                        $cycle['end_offset'] = 0;
                         $cycle['cycle'] = 0; //wöchentlich
                         $cycle->store();
                         $cycle_id = $cycle->getId();
@@ -132,6 +134,8 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                         $cycle->end_minute = $matches[5];
                         $cycle['weekday'] = $weekdays[$day];
                         $cycle['cycle'] = 0; //wöchentlich
+                        $cycle['week_offset'] = 0;
+                        $cycle['end_offset'] = 0;
                         $cycle->store();
 
                         $metadates[] = $found;
