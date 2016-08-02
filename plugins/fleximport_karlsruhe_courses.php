@@ -56,7 +56,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
         $import_type_dates = "karlsruhe_coursedates_import_".$object->getId();
         $import_type_metadates = "karlsruhe_coursemetadates_import_".$object->getId();
         foreach ($zeiten as $zeit) {
-            if (!is_numeric($zeit[0])) {
+            if (!is_numeric(trim($zeit[0]))) {
                 preg_match("/(\w+) (\d+):(\d+)\s*-\s*(\d+):(\d+)/", $zeit, $matches);
                 $day = strtolower($matches[1]);
                 if (isset($weekdays[$day])) {
@@ -127,9 +127,10 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                     }
                 }
             } else {
-                $zeit = explode("-", $zeit);
-                $begin = strtotime($zeit[0]);
-                $end = strtotime($zeit[1]);
+                //$zeit = explode("-", $zeit);
+                preg_match("/(\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{1,2})\s*-\s(\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{1,2})/", $zeit, $matches);
+                $begin = strtotime($matches[1]);
+                $end = strtotime($matches[2]);
                 $found = false;
 
                 $dates = CourseDate::findBySQL("range_id = :course_id AND date = :begin AND end_time = :end", array(
