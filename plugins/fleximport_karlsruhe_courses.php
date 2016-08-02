@@ -82,6 +82,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                         }
                     }
                     if (!$found) {
+                        $semester = $object->end_semester;
                         $cycle = new SeminarCycleDate(); //Does not work yet
                         $cycle['seminar_id'] = $object->getId();
                         $cycle->start_hour = $matches[2];
@@ -90,7 +91,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                         $cycle->end_minute = $matches[5];
                         $cycle['weekday'] = $weekdays[$day];
                         $cycle['week_offset'] = 0;
-                        $cycle['end_offset'] = 0;
+                        $cycle['end_offset'] = floor(($semester->ende - $semester->beginn) / (7*24*60*60)) - 2;
                         $cycle['cycle'] = 0; //wöchentlich
                         $cycle->store();
                         $cycle_id = $cycle->getId();
@@ -126,6 +127,8 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                             'startWeek' => 0,
                             'turnus' => 0
                         ));*/
+
+                        $semester = $object->end_semester;
                         $cycle = new SeminarCycleDate($found);
                         $cycle['seminar_id'] = $object->getId();
                         $cycle->start_hour = $matches[2];
@@ -135,7 +138,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                         $cycle['weekday'] = $weekdays[$day];
                         $cycle['cycle'] = 0; //wöchentlich
                         $cycle['week_offset'] = 0;
-                        $cycle['end_offset'] = 0;
+                        $cycle['end_offset'] = floor(($semester->ende - $semester->beginn) / (7*24*60*60)) - 2;
                         $cycle->store();
 
                         $metadates[] = $found;
