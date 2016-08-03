@@ -89,8 +89,8 @@
                         <? endif ?>
                     <? endforeach ?>
                 </tr>
+                <? $displayed_lines++ ?>
             <? endif ?>
-            <? $displayed_lines++ ?>
         <? endforeach ?>
         <? if ($count > $displayed_lines) : ?>
             <tr>

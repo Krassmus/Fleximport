@@ -17,14 +17,22 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
      */
     public function mapField($field, $line) {
         if ($field === "fleximport_dozenten") {
-            $statement = DBManager::get()->prepare("
-                SELECT user_id
-                FROM auth_user_md5
-                WHERE Nachname = ?
-                    AND perms = 'dozent'
-            ");
-            $statement->execute(array($line['dozent']));
-            return $statement->fetchAll(PDO::FETCH_COLUMN, 0);
+            $dozent_ids = array();
+            $dozenten = preg_split("/\s*,\s*/", $line['dozent'], null, PREG_SPLIT_NO_EMPTY);
+            foreach ($dozenten as $dozent) {
+                $statement = DBManager::get()->prepare("
+                    SELECT user_id
+                    FROM auth_user_md5
+                    WHERE Nachname = ?
+                        AND perms = 'dozent'
+                ");
+                $statement->execute(array($dozent));
+                $result = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
+                if (is_array($result)) {
+                    $dozent_ids = array_merge($dozent_ids, $result);
+                }
+            }
+            return $dozent_ids;
         }
         return false;
     }
@@ -82,7 +90,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                         }
                     }
                     if (!$found) {
-                        $semester = $object->end_semester;
+                        /*$semester = $object->end_semester;
                         $cycle = new SeminarCycleDate(); //Does not work yet
                         $cycle['seminar_id'] = $object->getId();
                         $cycle->start_hour = $matches[2];
@@ -94,9 +102,9 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                         $cycle['end_offset'] = floor(($semester->ende - $semester->beginn) / (7*24*60*60)) - 2;
                         $cycle['cycle'] = 0; //wöchentlich
                         $cycle->store();
-                        $cycle_id = $cycle->getId();
+                        $cycle_id = $cycle->getId();*/
 
-                        /*$seminar = new Seminar($object->getId());
+                        $seminar = new Seminar($object->getId());
                         $cycle_id = $seminar->addCycle(array(
                             'day' => $weekdays[$day],
                             'start_stunde' => $matches[2],
@@ -106,7 +114,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                             'week_offset' => 0,
                             'startWeek' => 0,
                             'turnus' => 0
-                        ));*/
+                        ));
 
                         $mapped = new FleximportMappedItem();
                         $mapped['import_type'] = $import_type_metadates;
@@ -115,7 +123,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
 
                         $metadates[] = $cycle_id;
                     } else {
-                        /*$seminar = new Seminar($object->getId());
+                        $seminar = new Seminar($object->getId());
                         $seminar->editCycle(array(
                             'cycle_id' => $found,
                             'day' => $weekdays[$day],
@@ -126,9 +134,9 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                             'week_offset' => 0,
                             'startWeek' => 0,
                             'turnus' => 0
-                        ));*/
+                        ));
 
-                        $semester = $object->end_semester;
+                        /*$semester = $object->end_semester;
                         $cycle = new SeminarCycleDate($found);
                         $cycle['seminar_id'] = $object->getId();
                         $cycle->start_hour = $matches[2];
@@ -139,7 +147,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                         $cycle['cycle'] = 0; //wöchentlich
                         $cycle['week_offset'] = 0;
                         $cycle['end_offset'] = floor(($semester->ende - $semester->beginn) / (7*24*60*60)) - 2;
-                        $cycle->store();
+                        $cycle->store();*/
 
                         $metadates[] = $found;
                     }
