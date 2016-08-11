@@ -46,6 +46,21 @@
                         </option>
                     <? endif ?>
                 <? endif ?>
+                <? if ($table['import_type'] === "User") : ?>
+                    <? if ($fieldname === "user_id") : ?>
+                        <option value="fleximport_map_from_username"<?= $table['tabledata']['simplematching']['user_id']['column'] === "fleximport_map_from_username" ? " selected" : "" ?>>
+                            <?= _("Von Username ermitteln") ?>
+                        </option>
+                        <option value="fleximport_map_from_email"<?= $table['tabledata']['simplematching']['user_id']['column'] === "fleximport_map_from_email" ? " selected" : "" ?>>
+                            <?= _("Von Email ermitteln") ?>
+                        </option>
+                        <? foreach (Datafield::findBySQL("object_type = 'user' ORDER BY name") as $datafield) : ?>
+                            <option value="fleximport_map_from_datafield_<?= $datafield->getId() ?>"<?= $table['tabledata']['simplematching']['user_id']['column'] === "fleximport_map_from_datafield_".$datafield->getId() ? " selected" : "" ?>>
+                                <?= sprintf(_("Von Datenfeld '%s' ermitteln"), $datafield['name']) ?>
+                            </option>
+                        <? endforeach ?>
+                    <? endif ?>
+                <? endif ?>
             </select>
             <div id="simplematching_<?= htmlReady($fieldname) ?>_static" style="<?= $table['tabledata']['simplematching'][$fieldname]['column'] !== "static value" ? "display: none;" : "" ?>">
                 <input type="text"

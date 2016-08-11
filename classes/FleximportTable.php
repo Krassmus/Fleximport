@@ -193,6 +193,7 @@ class FleximportTable extends SimpleORMap {
             foreach ($headers as $key => $field) {
                 $key < 1 || $insert_sql .= ", ";
                 $value = trim($line[$key]);
+                $field = strtolower($this->reduceDiakritikaFromIso88591($field));
                 $insert_sql .= "`".addslashes($field)."` = ".$db->quote($value)." ";
             }
             $db->exec($insert_sql);
@@ -413,7 +414,7 @@ class FleximportTable extends SimpleORMap {
                 break;
         }
         foreach ($datafields as $datafield) {
-            $fieldname = strtolower($datafield['name']);
+            $fieldname = $datafield['name'];
 
             if (isset($data[$fieldname])) {
                 $entry = new DatafieldEntryModel(array(
@@ -561,6 +562,30 @@ class FleximportTable extends SimpleORMap {
                     }
 
                     break;
+                case "User":
+                    if (!$data['username']) {
+                        $output['errors'] .= "Kein Nutzername. ";
+                    } else {
+                        $validator = new email_validation_class;
+                        if (!$validator->ValidateUsername($data['username'])) {
+                            $output['errors'] .= "Nutzername syntaktisch falsch. ";
+                        }
+                    }
+                    if (!$data['email']) {
+                        $output['errors'] .= "Keine Email. ";
+                    } else {
+                        $validator = new email_validation_class;
+                        if (!$validator->ValidateEmailAddress($data['email'])) {
+                            $output['errors'] .= "Email syntaktisch falsch. ";
+                        }
+                    }
+                    if (!$data['perms'] || !in_array($data['perms'], array("user", "autor", "tutor", "dozent", "admin", "root"))) {
+                        $output['errors'] .= "Keine korrekten Perms gesetzt. ";
+                    }
+                    if (!$data['vorname'] && !$data['nachname']) {
+                        $output['errors'] .= "Kein Name gesetzt. ";
+                    }
+                    break;
             }
         }
 
@@ -589,8 +614,9 @@ class FleximportTable extends SimpleORMap {
                 break;
             case "User":
                 foreach (Datafield::findBySQL("object_type = 'user'") as $datafield) {
-                    $fields[] = strtolower($datafield['name']);
+                    $fields[] = $datafield['name'];
                 }
+                $fields[] = "fleximport_userdomains";
                 break;
         }
 
@@ -779,6 +805,38 @@ class FleximportTable extends SimpleORMap {
                 }
             }
         }
+
+        if (($this['import_type'] === "User") && !$data['user_id']) {
+            //Map user_id :
+            if ($this['tabledata']['simplematching']["user_id"]['column'] === "fleximport_map_from_username") {
+                $user = User::findOneByUsername(
+                    $data['username'] ?: $line['username']
+                );
+                if ($user) {
+                    $data['user_id'] = $user->getId();
+                }
+            }
+            if ($this['tabledata']['simplematching']["user_id"]['column'] === "fleximport_map_from_email") {
+                $user = User::findOneByEmail(
+                    $data['email'] ?: $line['email']
+                );
+                if ($user) {
+                    $data['user_id'] = $user->getId();
+                }
+            }
+            if (strpos($this['tabledata']['simplematching']["user_id"]['column'], "fleximport_map_from_datafield_") === 0) {
+                $datafield_id = substr($this['tabledata']['simplematching']["user_id"]['column'], strlen("fleximport_map_from_datafield_"));
+                $datafield = new DataField($datafield_id);
+                $user = User::findByDatafield(
+                    $datafield_id,
+                    $data[$datafield['name']] ?: $line[$datafield['name']]
+                );
+                if ($user[0]) {
+                    $user = $user[0];
+                    $data['user_id'] = $user->getId();
+                }
+            }
+        }
         return $data;
     }
 
@@ -798,11 +856,14 @@ class FleximportTable extends SimpleORMap {
     {
         $classname = $this['import_type'];
         if ($classname) {
-            if (count($this->sorm_metadata) === 0) {
-                $object = new $classname();
-                $this->sorm_metadata = $object->getTableMetadata();
+            $object = new $classname();
+            $this->sorm_metadata = $object->getTableMetadata();
+            $fields = $this->sorm_metadata['fields'];
+            if ($classname === "User") {
+                $userinfometadata = $object->info->getTableMetadata();
+                $fields = array_merge($fields, $userinfometadata['fields']);
             }
-            return array_keys($this->sorm_metadata['fields']);
+            return array_keys($fields);
         } else {
             return array();
         }

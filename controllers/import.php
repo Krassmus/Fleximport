@@ -27,10 +27,12 @@ class ImportController extends PluginController {
                 PageLayout::postMessage(MessageBox::success(_("Import wurde durchgeführt"), $protocol));
             } elseif ($_FILES['tableupload']) {
                 foreach ($_FILES['tableupload']['tmp_name'] as $table_id => $tmp_name) {
-                    $table = new FleximportTable($table_id);
-                    $output = studip_utf8decode($this->plugin->getCSVDataFromFile($tmp_name));
-                    $headline = array_shift($output);
-                    $table->createTable($headline, $output);
+                    if ($tmp_name) {
+                        $table = new FleximportTable($table_id);
+                        $output = studip_utf8decode($this->plugin->getCSVDataFromFile($tmp_name));
+                        $headline = array_shift($output);
+                        $table->createTable($headline, $output);
+                    }
                 }
                 PageLayout::postMessage(MessageBox::success(_("CSV-Datei hochgeladen")));
             }
