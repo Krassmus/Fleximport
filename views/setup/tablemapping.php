@@ -86,11 +86,39 @@
                                 <? endif ?>
                             <? endforeach ?>
                         </select>
-                        <div id="simplematching_fleximport_studyarea_static" style="<?= $table['tabledata']['simplematching']['fleximport_dozenten']['column'] !== "static value" ? "display: none;" : "" ?>">
+                        <div id="simplematching_fleximport_studyarea_static" style="<?= $table['tabledata']['simplematching']['fleximport_studyarea']['column'] !== "static value" ? "display: none;" : "" ?>">
                             <input type="text"
                                    name="tabledata[simplematching][fleximport_studyarea][static]"
                                    value="<?= htmlReady($table['tabledata']['simplematching']['fleximport_studyarea']['static']) ?>"
                                    placeholder="<?= _("semikolonseparierte sem_tree_ids") ?>">
+                        </div>
+                    <? endif ?>
+                </td>
+            </tr>
+
+            <? $dynamically_mapped = in_array("fleximport_locked", $table->fieldsToBeDynamicallyMapped()) ?>
+            <tr style="<?= $dynamically_mapped ? "opacity: 0.5;" : "" ?>" class="<?= $dynamically_mapped ? "dynamically_mapped" : "" ?>">
+                <td>fleximport_locked</td>
+                <td>
+                    <? if ($dynamically_mapped) : ?>
+                        <?= _("Wird von einem Plugin dynamisch gemapped") ?>
+                    <? else : ?>
+                        <select name="<?= _("tabledata[simplematching][fleximport_locked][column]") ?>" onChange="jQuery('#simplematching_fleximport_locked_static').toggle(this.value === 'static value'); jQuery('#simplematching_fleximport_locked_format').toggle(this.value && (this.value !== 'static value')); ">
+                            <option value="" title="<?= _("Wert wird nicht gemapped") ?>"></option>
+                            <option value="static value"<?= $table['tabledata']['simplematching']['fleximport_locked']['column'] === "static value" ? " selected" : "" ?>>[<?= _("Fester Eintrag") ?>]</option>
+                            <? foreach ($table->getTableHeader() as $header) : ?>
+                                <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
+                                    <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching']['fleximport_locked']['column'] ? " selected" : "" ?>>
+                                        <?= htmlReady($header) ?>
+                                    </option>
+                                <? endif ?>
+                            <? endforeach ?>
+                        </select>
+                        <div id="simplematching_fleximport_locked_static" style="<?= $table['tabledata']['simplematching']['fleximport_locked']['column'] !== "static value" ? "display: none;" : "" ?>">
+                            <input type="text"
+                                   name="tabledata[simplematching][fleximport_locked][static]"
+                                   value="<?= htmlReady($table['tabledata']['simplematching']['fleximport_locked']['static']) ?>"
+                                   placeholder="<?= _("1 für gesperrt") ?>">
                         </div>
                     <? endif ?>
                 </td>

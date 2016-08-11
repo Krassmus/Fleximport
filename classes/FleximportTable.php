@@ -450,6 +450,19 @@ class FleximportTable extends SimpleORMap {
                 }
             }
 
+            //Lock or unlock course
+            if ($data['fleximport_locked']) {
+                CourseSet::addCourseToSet(
+                    CourseSet::getGlobalLockedAdmissionSetId(),
+                    $object->getId()
+                );
+            } elseif (in_array($data['fleximport_locked'], array("0", 0)) && ($data['fleximport_locked'] !== "")) {
+                CourseSet::removeCourseFromSet(
+                    CourseSet::getGlobalLockedAdmissionSetId(),
+                    $object->getId()
+                );
+            }
+
             $folder_exist = DBManager::get()->prepare("
                 SELECT 1 FROM folder WHERE range_id = ?
             ");
@@ -572,6 +585,7 @@ class FleximportTable extends SimpleORMap {
                 $fields[] = "fleximport_dozenten";
                 $fields[] = "fleximport_related_institutes";
                 $fields[] = "fleximport_studyarea";
+                $fields[] = "fleximport_locked";
                 break;
             case "User":
                 foreach (Datafield::findBySQL("object_type = 'user'") as $datafield) {
