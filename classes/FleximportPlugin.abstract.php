@@ -11,7 +11,8 @@
 
 abstract class FleximportPlugin {
 
-    protected $table; //an instance of FleximportTable
+    protected $table;           //an instance of FleximportTable
+    public $api = array();      //just some variable to store data of needed
 
     /**
      * The constructor. Usually you don't need to care about this.

@@ -1,5 +1,5 @@
 <? $already_configs = array() ?>
-<form action="<?= PluginEngine::getLink($plugin, array(), "config/edit") ?>" method="post" class="default">
+<form action="<?= PluginEngine::getLink($plugin, array(), "config/edit") ?>" method="post" class="default importconfigs">
     <table class="default">
         <thead>
             <tr>
@@ -14,7 +14,7 @@
                         <input type="text" name="configs[<?= htmlReady($name) ?>][name]" value="<?= htmlReady($name) ?>" style="width: calc(100% - 20px);">
                     </td>
                     <td>
-                        <input type="text" name="configs[<?= htmlReady($name) ?>][value]" value="<?= htmlReady($value) ?>" style="width: calc(100% - 20px);">
+                        <textarea name="configs[<?= htmlReady($name) ?>][value]" style="width: calc(100% - 20px); min-height: 40px; height: 40px;"><?= htmlReady($value) ?></textarea>
                     </td>
                 </tr>
                 <? $already_configs[] = $name ?>
@@ -25,7 +25,7 @@
                         <input type="text" name="configs[<?= htmlReady($config_name) ?>][name]" value="<?= htmlReady($config_name) ?>" style="width: calc(100% - 20px);">
                     </td>
                     <td>
-                        <input type="text" name="configs[<?= htmlReady($config_name) ?>][value]" value="" style="width: calc(100% - 20px);">
+                        <textarea name="configs[<?= htmlReady($config_name) ?>][value]" style="width: calc(100% - 20px); min-height: 40px; height: 40px;"></textarea>
                     </td>
                 </tr>
             <? endforeach ?>
@@ -36,7 +36,7 @@
                     <input type="text" name="new_name" value="" style="width: calc(100% - 20px);" placeholder="<?= _("Neuer Parameter") ?>">
                 </td>
                 <td>
-                    <input type="text" name="new_value" value="" style="width: calc(100% - 20px);">
+                    <textarea name="new_value" style="width: calc(100% - 20px); min-height: 40px; height: 40px;"></textarea>
                 </td>
             </tr>
         </tbody>
@@ -49,3 +49,9 @@
         </tfoot>
     </table>
 </form>
+
+<script>
+    jQuery(function () {
+        jQuery(".importconfigs textarea").elastic();
+    });
+</script>

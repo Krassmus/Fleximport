@@ -4,6 +4,8 @@ require_once 'app/controllers/plugin_controller.php';
 
 class SetupController extends PluginController {
 
+    protected $utf8decode_xhr = true;
+
     function before_filter(&$action, &$args)
     {
         parent::before_filter($action, $args);

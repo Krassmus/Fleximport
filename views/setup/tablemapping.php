@@ -124,6 +124,73 @@
                 </td>
             </tr>
         <? endif ?>
+        <? if ($table['import_type'] === "User") : ?>
+            <? $dynamically_mapped = in_array("fleximport_userdomains", $table->fieldsToBeDynamicallyMapped()) ?>
+            <tr style="<?= $dynamically_mapped ? "opacity: 0.5;" : "" ?>" class="<?= $dynamically_mapped ? "dynamically_mapped" : "" ?>">
+                <td>fleximport_userdomains</td>
+                <td>
+                    <? if ($dynamically_mapped) : ?>
+                        <?= _("Wird von einem Plugin dynamisch gemapped") ?>
+                    <? else : ?>
+                        <select name="<?= _("tabledata[simplematching][fleximport_userdomains][column]") ?>" onChange="jQuery('#simplematching_fleximport_userdomains_static').toggle(this.value === 'static value'); ">
+                            <option value="" title="<?= _("Wert wird nicht gemapped") ?>"></option>
+                            <option value="static value"<?= $table['tabledata']['simplematching']['fleximport_userdomains']['column'] === "static value" ? " selected" : "" ?>>[<?= _("Fester Eintrag") ?>]</option>
+                            <? foreach ($table->getTableHeader() as $header) : ?>
+                                <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
+                                    <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching']['fleximport_userdomains']['column'] ? " selected" : "" ?>>
+                                        <?= htmlReady($header) ?>
+                                    </option>
+                                <? endif ?>
+                            <? endforeach ?>
+                        </select>
+                        <div id="simplematching_fleximport_userdomains_static" style="<?= $table['tabledata']['simplematching']['fleximport_userdomains']['column'] !== "static value" ? "display: none;" : "" ?>">
+                            <input type="text"
+                                   name="tabledata[simplematching][fleximport_userdomains][static]"
+                                   value="<?= htmlReady($table['tabledata']['simplematching']['fleximport_userdomains']['static']) ?>"
+                                   placeholder="<?= _("kommaseparierte Domänennamen oder Domänen-IDs") ?>">
+                        </div>
+                    <? endif ?>
+                </td>
+            </tr>
+            <? $dynamically_mapped = in_array("fleximport_expiration_date", $table->fieldsToBeDynamicallyMapped()) ?>
+            <tr style="<?= $dynamically_mapped ? "opacity: 0.5;" : "" ?>" class="<?= $dynamically_mapped ? "dynamically_mapped" : "" ?>">
+                <td>fleximport_expiration_date</td>
+                <td>
+                    <? if ($dynamically_mapped) : ?>
+                        <?= _("Wird von einem Plugin dynamisch gemapped") ?>
+                    <? else : ?>
+                        <select name="tabledata[simplematching][fleximport_expiration_date][column]" onChange="jQuery('#simplematching_fleximport_expiration_date_static').toggle(this.value === 'static value'); ">
+                            <option value="" title="<?= _("Wert wird nicht gemapped") ?>"></option>
+                            <option value="static value"<?= $table['tabledata']['simplematching']['fleximport_expiration_date']['column'] === "static value" ? " selected" : "" ?>>[<?= _("Fester Eintrag") ?>]</option>
+                            <? foreach ($table->getTableHeader() as $header) : ?>
+                                <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
+                                    <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching']['fleximport_expiration_date']['column'] ? " selected" : "" ?>>
+                                        <?= htmlReady($header) ?>
+                                    </option>
+                                <? endif ?>
+                            <? endforeach ?>
+                        </select>
+                        <div id="simplematching_fleximport_expiration_date_static" style="<?= $table['tabledata']['simplematching']['fleximport_expiration_date']['column'] !== "static value" ? "display: none;" : "" ?>">
+                            <input type="text"
+                                   name="tabledata[simplematching][fleximport_expiration_date][static]"
+                                   value="<?= htmlReady($table['tabledata']['simplematching']['fleximport_expiration_date']['static']) ?>"
+                                   placeholder="<?= _("Datum") ?>">
+                        </div>
+                    <? endif ?>
+                </td>
+            </tr>
+            <? $dynamically_mapped = in_array("fleximport_welcome_message", $table->fieldsToBeDynamicallyMapped()) ?>
+            <tr style="<?= $dynamically_mapped ? "opacity: 0.5;" : "" ?>" class="<?= $dynamically_mapped ? "dynamically_mapped" : "" ?>">
+                <td>fleximport_welcome_message</td>
+                <td>
+                    <? if ($dynamically_mapped) : ?>
+                        <?= _("Wird von einem Plugin dynamisch gemapped") ?>
+                    <? else : ?>
+                        <input type="text" name="tabledata[simplematching][fleximport_welcome_message][column]" value="<?= htmlReady($table['tabledata']['simplematching']['fleximport_expiration_date']['column']) ?>">
+                    <? endif ?>
+                </td>
+            </tr>
+        <? endif ?>
         </tbody>
     </table>
 

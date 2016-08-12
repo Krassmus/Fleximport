@@ -209,7 +209,6 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
             )
         );
         foreach ($items as $item) {
-            var_dump($item['item_id']);
             $cycle = new SeminarCycleDate($item['item_id']);
             $cycle->delete();
         }

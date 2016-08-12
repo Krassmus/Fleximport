@@ -398,6 +398,28 @@ class FleximportTable extends SimpleORMap {
                     ));
                 }
                 break;
+            case "User":
+                if ($this['tabledata']['simplematching']["fleximport_userdomains"]['column'] || in_array("fleximport_userdomains", $this->fieldsToBeDynamicallyMapped())) {
+                    $olddomains = UserDomain::getUserDomainsForUser($object->getId());
+                    foreach ($olddomains as $olddomain) {
+                        if (!in_array($olddomain->getID(), (array)$data['fleximport_userdomains'])) {
+                            $olddomain->removeUser($object->getId());
+                        }
+                    }
+                    foreach ($data['fleximport_userdomains'] as $userdomain) {
+                        $domain = new UserDomain($userdomain);
+                        $domain->addUser($object->getId());
+                    }
+                    AutoInsert::instance()->saveUser($object->getId());
+                }
+                if ($this['tabledata']['simplematching']["fleximport_expiration_date"]['column'] || in_array("fleximport_expiration_date", $this->fieldsToBeDynamicallyMapped())) {
+                    if ($data['fleximport_expiration_date']) {
+                        UserConfig::get($object->getId())->store("EXPIRATION_DATE", $data['fleximport_expiration_date']);
+                    } else {
+                        UserConfig::get($object->getId())->delete("EXPIRATION_DATE");
+                    }
+                }
+                break;
         }
 
         //Datafields:
@@ -563,27 +585,31 @@ class FleximportTable extends SimpleORMap {
 
                     break;
                 case "User":
-                    if (!$data['username']) {
-                        $output['errors'] .= "Kein Nutzername. ";
-                    } else {
-                        $validator = new email_validation_class;
-                        if (!$validator->ValidateUsername($data['username'])) {
-                            $output['errors'] .= "Nutzername syntaktisch falsch. ";
+                    if (!$data['user_id']) {
+                        if (!$data['username']) {
+                            $output['errors'] .= "Kein Nutzername. ";
+                        } else {
+                            $validator = new email_validation_class;
+                            if (!$validator->ValidateUsername($data['username'])) {
+                                $output['errors'] .= "Nutzername syntaktisch falsch. ";
+                            } elseif (get_userid($data['username']) && get_userid($data['username']) !== $data['user_id']) {
+                                $output['errors'] .= "Nutzername schon vergeben. ";
+                            }
                         }
-                    }
-                    if (!$data['email']) {
-                        $output['errors'] .= "Keine Email. ";
-                    } else {
-                        $validator = new email_validation_class;
-                        if (!$validator->ValidateEmailAddress($data['email'])) {
-                            $output['errors'] .= "Email syntaktisch falsch. ";
+                        if (!$data['email'] && !$data['user_id']) {
+                            $output['errors'] .= "Keine Email. ";
+                        } else {
+                            $validator = new email_validation_class;
+                            if (!$validator->ValidateEmailAddress($data['email'])) {
+                                $output['errors'] .= "Email syntaktisch falsch. ";
+                            }
                         }
-                    }
-                    if (!$data['perms'] || !in_array($data['perms'], array("user", "autor", "tutor", "dozent", "admin", "root"))) {
-                        $output['errors'] .= "Keine korrekten Perms gesetzt. ";
-                    }
-                    if (!$data['vorname'] && !$data['nachname']) {
-                        $output['errors'] .= "Kein Name gesetzt. ";
+                        if (!$data['perms'] || !in_array($data['perms'], array("user", "autor", "tutor", "dozent", "admin", "root"))) {
+                            $output['errors'] .= "Keine korrekten Perms gesetzt. ";
+                        }
+                        if (!$data['vorname'] && !$data['nachname']) {
+                            $output['errors'] .= "Kein Name gesetzt. ";
+                        }
                     }
                     break;
             }
@@ -617,6 +643,8 @@ class FleximportTable extends SimpleORMap {
                     $fields[] = $datafield['name'];
                 }
                 $fields[] = "fleximport_userdomains";
+                $fields[] = "fleximport_expiration_date";
+                $fields[] = "fleximport_welcome_message";
                 break;
         }
 
@@ -834,6 +862,25 @@ class FleximportTable extends SimpleORMap {
                 if ($user[0]) {
                     $user = $user[0];
                     $data['user_id'] = $user->getId();
+                }
+            }
+            if ($this['tabledata']['simplematching']["username"]['column'] === "fleximport_get_username_from_email") {
+                list($data['username']) = explode("@", $data['email']);
+            }
+            if ($this['tabledata']['simplematching']["fleximport_userdomains"]['column'] && !in_array("fleximport_userdomains", $this->fieldsToBeDynamicallyMapped())) {
+                $data['fleximport_userdomains'] = (array) preg_split(
+                    "/\s*,\s*/",
+                    $data['fleximport_userdomains'],
+                    null,
+                    PREG_SPLIT_NO_EMPTY
+                );
+                $statement = DBManager::get()->prepare("SELECT userdomain_id FROM userdomains WHERE name IN (:domains) OR userdomain_id IN (:domains)");
+                $statement->execute(array('domains' => $data['fleximport_userdomains']));
+                $data['fleximport_userdomains'] = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
+            }
+            if ($this['tabledata']['simplematching']["fleximport_expiration_date"]['column'] && !in_array("fleximport_expiration_date", $this->fieldsToBeDynamicallyMapped())) {
+                if (!is_numeric($data['fleximport_expiration_date'])) {
+                    $data['fleximport_expiration_date'] = strtotime($data['fleximport_expiration_date']);
                 }
             }
         }

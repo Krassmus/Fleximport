@@ -60,6 +60,11 @@
                             </option>
                         <? endforeach ?>
                     <? endif ?>
+                <? if ($fieldname === "username") : ?>
+                    <option value="fleximport_get_username_from_email"<?= $table['tabledata']['simplematching']['username']['column'] === "fleximport_get_username_from_email" ? " selected" : "" ?>>
+                        <?= _("Erster Teil der Email") ?>
+                    </option>
+                <? endif ?>
                 <? endif ?>
             </select>
             <div id="simplematching_<?= htmlReady($fieldname) ?>_static" style="<?= $table['tabledata']['simplematching'][$fieldname]['column'] !== "static value" ? "display: none;" : "" ?>">
