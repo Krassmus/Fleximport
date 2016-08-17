@@ -60,11 +60,6 @@
                             </option>
                         <? endforeach ?>
                     <? endif ?>
-                <? if ($fieldname === "username") : ?>
-                    <option value="fleximport_get_username_from_email"<?= $table['tabledata']['simplematching']['username']['column'] === "fleximport_get_username_from_email" ? " selected" : "" ?>>
-                        <?= _("Erster Teil der Email") ?>
-                    </option>
-                <? endif ?>
                 <? endif ?>
             </select>
             <div id="simplematching_<?= htmlReady($fieldname) ?>_static" style="<?= $table['tabledata']['simplematching'][$fieldname]['column'] !== "static value" ? "display: none;" : "" ?>">
@@ -99,6 +94,14 @@
                     <select name="tabledata[simplematching][<?= htmlReady($fieldname) ?>][format]">
                         <option value=""><?= _("Format: sem_type_id") ?></option>
                         <option value="name"<?= $table['tabledata']['simplematching'][$fieldname]['format'] === "name" ? " selected" : "" ?>><?= _("Format: Veranstaltungstyp-Name") ?></option>
+                    </select>
+                </div>
+            <? endif ?>
+            <? if (($table['import_type'] === "User") && ($fieldname === "username")) : ?>
+                <div class="format" id="simplematching_<?= htmlReady($fieldname) ?>_format">
+                    <select name="tabledata[simplematching][<?= htmlReady($fieldname) ?>][format]">
+                        <option value="cleartext"><?= _("Format: Reiner Text") ?></option>
+                        <option value="email_first_part"<?= $table['tabledata']['simplematching'][$fieldname]['format'] === "email_first_part" ? " selected" : "" ?>><?= _("Format: Erster Teil der Email") ?></option>
                     </select>
                 </div>
             <? endif ?>

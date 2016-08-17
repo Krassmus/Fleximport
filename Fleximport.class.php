@@ -52,7 +52,7 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
     }
 
     protected function getDisplayName() {
-        return _("Fleximport");
+        return FleximportConfig::get("FLEXIMPORT_NAME") ?: _("Fleximport");
     }
 
     public function triggerImport()
@@ -60,8 +60,22 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
         foreach (FleximportTable::findAll() as $table) {
             $table->isInDatabase();
         }
+        $protocol = array();
         foreach (FleximportTable::findAll() as $table) {
-            $table->doImport();
+            $protocol = array_merge($protocol, $table->doImport());
+        }
+        if (count($protocol) && $GLOBALS['FLEXIMPORT_IS_CRONJOB'] && FleximportConfig::get("REPORT_CRONJOB_ERRORS")) {
+            $message = _("Es hat folgende Probleme beim Import gegeben:");
+
+            $message .= "\n\n".implode("\n\n", $protocol);
+            $mail = new StudipMail();
+            $mail->setSubject(_("Fleximport Fehlerbericht von Stud.IP"));
+            $mail->setBodyText($message);
+            $emails = preg_split("/\s*[,;]+\s*/", FleximportConfig::get("REPORT_CRONJOB_ERRORS"), null, PREG_SPLIT_NO_EMPTY);
+            foreach ($emails as $email) {
+                $mail->addRecipient($email);
+            }
+            $mail->send();
         }
     }
 }

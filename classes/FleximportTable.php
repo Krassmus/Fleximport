@@ -265,7 +265,11 @@ class FleximportTable extends SimpleORMap {
         while ($line = $statement->fetch(PDO::FETCH_ASSOC)) {
             $output = $this->importLine($line);
             if (isset($output['errors'])) {
-                $protocol[] = $output['errors'];
+                $error = $output['errors'];
+                if ($GLOBALS['FLEXIMPORT_IS_CRONJOB'] && $output['name']) {
+                    $error = $output['name'].": ".$error;
+                }
+                $protocol[] = $error;
             }
             if (isset($output['pk'])) {
                 $item_ids[] = is_array($output['pk']) ? implode("-", $output['pk']) : $output['pk'];
@@ -339,9 +343,6 @@ class FleximportTable extends SimpleORMap {
         }
         //Last chance to quit:
         $error = $this->checkLine($line);
-        if ($error && $error['errors']) {
-            return $error;
-        }
 
         $data = $this->getMappedData($line);
         $pk = $this->getPrimaryKey($data);
@@ -360,7 +361,21 @@ class FleximportTable extends SimpleORMap {
         foreach ($data as $fieldname => $value) {
             if (($value !== false) && in_array($fieldname, $this->getTargetFields())) {
                 $object[$fieldname] = $value;
+                if ($classname === "User" && $fieldname === "password") {
+                    $object[$fieldname] = UserManagement::getPwdHasher()->HashPassword($value);
+                }
             }
+        }
+        if (method_exists($object, "getFullName")) {
+            $error['name'] = $output['name'] = $object->getFullName();
+        } elseif ($object->isField("name")) {
+            $error['name'] = $output['name'] = $object['name'];
+        } elseif ($object->isField("title")) {
+            $error['name'] = $output['name'] = $object['title'];
+        }
+
+        if ($error && $error['errors']) {
+            return $error;
         }
 
         if ($plugin) {
@@ -418,6 +433,49 @@ class FleximportTable extends SimpleORMap {
                     } else {
                         UserConfig::get($object->getId())->delete("EXPIRATION_DATE");
                     }
+                }
+                if (($output['found'] === false) && ($data['fleximport_welcome_message'] !== "none")) {
+                    $user_language = getUserLanguagePath($object->getId());
+                    setTempLanguage(false, $user_language);
+                    if ($data['fleximport_welcome_message']) {
+                        $message = FleximportConfig::get($data['fleximport_welcome_message']);
+                        foreach ($data as $field => $value) {
+                            $message = str_replace("{{".$field."}}", $value, $message);
+                        }
+                        foreach ($line as $field => $value) {
+                            $message = str_replace("{{".$field."}}", $value, $message);
+                        }
+                        if (strpos($message, "\n") === false) {
+                            $subject = dgettext($user_language, "Anmeldung Stud.IP-System");
+                        } else {
+                            $subject = strstr($message, "\n", true);
+                            $message = substr($message, strpos($message, "\n") + 1);
+                        }
+                    } else {
+                        $Zeit=date("H:i:s, d.m.Y",time());
+                        $this->user_data = array(
+                            'auth_user_md5.username' => $object['username'],
+                            'auth_user_md5.perms' => $object['perms'],
+                            'auth_user_md5.Vorname' => $object['vorname'],
+                            'auth_user_md5.Nachname' => $object['nachname'],
+                            'auth_user_md5.Email' => $object['email']
+                        );
+                        $password = $data['password']; //this is the not hashed password in cleartext
+                        include("locale/$user_language/LC_MAILS/create_mail.inc.php");
+                        $message = $mailbody;
+                    }
+                    if ($message) {
+                        $mail = new StudipMail();
+                        $mail->addRecipient($object['email'], $object->getFullName());
+                        $mail->setSubject($subject);
+                        $mail->setBodyText($message);
+                        if (Config::get()->MAILQUEUE_ENABLE) {
+                            MailQueueEntry::add($mail);
+                        } else {
+                            $mail->send();
+                        }
+                    }
+                    restoreLanguage();
                 }
                 break;
         }
@@ -513,112 +571,6 @@ class FleximportTable extends SimpleORMap {
         if ($plugin && !$object->isNew()) {
             $plugin->afterUpdate($object, $line);
         }
-        return $output;
-    }
-
-    public function checkLine($line)
-    {
-        $plugin = $this->getPlugin();
-        $classname = $this['import_type'];
-
-        $output = array(
-            'found' => false,
-            'pk' => null,
-            'errors' => ""
-        );
-
-        if ($classname) {
-            try {
-                $data = $this->getMappedData($line);
-                $pk = $this->getPrimaryKey($data);
-            } catch (Exception $e) {
-                return array('errors' => "Tabellenmapping ist vermutlich falsch konfiguriert: ".$e->getMessage()." ".$e->getTraceAsString());
-            }
-            $object = new $classname($pk);
-            if (!$object->isNew()) {
-                $output['found'] = true;
-                $output['pk'] = $pk;
-            }
-            $object->setData($data);
-
-            switch ($classname) {
-                case "Course":
-                    if (!$data['fleximport_dozenten'] || !count($data['fleximport_dozenten'])) {
-                        $output['errors'] .= "Dozent kann nicht gemapped werden. ";
-                    } else {
-                        $exist = false;
-                        foreach ((array)$data['fleximport_dozenten'] as $dozent_id) {
-                            if (User::find($dozent_id)) {
-                                $exist = true;
-                                break;
-                            }
-                        }
-                        if (!$exist) {
-                            $output['errors'] .= "Angegebene Dozenten sind nicht im System vorhanden. ";
-                        }
-                    }
-
-                    if (!$data['institut_id'] || !Institute::find($data['institut_id'])) {
-                        $output['errors'] .= "Keine gültige Heimateinrichtung. ";
-                    }
-
-                    if (!Semester::findByTimestamp($data['start_time'])) {
-                        $output['errors'] .= "Semester wurde nicht gefunden. ";
-                    }
-
-                    if ($data['status']) {
-                        if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$data['status']]['class']]['bereiche']) {
-                            $found = false;
-                            foreach ((array)$data['fleximport_studyarea'] as $sem_tree_id) {
-                                if (StudipStudyArea::find($sem_tree_id)) {
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                            if (!$found) {
-                                $output['errors'] .= "Keine (korrekten) Studienbereiche definiert. ";
-                            }
-                        }
-                    } else {
-                        $output['errors'] .= "Kein Veranstaltungstyp definiert. ";
-                    }
-
-                    break;
-                case "User":
-                    if (!$data['user_id']) {
-                        if (!$data['username']) {
-                            $output['errors'] .= "Kein Nutzername. ";
-                        } else {
-                            $validator = new email_validation_class;
-                            if (!$validator->ValidateUsername($data['username'])) {
-                                $output['errors'] .= "Nutzername syntaktisch falsch. ";
-                            } elseif (get_userid($data['username']) && get_userid($data['username']) !== $data['user_id']) {
-                                $output['errors'] .= "Nutzername schon vergeben. ";
-                            }
-                        }
-                        if (!$data['email'] && !$data['user_id']) {
-                            $output['errors'] .= "Keine Email. ";
-                        } else {
-                            $validator = new email_validation_class;
-                            if (!$validator->ValidateEmailAddress($data['email'])) {
-                                $output['errors'] .= "Email syntaktisch falsch. ";
-                            }
-                        }
-                        if (!$data['perms'] || !in_array($data['perms'], array("user", "autor", "tutor", "dozent", "admin", "root"))) {
-                            $output['errors'] .= "Keine korrekten Perms gesetzt. ";
-                        }
-                        if (!$data['vorname'] && !$data['nachname']) {
-                            $output['errors'] .= "Kein Name gesetzt. ";
-                        }
-                    }
-                    break;
-            }
-        }
-
-        if ($plugin) {
-            $output['errors'] .= $plugin->checkLine($line);
-        }
-
         return $output;
     }
 
@@ -835,6 +787,9 @@ class FleximportTable extends SimpleORMap {
         }
 
         if (($this['import_type'] === "User") && !$data['user_id']) {
+            if ($this['tabledata']['simplematching']["username"]['format'] === "email_first_part") {
+                list($data['username']) = explode("@", $data['username']);
+            }
             //Map user_id :
             if ($this['tabledata']['simplematching']["user_id"]['column'] === "fleximport_map_from_username") {
                 $user = User::findOneByUsername(
@@ -864,9 +819,6 @@ class FleximportTable extends SimpleORMap {
                     $data['user_id'] = $user->getId();
                 }
             }
-            if ($this['tabledata']['simplematching']["username"]['column'] === "fleximport_get_username_from_email") {
-                list($data['username']) = explode("@", $data['email']);
-            }
             if ($this['tabledata']['simplematching']["fleximport_userdomains"]['column'] && !in_array("fleximport_userdomains", $this->fieldsToBeDynamicallyMapped())) {
                 $data['fleximport_userdomains'] = (array) preg_split(
                     "/\s*,\s*/",
@@ -883,8 +835,118 @@ class FleximportTable extends SimpleORMap {
                     $data['fleximport_expiration_date'] = strtotime($data['fleximport_expiration_date']);
                 }
             }
+            if (!$data['user_id'] && ($data['auth_plugin'] === "standard") && !$data['password']) {
+                $usermanager = new UserManagement();
+                $data['password'] = $usermanager->generate_password(6);
+            }
         }
         return $data;
+    }
+
+    public function checkLine($line)
+    {
+        $plugin = $this->getPlugin();
+        $classname = $this['import_type'];
+
+        $output = array(
+            'found' => false,
+            'pk' => null,
+            'errors' => ""
+        );
+
+        if ($classname) {
+            try {
+                $data = $this->getMappedData($line);
+                $pk = $this->getPrimaryKey($data);
+            } catch (Exception $e) {
+                return array('errors' => "Tabellenmapping ist vermutlich falsch konfiguriert: ".$e->getMessage()." ".$e->getTraceAsString());
+            }
+            $object = new $classname($pk);
+            if (!$object->isNew()) {
+                $output['found'] = true;
+                $output['pk'] = $pk;
+            }
+            $object->setData($data);
+
+            switch ($classname) {
+                case "Course":
+                    if (!$data['fleximport_dozenten'] || !count($data['fleximport_dozenten'])) {
+                        $output['errors'] .= "Dozent kann nicht gemapped werden. ";
+                    } else {
+                        $exist = false;
+                        foreach ((array)$data['fleximport_dozenten'] as $dozent_id) {
+                            if (User::find($dozent_id)) {
+                                $exist = true;
+                                break;
+                            }
+                        }
+                        if (!$exist) {
+                            $output['errors'] .= "Angegebene Dozenten sind nicht im System vorhanden. ";
+                        }
+                    }
+
+                    if (!$data['institut_id'] || !Institute::find($data['institut_id'])) {
+                        $output['errors'] .= "Keine gültige Heimateinrichtung. ";
+                    }
+
+                    if (!Semester::findByTimestamp($data['start_time'])) {
+                        $output['errors'] .= "Semester wurde nicht gefunden. ";
+                    }
+
+                    if ($data['status']) {
+                        if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$data['status']]['class']]['bereiche']) {
+                            $found = false;
+                            foreach ((array)$data['fleximport_studyarea'] as $sem_tree_id) {
+                                if (StudipStudyArea::find($sem_tree_id)) {
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if (!$found) {
+                                $output['errors'] .= "Keine (korrekten) Studienbereiche definiert. ";
+                            }
+                        }
+                    } else {
+                        $output['errors'] .= "Kein Veranstaltungstyp definiert. ";
+                    }
+
+                    break;
+                case "User":
+                    if (!$data['user_id']) {
+                        if (!$data['username']) {
+                            $output['errors'] .= "Kein Nutzername. ";
+                        } else {
+                            $validator = new email_validation_class;
+                            if (!$validator->ValidateUsername($data['username'])) {
+                                $output['errors'] .= "Nutzername syntaktisch falsch. ";
+                            } elseif (get_userid($data['username']) && get_userid($data['username']) !== $data['user_id']) {
+                                $output['errors'] .= "Nutzername schon vergeben. ";
+                            }
+                        }
+                        if (!$data['perms'] || !in_array($data['perms'], array("user", "autor", "tutor", "dozent", "admin", "root"))) {
+                            $output['errors'] .= "Keine korrekten Perms gesetzt. ";
+                        }
+                        if (!$data['vorname'] && !$data['nachname']) {
+                            $output['errors'] .= "Kein Name gesetzt. ";
+                        }
+                    }
+                    if (!$data['email']) {
+                        $output['errors'] .= "Keine Email. ";
+                    } else {
+                        $validator = new email_validation_class;
+                        if (!$validator->ValidateEmailAddress($data['email'])) {
+                            $output['errors'] .= "Email syntaktisch falsch. ";
+                        }
+                    }
+                    break;
+            }
+        }
+
+        if ($plugin) {
+            $output['errors'] .= $plugin->checkLine($line);
+        }
+
+        return $output;
     }
 
     public function getPrimaryKey($data)

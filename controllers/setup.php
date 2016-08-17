@@ -18,9 +18,15 @@ class SetupController extends PluginController {
         $this->table = new FleximportTable($table_id);
         if (Request::isPost()) {
             $data = Request::getArray("table");
+            $oldname = $this->table['name'];
             $data['tabledata'] = array_merge($this->table['tabledata'], $data['tabledata']);
             $data['synchronization'] = $data['synchronization'] ? 1 : 0;
             $this->table->setData($data);
+            if ($oldname && $data['name'] && $oldname !== $data['name']) {
+                try {
+                    DBManager::get()->exec("RENAME TABLE `".addslashes($oldname)."`TO `".addslashes($data['name'])."`;");
+                } catch(Exception $e) {}
+            }
             if ($this->table['import_type'] === "other") {
                 $this->table['import_type'] = Request::get("other_import_type");
             } elseif ($this->table['source'] === "sqlview" && $GLOBALS['perm']->have_perm("root")) {

@@ -181,7 +181,10 @@
             </tr>
             <? $dynamically_mapped = in_array("fleximport_welcome_message", $table->fieldsToBeDynamicallyMapped()) ?>
             <tr style="<?= $dynamically_mapped ? "opacity: 0.5;" : "" ?>" class="<?= $dynamically_mapped ? "dynamically_mapped" : "" ?>">
-                <td>fleximport_welcome_message</td>
+                <td>
+                    fleximport_welcome_message
+                    <div style="font-size: 0.8em;"><?= _("Nachricht, die an neue Nutzer versendet wird. Name einer Fleximport-Variablen oder 'none', wennn nie etwas versendet werden soll. Schreiben Sie {{password}} oder {{link}} oder andere Parameter in die Nachricht.") ?></div>
+                </td>
                 <td>
                     <? if ($dynamically_mapped) : ?>
                         <?= _("Wird von einem Plugin dynamisch gemapped") ?>
