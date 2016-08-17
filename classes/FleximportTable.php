@@ -882,6 +882,23 @@ class FleximportTable extends SimpleORMap {
                         }
                         if (!$exist) {
                             $output['errors'] .= "Angegebene Dozenten sind nicht im System vorhanden. ";
+                        } else {
+                            if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$object['status']]['class']]['only_inst_user']) {
+                                $statement = DBManager::get()->prepare("
+                                    SELECT 1
+                                    FROM user_inst
+                                    WHERE user_id IN (:dozent_ids)
+                                        AND Institut_id IN (:institut_ids)
+                                        AND inst_perms IN ('autor','tutor','dozent')
+                                ");
+                                $statement->execute(array(
+                                    'dozent_ids' => (array) $data['fleximport_dozenten'],
+                                    'institut_ids' => $data['fleximport_related_institutes'] ?: array($object['institut_id'])
+                                ));
+                                if (!$statement->fetch(PDO::FETCH_COLUMN, 0)) {
+                                    $output['errors'] .= "Keiner der Dozenten ist in einer beteiligten Einrichtung angestellt. ";
+                                }
+                            }
                         }
                     }
 
