@@ -6,6 +6,8 @@ class FleximportTable extends SimpleORMap {
     protected $plugin = null;
     protected $already_fetched = false;
 
+    private $user_data = array(); //only needed for welcome email from Stud.IP for new users
+
     static public function findAll()
     {
         return self::findBySQL("1=1 ORDER BY position ASC, name ASC");
@@ -414,6 +416,15 @@ class FleximportTable extends SimpleORMap {
                 }
                 break;
             case "User":
+                if ($this['tabledata']['simplematching']["fleximport_user_inst"]['column'] || in_array("fleximport_user_inst", $this->fieldsToBeDynamicallyMapped())) {
+                    if ($object['perms'] !== "root") {
+                        foreach ($data['fleximport_user_inst'] as $institut_id) {
+                            $member = new InstituteMember(array($object->getId(), $institut_id));
+                            $member['inst_perms'] = $object['perms'];
+                            $member->store();
+                        }
+                    }
+                }
                 if ($this['tabledata']['simplematching']["fleximport_userdomains"]['column'] || in_array("fleximport_userdomains", $this->fieldsToBeDynamicallyMapped())) {
                     $olddomains = UserDomain::getUserDomainsForUser($object->getId());
                     foreach ($olddomains as $olddomain) {
@@ -443,7 +454,9 @@ class FleximportTable extends SimpleORMap {
                             $message = str_replace("{{".$field."}}", $value, $message);
                         }
                         foreach ($line as $field => $value) {
-                            $message = str_replace("{{".$field."}}", $value, $message);
+                            if (!in_array($field, $data)) {
+                                $message = str_replace("{{".$field."}}", $value, $message);
+                            }
                         }
                         if (strpos($message, "\n") === false) {
                             $subject = dgettext($user_language, "Anmeldung Stud.IP-System");
@@ -469,6 +482,7 @@ class FleximportTable extends SimpleORMap {
                         $mail->addRecipient($object['email'], $object->getFullName());
                         $mail->setSubject($subject);
                         $mail->setBodyText($message);
+                        $mail->setBodyHtml(formatReady($message));
                         if (Config::get()->MAILQUEUE_ENABLE) {
                             MailQueueEntry::add($mail);
                         } else {
@@ -595,6 +609,7 @@ class FleximportTable extends SimpleORMap {
                     $fields[] = $datafield['name'];
                 }
                 $fields[] = "fleximport_userdomains";
+                $fields[] = "fleximport_user_inst";
                 $fields[] = "fleximport_expiration_date";
                 $fields[] = "fleximport_welcome_message";
                 break;
@@ -818,6 +833,28 @@ class FleximportTable extends SimpleORMap {
                     $user = $user[0];
                     $data['user_id'] = $user->getId();
                 }
+            }
+            if ($this['tabledata']['simplematching']["fleximport_user_inst"]['column']) {
+                $data['fleximport_user_inst'] = (array) preg_split(
+                    "/\s*,\s*/",
+                    $data['fleximport_user_inst'],
+                    null,
+                    PREG_SPLIT_NO_EMPTY
+                );
+                $institut_ids = array();
+                foreach ($data['fleximport_user_inst'] as $inst_name) {
+                    $statement = DBManager::get()->prepare("
+                        SELECT Institut_id
+                        FROM Institute
+                        WHERE Name = ?
+                    ");
+                    $statement->execute(array($inst_name));
+                    $institut_id = $statement->fetch(PDO::FETCH_COLUMN, 0);
+                    if ($institut_id) {
+                        $institut_ids[] = $institut_id;
+                    }
+                }
+                $data['fleximport_user_inst'] = $institut_ids;
             }
             if ($this['tabledata']['simplematching']["fleximport_userdomains"]['column'] && !in_array("fleximport_userdomains", $this->fieldsToBeDynamicallyMapped())) {
                 $data['fleximport_userdomains'] = (array) preg_split(

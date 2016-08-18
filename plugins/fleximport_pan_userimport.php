@@ -32,7 +32,7 @@ class fleximport_pan_userimport extends FleximportPlugin {
                         $welcome = substr($welcome, strpos($welcome, "\n") + 1);
                     }
                     $messaging = new messaging();
-                    $messaging->insert_message(
+                    $count = $messaging->insert_message(
                         $welcome,
                         $object->username,
                         '____%system%____',
@@ -44,6 +44,7 @@ class fleximport_pan_userimport extends FleximportPlugin {
                         true,
                         'normal'
                     );
+                    var_dump($count);
                 }
             }
         }
