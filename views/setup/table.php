@@ -26,8 +26,9 @@
     <? if ($table->isNew() || !$table->getPlugin() || !$table->getPlugin()->customImportEnabled()) : ?>
         <label>
             <?= _("Import über") ?>
-            <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink'); jQuery('#sqlview_info').toggle(this.value == 'sqlview');">
+            <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink'); jQuery('#sqlview_info').toggle(this.value == 'sqlview'); jQuery('#csv_studipfile_info').toggle(this.value == 'csv_studipfile'); jQuery('#csv_encoding').toggle(['csv_studipfile','csv_upload','csv_weblink'].indexOf(this.value) !== -1);">
                 <option value="csv_upload"<?= $table['source'] === "csv_upload" || $table->isNew() ? " selected" : "" ?>><?= _("CSV-Upload") ?></option>
+                <option value="csv_studipfile"<?= $table['source'] === "csv_studipfile" ? " selected" : "" ?>><?= _("CSV-Datei in Stud.IP") ?></option>
                 <option value="csv_weblink"<?= $table['source'] === "csv_weblink" ? " selected" : "" ?>><?= _("CSV-Internetquelle") ?></option>
                 <option value="database"<?= $table['source'] === "database" ? " selected" : "" ?>><?= _("Datenbank") ?></option>
                 <option value="extern"<?= $table['source'] === "extern" ? " selected" : "" ?>><?= _("Externes Tool") ?></option>
@@ -35,6 +36,19 @@
             </select>
         </label>
     <? endif ?>
+
+    <label id="csv_encoding" style="<?= !in_array($table['source'], array("csv_upload", "csv_studipfile", "csv_weblink")) ? "display: none;" : "" ?>">
+        <?= _("Zeichensatz der Datei") ?>
+        <select name="table[tabledata][source_encoding]">
+            <option value="utf8"<?= $table['tabledata']['source_encoding'] === "utf8" ? " selected" : "" ?>>UTF-8</option>
+            <option value="windows-1252"<?= $table['tabledata']['source_encoding'] === "windows-1252" ? " selected" : "" ?>>windows-1252</option>
+        </select>
+    </label>
+
+    <label id="csv_studipfile_info" style="<?= $table['source'] !== "csv_studipfile" ? "display: none;" : "" ?>">
+        <?= _("Datei-ID der Datei in Stud.IP") ?>
+        <input type="text" name="table[tabledata][weblink][file_id]" value="<?= htmlReady($table['tabledata']['weblink']['file_id']) ?>">
+    </label>
 
     <label id="weblink_info" style="<?= $table['source'] !== "csv_weblink" ? "display: none;" : "" ?>">
         <?= _("URL der CSV-Datei") ?>

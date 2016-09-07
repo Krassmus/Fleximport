@@ -45,8 +45,18 @@
                 'table' => $table,
                 'placeholder' => _("1 für gesperrt")
             )) ?>
+            <?= $this->render_partial("setup/_field_mapping.php", array(
+                'field' => "fleximport_course_userdomains",
+                'table' => $table,
+                'placeholder' => _("kommaseparierte Domänennamen oder Domänen-IDs")
+            )) ?>
         <? endif ?>
         <? if ($table['import_type'] === "User") : ?>
+            <?= $this->render_partial("setup/_field_mapping.php", array(
+                'field' => "fleximport_username_prefix",
+                'table' => $table,
+                'placeholder' => _("Präfix für den Nutzernamen")
+            )) ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_user_inst",
                 'table' => $table,

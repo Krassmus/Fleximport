@@ -44,7 +44,6 @@ class fleximport_pan_userimport extends FleximportPlugin {
                         true,
                         'normal'
                     );
-                    var_dump($count);
                 }
             }
         }

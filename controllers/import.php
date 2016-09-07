@@ -29,7 +29,10 @@ class ImportController extends PluginController {
                 foreach ($_FILES['tableupload']['tmp_name'] as $table_id => $tmp_name) {
                     if ($tmp_name) {
                         $table = new FleximportTable($table_id);
-                        $output = studip_utf8decode($this->plugin->getCSVDataFromFile($tmp_name));
+                        $output = $this->plugin->getCSVDataFromFile($tmp_name);
+                        if ($table['tabledata']['source_encoding'] === "utf8") {
+                            $output = studip_utf8decode($output);
+                        }
                         $headline = array_shift($output);
                         $table->createTable($headline, $output);
                     }

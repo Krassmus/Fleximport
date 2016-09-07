@@ -16,27 +16,34 @@ class FleximportTable extends SimpleORMap {
     static protected function configure($config = array())
     {
         $config['db_table'] = 'fleximport_tables';
+        if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.2", ">=")) {
+            $config['registered_callbacks']['before_store'][]     = 'cbSerializeData';
+            $config['registered_callbacks']['after_store'][]      = 'cbUnserializeData';
+            $config['registered_callbacks']['after_initialize'][] = 'cbUnserializeData';
+        }
         parent::configure($config);
     }
 
     function __construct($id = null)
     {
-        $this->registerCallback('before_store', 'cbSerializeData');
-        $this->registerCallback('after_store after_initialize', 'cbUnserializeData');
+        if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.2", "<")) {
+            //$this->registerCallback('before_store', 'cbSerializeData');
+            //$this->registerCallback('after_store after_initialize', 'cbUnserializeData');
+        }
         parent::__construct($id);
     }
 
     function cbSerializeData()
     {
         $this->content['tabledata'] = json_encode(studip_utf8encode($this->content['tabledata']));
-        $this->content_db['tabledata'] = json_encode(studip_utf8encode($this->content_db['tabledata']));
+        //$this->content_db['tabledata'] = json_encode(studip_utf8encode($this->content_db['tabledata']));
         return true;
     }
 
     function cbUnserializeData()
     {
         $this->content['tabledata'] = (array) studip_utf8decode(json_decode($this->content['tabledata'], true));
-        $this->content_db['tabledata'] = (array) studip_utf8decode(json_decode($this->content_db['tabledata'], true));
+        //$this->content_db['tabledata'] = (array) studip_utf8decode(json_decode($this->content_db['tabledata'], true));
         return true;
     }
 
@@ -73,6 +80,10 @@ class FleximportTable extends SimpleORMap {
                 } elseif ($this['source'] === "csv_weblink") {
                     $this->fetchDataFromWeblink();
                     return;
+                } elseif($this['source'] === "csv_studipfile") {
+                    $output = $this->getCSVDataFromFile(studip_utf8decode(get_upload_file_path($this['tabledata']['weblink']['file_id']), ","));
+                    $headline = array_shift($output);
+                    $this->createTable($headline, $output);
                 }
             } else {
                 $this->getPlugin()->fetchData();
@@ -241,7 +252,11 @@ class FleximportTable extends SimpleORMap {
     }
 
     public function getCSVDataFromURL($file_path, $delim = ';', $encl = '"', $optional = 1) {
-        return $this->CSV2Array(studip_utf8decode(file_get_contents($file_path)), $delim, $encl, $optional);
+        $contents = file_get_contents($file_path);
+        if ($this['tabledata']['source_encoding'] === "utf8") {
+            $contents = studip_utf8decode($contents);
+        }
+        return $this->CSV2Array($contents, $delim, $encl, $optional);
     }
 
     public function drop()
@@ -413,6 +428,23 @@ class FleximportTable extends SimpleORMap {
                         'seminar_id' => $object->getId(),
                         'institut_id' => $institut_id
                     ));
+                }
+                if ($this['tabledata']['simplematching']["fleximport_course_userdomains"]['column'] || in_array("fleximport_course_userdomains", $this->fieldsToBeDynamicallyMapped())) {
+                    $statement = DBManager::get()->prepare("
+                        SELECT userdomain_id
+                        FROM seminar_userdomains
+                        WHERE seminar_id = ?
+                    ");
+                    $statement->execute(array($object->getId()));
+                    $olddomains = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
+                    foreach (array_diff($data['fleximport_user_inst'], $olddomains) as $to_add) {
+                        $domain = new UserDomain($to_add);
+                        $domain->addSeminar($object->getId());
+                    }
+                    foreach (array_diff($olddomains, $data['fleximport_user_inst']) as $to_remove) {
+                        $domain = new UserDomain($to_remove);
+                        $domain->removeSeminar($object->getId());
+                    }
                 }
                 break;
             case "User":
@@ -597,17 +629,19 @@ class FleximportTable extends SimpleORMap {
         switch ($this['import_type']) {
             case "Course":
                 foreach (Datafield::findBySQL("object_type = 'sem'") as $datafield) {
-                    $fields[] = strtolower($datafield['name']);
+                    $fields[] = $datafield['name'];
                 }
                 $fields[] = "fleximport_dozenten";
                 $fields[] = "fleximport_related_institutes";
                 $fields[] = "fleximport_studyarea";
                 $fields[] = "fleximport_locked";
+                $fields[] = "fleximport_course_userdomains";
                 break;
             case "User":
                 foreach (Datafield::findBySQL("object_type = 'user'") as $datafield) {
                     $fields[] = $datafield['name'];
                 }
+                $fields[] = "fleximport_username_prefix";
                 $fields[] = "fleximport_userdomains";
                 $fields[] = "fleximport_user_inst";
                 $fields[] = "fleximport_expiration_date";
@@ -636,7 +670,7 @@ class FleximportTable extends SimpleORMap {
                 } else {
                     //just use a field with the same name if there is one
                     if (isset($line[$field])) {
-                        $data[$field] = $line[$field];
+                        //$data[$field] = $line[$field];
                     }
                     //else no mapping, don't even overwrite old value.
                 }
@@ -799,11 +833,25 @@ class FleximportTable extends SimpleORMap {
                     $data['fleximport_studyarea'] = $study_areas;
                 }
             }
+            if ($this['tabledata']['simplematching']["fleximport_course_userdomains"]['column'] && !in_array("fleximport_course_userdomains", $this->fieldsToBeDynamicallyMapped())) {
+                $data['fleximport_course_userdomains'] = (array) preg_split(
+                    "/\s*,\s*/",
+                    $data['fleximport_course_userdomains'],
+                    null,
+                    PREG_SPLIT_NO_EMPTY
+                );
+                $statement = DBManager::get()->prepare("SELECT userdomain_id FROM userdomains WHERE name IN (:domains) OR userdomain_id IN (:domains)");
+                $statement->execute(array('domains' => $data['fleximport_course_userdomains']));
+                $data['fleximport_course_userdomains'] = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
+            }
         }
 
         if (($this['import_type'] === "User") && !$data['user_id']) {
             if ($this['tabledata']['simplematching']["username"]['format'] === "email_first_part") {
                 list($data['username']) = explode("@", $data['username']);
+            }
+            if ($this['tabledata']['simplematching']["fleximport_username_prefix"]['column']) {
+                $data['username'] = $data['fleximport_username_prefix'].$data['username'];
             }
             //Map user_id :
             if ($this['tabledata']['simplematching']["user_id"]['column'] === "fleximport_map_from_username") {
@@ -984,12 +1032,14 @@ class FleximportTable extends SimpleORMap {
                             $output['errors'] .= "Kein Name gesetzt. ";
                         }
                     }
-                    if (!$data['email']) {
-                        $output['errors'] .= "Keine Email. ";
-                    } else {
-                        $validator = new email_validation_class;
-                        if (!$validator->ValidateEmailAddress($data['email'])) {
-                            $output['errors'] .= "Email syntaktisch falsch. ";
+                    if ($this['tabledata']['simplematching']["email"]['column'] || in_array("email", $this->fieldsToBeDynamicallyMapped())) {
+                        if (!$data['email']) {
+                            $output['errors'] .= "Keine Email. ";
+                        } else {
+                            $validator = new email_validation_class;
+                            if (!$validator->ValidateEmailAddress($data['email'])) {
+                                $output['errors'] .= "Email syntaktisch falsch. ";
+                            }
                         }
                     }
                     break;
