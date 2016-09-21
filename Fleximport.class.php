@@ -4,6 +4,16 @@ require_once __DIR__."/classes/FleximportTable.php";
 require_once __DIR__."/classes/FleximportConfig.php";
 require_once __DIR__."/classes/FleximportMappedItem.php";
 require_once __DIR__ . "/classes/FleximportPlugin.abstract.php";
+foreach (scandir(__DIR__."/classes/checker") as $checker) {
+    if ($checker[0] !== "." && substr($checker, -4) === ".php") {
+        require_once __DIR__."/classes/checker/".$checker;
+    }
+}
+foreach (scandir(__DIR__."/classes/mapper") as $mapper) {
+    if ($mapper[0] !== "." && substr($mapper, -4) === ".php") {
+        require_once __DIR__."/classes/mapper/".$mapper;
+    }
+}
 foreach (scandir(__DIR__."/plugins") as $plugin) {
     if ($plugin[0] !== "." && substr($plugin, -4) === ".php") {
         require_once __DIR__."/plugins/".$plugin;

@@ -724,6 +724,19 @@ class FleximportTable extends SimpleORMap {
                 }
             }
 
+            //mapper:
+            if (class_exists($this['tabledata']['simplematching']["seminar_id"]['column'])) {
+                $mapperclass = $this['tabledata']['simplematching']["seminar_id"]['column'];
+                if (is_a($mapperclass, "FleximportMapper")) {
+                    $mapper = new $mapperclass();
+                    $data['seminar_id'] = $mapper->map(
+                        $this['tabledata']['simplematching']["seminar_id"],
+                        $line,
+                        $data
+                    );
+                }
+            }
+
             //Map dozenten:
             if ($this['tabledata']['simplematching']["fleximport_dozenten"]['column'] && !in_array("fleximport_dozenten", $this->fieldsToBeDynamicallyMapped())) {
                 $data['fleximport_dozenten'] = (array) preg_split(
@@ -953,96 +966,19 @@ class FleximportTable extends SimpleORMap {
             }
             $object->setData($data);
 
-            switch ($classname) {
-                case "Course":
-                    if (!$data['fleximport_dozenten'] || !count($data['fleximport_dozenten'])) {
-                        $output['errors'] .= "Dozent kann nicht gemapped werden. ";
-                    } else {
-                        $exist = false;
-                        foreach ((array)$data['fleximport_dozenten'] as $dozent_id) {
-                            if (User::find($dozent_id)) {
-                                $exist = true;
-                                break;
-                            }
-                        }
-                        if (!$exist) {
-                            $output['errors'] .= "Angegebene Dozenten sind nicht im System vorhanden. ";
-                        } else {
-                            if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$object['status']]['class']]['only_inst_user']) {
-                                $statement = DBManager::get()->prepare("
-                                    SELECT 1
-                                    FROM user_inst
-                                    WHERE user_id IN (:dozent_ids)
-                                        AND Institut_id IN (:institut_ids)
-                                        AND inst_perms IN ('autor','tutor','dozent')
-                                ");
-                                $statement->execute(array(
-                                    'dozent_ids' => (array) $data['fleximport_dozenten'],
-                                    'institut_ids' => $data['fleximport_related_institutes'] ?: array($object['institut_id'])
-                                ));
-                                if (!$statement->fetch(PDO::FETCH_COLUMN, 0)) {
-                                    $output['errors'] .= "Keiner der Dozenten ist in einer beteiligten Einrichtung angestellt. ";
-                                }
-                            }
-                        }
-                    }
-
-                    if (!$data['institut_id'] || !Institute::find($data['institut_id'])) {
-                        $output['errors'] .= "Keine gültige Heimateinrichtung. ";
-                    }
-
-                    if (!Semester::findByTimestamp($data['start_time'])) {
-                        $output['errors'] .= "Semester wurde nicht gefunden. ";
-                    }
-
-                    if ($data['status']) {
-                        if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$data['status']]['class']]['bereiche']) {
-                            $found = false;
-                            foreach ((array)$data['fleximport_studyarea'] as $sem_tree_id) {
-                                if (StudipStudyArea::find($sem_tree_id)) {
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                            if (!$found) {
-                                $output['errors'] .= "Keine (korrekten) Studienbereiche definiert. ";
-                            }
-                        }
-                    } else {
-                        $output['errors'] .= "Kein Veranstaltungstyp definiert. ";
-                    }
-
-                    break;
-                case "User":
-                    if (!$data['user_id']) {
-                        if (!$data['username']) {
-                            $output['errors'] .= "Kein Nutzername. ";
-                        } else {
-                            $validator = new email_validation_class;
-                            if (!$validator->ValidateUsername($data['username'])) {
-                                $output['errors'] .= "Nutzername syntaktisch falsch. ";
-                            } elseif (get_userid($data['username']) && get_userid($data['username']) !== $data['user_id']) {
-                                $output['errors'] .= "Nutzername schon vergeben. ";
-                            }
-                        }
-                        if (!$data['perms'] || !in_array($data['perms'], array("user", "autor", "tutor", "dozent", "admin", "root"))) {
-                            $output['errors'] .= "Keine korrekten Perms gesetzt. ";
-                        }
-                        if (!$data['vorname'] && !$data['nachname']) {
-                            $output['errors'] .= "Kein Name gesetzt. ";
-                        }
-                    }
-                    if ($this['tabledata']['simplematching']["email"]['column'] || in_array("email", $this->fieldsToBeDynamicallyMapped())) {
-                        if (!$data['email']) {
-                            $output['errors'] .= "Keine Email. ";
-                        } else {
-                            $validator = new email_validation_class;
-                            if (!$validator->ValidateEmailAddress($data['email'])) {
-                                $output['errors'] .= "Email syntaktisch falsch. ";
-                            }
-                        }
-                    }
-                    break;
+            //now do the checking
+            $checkerclass = "Fleximport".$classname."Checker";
+            $relevantfields = $this->fieldsToBeDynamicallyMapped();
+            foreach ((array) $this['tabledata']['simplematching'] as $field => $value) {
+                if ($value['column']) {
+                    $relevantfields[] = $field;
+                }
+            }
+            if (class_exists($checkerclass)) {
+                $checker = new $checkerclass();
+                if (is_a($checker, "FleximportChecker")) {
+                    $output['errors'] .= $checker->check($data, $object, $relevantfields);
+                }
             }
         }
 

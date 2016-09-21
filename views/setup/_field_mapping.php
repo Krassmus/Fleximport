@@ -25,6 +25,22 @@
                         </option>
                     <? endif ?>
                 <? endforeach ?>
+
+                <? foreach (get_declared_classes() as $class) {
+                    if (is_subclass_of($class, "FleximportMapper") && $class !== "FleximportMapper") {
+                        $mapper = new $class();
+                        if (in_array($field, $mapper->possibleFieldnames())) {
+                            foreach ($mapper->possibleFormats() as $index => $value) : ?>
+                                <? $optionvalue = "fleximport_mapper__".$class."__".$index ?>
+                                <option value="<?= htmlReady($optionvalue) ?>"<?= $optionvalue === $table['tabledata']['simplematching'][$field]['column'] ? " selected" : "" ?>>
+                                    <?= sprintf(_("Von %s ermitteln"), $value) ?>
+                                </option>
+                            <? endforeach;
+                        }
+                    }
+                } ?>
+
+
                 <? if (in_array($table['import_type'], (array) array("Course", "CourseMember"))) : ?>
                     <? if ($field === "seminar_id") : ?>
                         <option value="fleximport_map_from_veranstaltungsnummer"<?= $table['tabledata']['simplematching']['seminar_id']['column'] === "fleximport_map_from_veranstaltungsnummer" ? " selected" : "" ?>>
