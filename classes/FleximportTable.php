@@ -678,6 +678,7 @@ class FleximportTable extends SimpleORMap {
         }
 
 
+
         //special mapping
         if (($this['import_type'] === "Course") && !$data['seminar_id']) {
             //Map start_time
@@ -703,37 +704,10 @@ class FleximportTable extends SimpleORMap {
             }
 
             //Map seminar_id :
-            if ($this['tabledata']['simplematching']["seminar_id"]['column'] === "fleximport_map_from_veranstaltungsnummer") {
-                $course = Course::findOneByVeranstaltungsnummer(
-                    $data['veranstaltungsnummer'] ?: $line['veranstaltungsnummer']
-                );
-                if ($course) {
-                    $data['seminar_id'] = $course->getId();
-                }
-            }
-            if ($this['tabledata']['simplematching']["seminar_id"]['column'] === "fleximport_map_from_name") {
-                $course = Course::findOneBySQL("name = ? ", array($data['name']));
-                if ($course) {
-                    $data['seminar_id'] = $course->getId();
-                }
-            }
             if ($this['tabledata']['simplematching']["seminar_id"]['column'] === "fleximport_map_from_veranstaltungsnummer_and_semester") {
                 $course = Course::findOneBySQL("name = ? AND start_time = ?", array($data['name'], $data['start_time']));
                 if ($course) {
                     $data['seminar_id'] = $course->getId();
-                }
-            }
-
-            //mapper:
-            if (class_exists($this['tabledata']['simplematching']["seminar_id"]['column'])) {
-                $mapperclass = $this['tabledata']['simplematching']["seminar_id"]['column'];
-                if (is_a($mapperclass, "FleximportMapper")) {
-                    $mapper = new $mapperclass();
-                    $data['seminar_id'] = $mapper->map(
-                        $this['tabledata']['simplematching']["seminar_id"],
-                        $line,
-                        $data
-                    );
                 }
             }
 
@@ -866,35 +840,6 @@ class FleximportTable extends SimpleORMap {
             if ($this['tabledata']['simplematching']["fleximport_username_prefix"]['column']) {
                 $data['username'] = $data['fleximport_username_prefix'].$data['username'];
             }
-            //Map user_id :
-            if ($this['tabledata']['simplematching']["user_id"]['column'] === "fleximport_map_from_username") {
-                $user = User::findOneByUsername(
-                    $data['username'] ?: $line['username']
-                );
-                if ($user) {
-                    $data['user_id'] = $user->getId();
-                }
-            }
-            if ($this['tabledata']['simplematching']["user_id"]['column'] === "fleximport_map_from_email") {
-                $user = User::findOneByEmail(
-                    $data['email'] ?: $line['email']
-                );
-                if ($user) {
-                    $data['user_id'] = $user->getId();
-                }
-            }
-            if (strpos($this['tabledata']['simplematching']["user_id"]['column'], "fleximport_map_from_datafield_") === 0) {
-                $datafield_id = substr($this['tabledata']['simplematching']["user_id"]['column'], strlen("fleximport_map_from_datafield_"));
-                $datafield = new DataField($datafield_id);
-                $user = User::findByDatafield(
-                    $datafield_id,
-                    $data[$datafield['name']] ?: $line[$datafield['name']]
-                );
-                if ($user[0]) {
-                    $user = $user[0];
-                    $data['user_id'] = $user->getId();
-                }
-            }
             if ($this['tabledata']['simplematching']["fleximport_user_inst"]['column']) {
                 $data['fleximport_user_inst'] = (array) preg_split(
                     "/\s*,\s*/",
@@ -933,6 +878,24 @@ class FleximportTable extends SimpleORMap {
                     $data['fleximport_expiration_date'] = strtotime($data['fleximport_expiration_date']);
                 }
             }
+
+        }
+
+        foreach ($fields as $field) {
+            //mapper:
+            if (strpos($this['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") === 0) {
+                list($prefix, $mapperclass, $format) = explode("__", $this['tabledata']['simplematching'][$field]['column']);
+                if (is_a($mapperclass, "FleximportMapper")) {
+                    $mapper = new $mapperclass();
+                    $data['seminar_id'] = $mapper->map(
+                        $format,
+                        $data[$format] ?: $line[$format]
+                    );
+                }
+            }
+        }
+
+        if (($this['import_type'] === "User") && !$data['user_id']) {
             if (!$data['user_id'] && ($data['auth_plugin'] === "standard") && !$data['password']) {
                 $usermanager = new UserManagement();
                 $data['password'] = $usermanager->generate_password(6);

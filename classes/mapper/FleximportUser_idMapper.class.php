@@ -1,21 +1,21 @@
 <?php
 
-class FleximportSeminar_idMapper implements FleximportMapper {
+class FleximportUser_idMapper implements FleximportMapper {
 
     public function getName() {
-        return "Seminar_id";
+        return "user_id";
     }
 
     public function possibleFieldnames() {
-        return array("seminar_id", "range_id");
+        return array("user_id", "range_id");
     }
 
     public function possibleFormats() {
         $formats = array(
-            "number" => "Veranstaltungsnummer",
-            "name" => "Name"
+            "username" => "Nutzername",
+            "email" => "Email"
         );
-        $datafields = DataField::findBySQL("object_type = 'sem' ORDER BY name ASC");
+        $datafields = DataField::findBySQL("object_type = 'user' ORDER BY name ASC");
         foreach ($datafields as $datafield) {
             $formats[$datafield->getId()] = _("Datenfeld")." '".$datafield['name']."'";
         }
@@ -24,22 +24,22 @@ class FleximportSeminar_idMapper implements FleximportMapper {
 
     public function map($format, $value) {
         switch ($format) {
-            case "number":
-                $course = Course::findOneByVeranstaltungsnummer($value);
-                if ($course) {
-                    return $course->getId();
+            case "username":
+                $user = User::findOneByUsername($value);
+                if ($user) {
+                    return $user->getId();
                 }
                 break;
-            case "name":
-                $course = Course::findOneByName($value);
-                if ($course) {
-                    return $course->getId();
+            case "email":
+                $user = User::findOneByEmail($value);
+                if ($user) {
+                    return $user->getId();
                 }
                 break;
             default:
                 //Datenfeld:
                 $datafield = DataField::find($format);
-                if ($datafield && $datafield['object_type'] === "sem") {
+                if ($datafield && $datafield['object_type'] === "user") {
                     $entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND content = ?", array(
                         $datafield->getId(),
                         $value
