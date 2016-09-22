@@ -15,6 +15,7 @@
             <option value="User"<?= $table['import_type'] === "User" ? " selected" : "" ?>><?= _("Nutzerimport") ?></option>
             <option value="Course"<?= $table['import_type'] === "Course" ? " selected" : "" ?>><?= _("Veranstaltungsimport") ?></option>
             <option value="CourseMember"<?= $table['import_type'] === "CourseMember" ? " selected" : "" ?>><?= _("Teilnehmerimport") ?></option>
+            <option value="CourseDate"<?= $table['import_type'] === "CourseDate" ? " selected" : "" ?>><?= _("Veranstaltungstermine") ?></option>
             <option value=""<?= !$table['import_type'] && !$table->isNew() ? " selected" : "" ?>><?= _("Tabelle nicht importieren") ?></option>
             <option value="other"<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course")) ? " selected" : "" ?>><?= _("SORM-Objekt") ?></option>
         </select>

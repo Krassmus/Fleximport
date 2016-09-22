@@ -73,11 +73,11 @@
             <? if (count($mapperclasses)) : ?>
                 <select id="simplematching_<?= htmlReady($field) ?>_mapfrom"
                         name="tabledata[simplematching][<?= htmlReady($field) ?>][mapfrom]"
-                        style="<?= strpos($table['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") ? "" : "display: none;" ?>">
+                        style="<?= strpos($table['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") === 0 ? "" : "display: none;" ?>">
                     <option value=""><?= _("Aus Spalte ...") ?></option>
                     <? foreach ($table->getTableHeader() as $header) : ?>
                         <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
-                            <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching'][$field]['column'] ? " selected" : "" ?>>
+                            <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching'][$field]['mapfrom'] ? " selected" : "" ?>>
                                 <?= htmlReady($header) ?>
                             </option>
                         <? endif ?>

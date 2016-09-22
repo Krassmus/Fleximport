@@ -878,19 +878,21 @@ class FleximportTable extends SimpleORMap {
                     $data['fleximport_expiration_date'] = strtotime($data['fleximport_expiration_date']);
                 }
             }
-
         }
 
         foreach ($fields as $field) {
             //mapper:
             if (strpos($this['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") === 0) {
                 list($prefix, $mapperclass, $format) = explode("__", $this['tabledata']['simplematching'][$field]['column']);
-                if (is_a($mapperclass, "FleximportMapper")) {
+                if (class_exists($mapperclass)) {
                     $mapper = new $mapperclass();
-                    $data['seminar_id'] = $mapper->map(
-                        $format,
-                        $data[$format] ?: $line[$format]
-                    );
+                    if (is_a($mapper, "FleximportMapper")) {
+                        $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'];
+                        $data[$field] = $mapper->map(
+                            $format,
+                            $data[$mapfrom] ?: $line[$mapfrom]
+                        );
+                    }
                 }
             }
         }
