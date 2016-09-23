@@ -2,6 +2,7 @@
 
 require_once __DIR__."/classes/FleximportTable.php";
 require_once __DIR__."/classes/FleximportConfig.php";
+require_once __DIR__."/classes/FleximportProcess.php";
 require_once __DIR__."/classes/FleximportMappedItem.php";
 require_once __DIR__ . "/classes/FleximportPlugin.abstract.php";
 foreach (scandir(__DIR__."/classes/checker") as $checker) {
@@ -53,9 +54,16 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
             Navigation::addItem('/start/fleximport', $navigation);
             Navigation::addItem('/fleximport', $navigation);
 
-            $navigation = new Navigation(_("Import"), PluginEngine::getURL($this, array(), 'import/overview'));
-            Navigation::addItem('/fleximport/overview', $navigation);
-
+            $processes = FleximportProcess::findBySQL("1=1 ORDER BY name ASC");
+            if (count($processes)) {
+                foreach ($processes as $process) {
+                    $navigation = new Navigation($process['name'], PluginEngine::getURL($this, array(), 'import/overview/'.$process->getId()));
+                    Navigation::addItem('/fleximport/process_'.$process->getId(), $navigation);
+                }
+            } else {
+                $navigation = new Navigation(_("Import"), PluginEngine::getURL($this, array(), 'import/overview'));
+                Navigation::addItem('/fleximport/overview', $navigation);
+            }
             $navigation = new Navigation(_("Konfiguration"), PluginEngine::getURL($this, array(), 'config/overview'));
             Navigation::addItem('/fleximport/config', $navigation);
         }

@@ -7,20 +7,27 @@ class ImportController extends PluginController {
     function before_filter(&$action, &$args)
     {
         parent::before_filter($action, $args);
-        Navigation::activateItem("/fleximport/overview");
+        Navigation::activateItem("/fleximport");
     }
 
-    public function overview_action()
+    public function overview_action($process_id = null)
     {
-        $this->tables = FleximportTable::findAll();
+        $this->process = FleximportProcess::find($process_id);
+        if ($this->process) {
+            Navigation::activateItem("/fleximport/process_".$process_id);
+            $this->tables = FleximportTable::findByProcess_id($process_id);
+        } else {
+            Navigation::activateItem("/fleximport/overview");
+            PageLayout::postMessage(MessageBox::info(_("Erstellen Sie erst einen Prozess und dann darin die Tabellen, die importiert werden sollen.")));
+        }
     }
 
-    public function process_action()
+    public function process_action($process_id)
     {
         if (Request::isPost()) {
             if (Request::submitted("start")) {
                 $protocol = array();
-                $this->tables = FleximportTable::findAll();
+                $this->tables = FleximportTable::findByProcess_id($process_id);
                 foreach ($this->tables as $table) {
                     $table->doImport();
                 }
@@ -41,7 +48,7 @@ class ImportController extends PluginController {
             }
 
         }
-        $this->redirect("import/overview");
+        $this->redirect("import/overview/".$process_id);
     }
 
     public function showtable_action($table_id)

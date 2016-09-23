@@ -1,8 +1,11 @@
 <form
     action="<?= PluginEngine::getLink($plugin, array(), "setup/table" . ($table->isNew() ? "" : "/" . $table->getId())) ?>"
     method="post"
-    class="studip_form"
+    class="studip_form default"
     data-dialog xmlns="http://www.w3.org/1999/html">
+
+    <input type="hidden" name="table[process_id]" value="<?= htmlReady($table['process_id']) ?>">
+    <input type="hidden" name="process_id" value="<?= htmlReady($table['process_id']) ?>">
 
     <label>
         <?= _("Tabellenname") ?>

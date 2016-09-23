@@ -9,13 +9,17 @@ class SetupController extends PluginController {
     function before_filter(&$action, &$args)
     {
         parent::before_filter($action, $args);
-        Navigation::activateItem("/fleximport/overview");
+        Navigation::activateItem("/fleximport");
     }
 
     public function table_action($table_id = null)
     {
         PageLayout::setTitle($table_id ? _("Tabelleneinstellung bearbeiten") : _("Tabelle hinzufügen"));
         $this->table = new FleximportTable($table_id);
+        if ($this->table->isNew() && Request::option("process_id")) {
+            $this->table['process_id'] = Request::option("process_id");
+        }
+        Navigation::activateItem("/fleximport/process_".$this->table['process_id']);
         if (Request::isPost()) {
             $data = Request::getArray("table");
             $oldname = $this->table['name'];
@@ -54,6 +58,7 @@ class SetupController extends PluginController {
     {
         PageLayout::setTitle(_("Datenmapping einstellen"));
         $this->table = new FleximportTable($table_id);
+        Navigation::activateItem("/fleximport/process_".$this->table['process_id']);
         if (Request::isPost()) {
             $tabledata = Request::getArray("tabledata");
             $tabledata = array_merge($this->table['tabledata'], $tabledata);
