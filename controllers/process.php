@@ -14,10 +14,17 @@ class ProcessController extends PluginController {
     {
         $this->process = new FleximportProcess($process_id);
         if (Request::isPost()) {
-            $this->process->setData(Request::getArray("data"));
-            $this->process->store();
-            PageLayout::postMessage(MessageBox::success(_("Prozess wurde gespeichert")));
-            $this->redirect("import/overview/".$this->process->getId());
+            if (Request::submitted("delete_process")) {
+                $this->process->delete();
+                PageLayout::postMessage(MessageBox::success(_("Prozess wurde gelöscht.")));
+                $processes = FleximportProcess::findBySQL("1=1 ORDER BY name ASC");
+                $this->redirect("import/overview" . (count($processes) ? "/".$processes[0]['process_id'] : ""));
+            } else {
+                $this->process->setData(Request::getArray("data"));
+                $this->process->store();
+                PageLayout::postMessage(MessageBox::success(_("Prozess wurde gespeichert")));
+                $this->redirect("import/overview/" . $this->process->getId());
+            }
         }
     }
 }

@@ -68,6 +68,12 @@ $actions->addLink(
 );
 if ($process) {
     $actions->addLink(
+        _("Prozess bearbeiten"),
+        PluginEngine::getURL($plugin, array(), "process/edit/".$process->getId()),
+        Assets::image_path("icons/black/edit"),
+        array('data-dialog' => 1)
+    );
+    $actions->addLink(
         _("Tabelle hinzufügen"),
         PluginEngine::getURL($plugin, array('process_id' => $process->getId()), "setup/table"),
         Assets::image_path("icons/black/add"),

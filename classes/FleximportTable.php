@@ -19,6 +19,7 @@ class FleximportTable extends SimpleORMap {
         if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.2", ">=")) {
             $config['registered_callbacks']['before_store'][]     = 'cbSerializeData';
             $config['registered_callbacks']['after_store'][]      = 'cbUnserializeData';
+            $config['registered_callbacks']['after_delete'][]      = 'cbDeleteTable';
             $config['registered_callbacks']['after_initialize'][] = 'cbUnserializeData';
         }
         parent::configure($config);
@@ -31,6 +32,11 @@ class FleximportTable extends SimpleORMap {
             //$this->registerCallback('after_store after_initialize', 'cbUnserializeData');
         }
         parent::__construct($id);
+    }
+
+    function cbDeleteTable()
+    {
+        DBManager::get()->exec("DROP TABLE IF EXISTS `".$this['name']."`;");
     }
 
     function cbSerializeData()

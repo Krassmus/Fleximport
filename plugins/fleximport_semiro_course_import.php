@@ -219,6 +219,17 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                     }
                 }
             }
+            //Dozent zu Statusgruppe hinzufügen:
+            $gruppe = Statusgruppen::findOneBySQL("range_id = ? AND name = ?", array(
+                $object->getId(),
+                $teilnehmergruppe
+            ));
+            foreach ($object->members->filter(function ($member, $value) { return $member['status'] === "dozent"; }) as $teacher) {
+                if (!$gruppe->isMember($teacher->getId())) {
+                    $gruppe->addUser($teacher->getId());
+                }
+            }
+
             $items = FleximportMappedItem::findBySQL(
                 "import_type = :import_type AND item_id NOT IN (:ids)",
                 array(

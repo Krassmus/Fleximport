@@ -5,6 +5,8 @@ require_once __DIR__."/classes/FleximportConfig.php";
 require_once __DIR__."/classes/FleximportProcess.php";
 require_once __DIR__."/classes/FleximportMappedItem.php";
 require_once __DIR__ . "/classes/FleximportPlugin.abstract.php";
+require_once __DIR__ . "/classes/mapper/FleximportMapper.interface.php";
+require_once __DIR__ . "/classes/checker/FleximportChecker.interface.php";
 foreach (scandir(__DIR__."/classes/checker") as $checker) {
     if ($checker[0] !== "." && substr($checker, -4) === ".php") {
         require_once __DIR__."/classes/checker/".$checker;
@@ -50,11 +52,12 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
     public function __construct() {
         parent::__construct();
         if ($GLOBALS['perm']->have_perm("root")) {
-            $navigation = new Navigation($this->getDisplayName(), PluginEngine::getURL($this, array(), 'import/overview'));
+            $processes = FleximportProcess::findBySQL("1=1 ORDER BY name ASC");
+            $navigation = new Navigation($this->getDisplayName());
+            $navigation->setURL(PluginEngine::getURL($this, array(), 'import/overview'.(count($processes) ? "/".$processes[0]['process_id'] : "")));
             Navigation::addItem('/start/fleximport', $navigation);
             Navigation::addItem('/fleximport', $navigation);
 
-            $processes = FleximportProcess::findBySQL("1=1 ORDER BY name ASC");
             if (count($processes)) {
                 foreach ($processes as $process) {
                     $navigation = new Navigation($process['name'], PluginEngine::getURL($this, array(), 'import/overview/'.$process->getId()));
@@ -75,12 +78,17 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
 
     public function triggerImport()
     {
-        foreach (FleximportTable::findAll() as $table) {
-            $table->isInDatabase();
+        $processes = FleximportProcess::findBySQL("triggered_by_cronjob = '1' ORDER BY name ASC");
+        foreach ($processes as $process) {
+            foreach ($process->tables as $table) {
+                $table->isInDatabase();
+            }
         }
         $protocol = array();
-        foreach (FleximportTable::findAll() as $table) {
-            $protocol = array_merge($protocol, $table->doImport());
+        foreach ($processes as $process) {
+            foreach ($process->tables as $table) {
+                $protocol = array_merge($protocol, $table->doImport());
+            }
         }
         if (count($protocol) && $GLOBALS['FLEXIMPORT_IS_CRONJOB'] && FleximportConfig::get("REPORT_CRONJOB_ERRORS")) {
             $message = _("Es hat folgende Probleme beim Import gegeben:");

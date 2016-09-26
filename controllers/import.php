@@ -16,6 +16,9 @@ class ImportController extends PluginController {
         if ($this->process) {
             Navigation::activateItem("/fleximport/process_".$process_id);
             $this->tables = FleximportTable::findByProcess_id($process_id);
+            if ($this->process['description']) {
+                PageLayout::postMessage(MessageBox::info($this->process['description']));
+            }
         } else {
             Navigation::activateItem("/fleximport/overview");
             PageLayout::postMessage(MessageBox::info(_("Erstellen Sie erst einen Prozess und dann darin die Tabellen, die importiert werden sollen.")));
