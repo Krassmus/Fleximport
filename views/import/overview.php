@@ -63,7 +63,7 @@ $actions = new ActionsWidget();
 $actions->addLink(
     _("Prozess erstellen"),
     PluginEngine::getURL($plugin, array(), "process/edit"),
-    Assets::image_path("icons/black/add"),
+    Assets::image_path("icons/black/add/archive2"),
     array('data-dialog' => 1)
 );
 if ($process) {
