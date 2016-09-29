@@ -69,6 +69,10 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
             }
             $navigation = new Navigation(_("Konfiguration"), PluginEngine::getURL($this, array(), 'config/overview'));
             Navigation::addItem('/fleximport/config', $navigation);
+
+            if (FleximportConfig::get("DISPLAY_AT_HEADER")) {
+                Navigation::getItem('/fleximport')->setImage(Assets::image_path("icons/lightblue/install.svg"));
+            }
         }
     }
 
@@ -97,7 +101,7 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
             $mail = new StudipMail();
             $mail->setSubject(_("Fleximport Fehlerbericht von Stud.IP"));
             $mail->setBodyText($message);
-            $emails = preg_split("/\s*[,;]+\s*/", FleximportConfig::get("REPORT_CRONJOB_ERRORS"), null, PREG_SPLIT_NO_EMPTY);
+            $emails = preg_split("/\s*[,;\s]+\s*/", FleximportConfig::get("REPORT_CRONJOB_ERRORS"), null, PREG_SPLIT_NO_EMPTY);
             foreach ($emails as $email) {
                 $mail->addRecipient($email);
             }
