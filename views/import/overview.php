@@ -37,6 +37,10 @@
                                 break;
                         } ?>
                         <?= htmlReady($table['name']) ?>
+                        <? if ($table->getPlugin()) : ?>
+                            <? $description = $table->getPlugin()->getDescription() ?>
+                            <?= Assets::img("icons/13/grey/plugin", array('class' => "text-bottom", 'title' => $description ? _("Diese Tabelle wird von einem Plugin unterstützt, das folgendes macht: ").$description : _("Diese Tabelle wird von einem Plugin unterstützt."))) ?>
+                        <? endif ?>
                     </h2>
 
                     <? if ($table['source'] === "csv_upload") : ?>
@@ -58,7 +62,6 @@
 </form>
 
 <?
-
 $actions = new ActionsWidget();
 $actions->addLink(
     _("Prozess erstellen"),

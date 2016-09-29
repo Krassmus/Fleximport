@@ -41,6 +41,11 @@ class InitProcesses extends Migration {
             ));
         }
 
+        DBManager::get()->exec("
+            ALTER TABLE `fleximport_tables` CHANGE `source` 
+                `source` enum('csv_upload','csv_weblink','csv_studipfile','database','extern') NOT NULL DEFAULT 'csv_upload';
+        ");
+
     }
 
     function down()

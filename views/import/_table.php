@@ -24,6 +24,10 @@
                 } ?>
                 <?= htmlReady($table['name']) ?>
                 <div class="caption-subtext" style="font-size: 0.6em; display: inline;">(<?= sprintf("%s Einträge", $count) ?>)</div>
+                <? if ($table->getPlugin()) : ?>
+                    <? $description = $table->getPlugin()->getDescription() ?>
+                    <?= Assets::img("icons/13/grey/plugin", array('class' => "text-bottom", 'title' => $description ? _("Diese Tabelle wird von einem Plugin unterstützt, das folgendes macht: ").$description : _("Diese Tabelle wird von einem Plugin unterstützt."))) ?>
+                <? endif ?>
             </div>
             <div class="caption-actions">
                 <? if ($table['source'] === "csv_upload" && !$table->customImportEnabled()) : ?>

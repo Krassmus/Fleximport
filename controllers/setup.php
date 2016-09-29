@@ -41,17 +41,19 @@ class SetupController extends PluginController {
                 ");
             }
             $this->table->store();
+
             PageLayout::postMessage(MessageBox::success(_("Daten wurden gespeichert.")));
         }
     }
 
     public function removetable_action($table_id)
     {
+        $process_id = $this->table['process_id'];
         $this->table = new FleximportTable($table_id);
         $this->table->drop();
         $this->table->delete();
         PageLayout::postMessage(MessageBox::success(_("Tabelle gelöscht.")));
-        $this->redirect("import/overview");
+        $this->redirect("import/overview/".$process_id);
     }
 
     public function tablemapping_action($table_id)

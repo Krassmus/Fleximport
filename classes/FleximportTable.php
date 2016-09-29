@@ -28,8 +28,8 @@ class FleximportTable extends SimpleORMap {
     function __construct($id = null)
     {
         if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.2", "<")) {
-            //$this->registerCallback('before_store', 'cbSerializeData');
-            //$this->registerCallback('after_store after_initialize', 'cbUnserializeData');
+            $this->registerCallback('before_store', 'cbSerializeData');
+            $this->registerCallback('after_store after_initialize', 'cbUnserializeData');
         }
         parent::__construct($id);
     }
@@ -37,6 +37,7 @@ class FleximportTable extends SimpleORMap {
     function cbDeleteTable()
     {
         DBManager::get()->exec("DROP TABLE IF EXISTS `".$this['name']."`;");
+        DBManager::get()->exec("DROP VIEW IF EXISTS `".$this['name']."`;");
     }
 
     function cbSerializeData()
@@ -87,9 +88,10 @@ class FleximportTable extends SimpleORMap {
                     $this->fetchDataFromWeblink();
                     return;
                 } elseif($this['source'] === "csv_studipfile") {
-                    $output = $this->getCSVDataFromFile(studip_utf8decode(get_upload_file_path($this['tabledata']['weblink']['file_id']), ","));
+                    $output = $this->getCSVDataFromFile(get_upload_file_path($this['tabledata']['weblink']['file_id']), ";");
                     $headline = array_shift($output);
                     $this->createTable($headline, $output);
+                    return;
                 }
             } else {
                 $this->getPlugin()->fetchData();
@@ -254,7 +256,11 @@ class FleximportTable extends SimpleORMap {
     }
 
     public function getCSVDataFromFile($file_path, $delim = ';', $encl = '"', $optional = 1) {
-        return $this->CSV2Array(file_get_contents($file_path), $delim, $encl, $optional);
+        $contents = file_get_contents($file_path);
+        if ($this['tabledata']['source_encoding'] === "utf8") {
+            $contents = studip_utf8decode($contents);
+        }
+        return $this->CSV2Array($contents, $delim, $encl, $optional);
     }
 
     public function getCSVDataFromURL($file_path, $delim = ';', $encl = '"', $optional = 1) {
@@ -268,6 +274,7 @@ class FleximportTable extends SimpleORMap {
     public function drop()
     {
         DBManager::get()->exec("DROP TABLE IF EXISTS `".addslashes($this['name'])."` ");
+        DBManager::get()->exec("DROP VIEW IF EXISTS `".addslashes($this['name'])."` ");
     }
 
 

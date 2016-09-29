@@ -45,8 +45,36 @@ class fleximport_pan_userimport extends FleximportPlugin {
                         'normal'
                     );
                 }
+                if ($domain_id === "alumni") {
+                    //In Veranstaltung ALUMNI die Statusgruppe anlegen:
+                    $datafield = Datafield::findOneBySQL("name = 'Alumni' AND object_type = 'user'");
+                    $entry = DatafieldEntry::findOneBySQL("datafield_id = ? AND range_id = ?");
+                    $course = Course::findOneByName("ALUMNI");
+                    $gruppenname = $entry ? $entry['content'] : null;
+                    if ($course && $gruppenname) {
+                        $statusgruppe = Statusgruppen::findOneBySQL("name = ? range_id = ?", array($gruppenname, $course->getId()));
+                        if (!$statusgruppe) {
+                            $statusgruppe = new Statusgruppen();
+                            $statusgruppe['name'] = $gruppenname;
+                            $statusgruppe['range_id'] = $course->getId();
+                            $statusgruppe->store();
+                        }
+                        if (!$statusgruppe->isMember($object->getId())) {
+                            $statusgruppe->addUser($object->getId());
+                        }
+                    }
+                }
             }
         }
+    }
+
+    public function getDescription()
+    {
+        return "Den Nutzern werden, wenn sie in eine neue Domäne eingetragen werden, Willkommensnachrichten zugesendet. " .
+            "Diese sind Konfgurationsvariablen mit dem Namen USERDOMAIN_WELCOME_domainid. Falls es diese Konfigurationsvariablen " .
+            "zu der passenden Domäne nicht gibt. wird keine Nachricht verschickt. Die erste Zeile in der Konfigurationsvariablen " .
+            "ist der Betreff, alle anderen Zeilen die Nachricht selbst. " .
+            "Es können in der Nachricht Variablen der Tabelle oder des User-Objektes verwendet werden mit z.B. {{vorname}} als Schreibweise.";
     }
 }
 

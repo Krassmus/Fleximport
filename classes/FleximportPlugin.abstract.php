@@ -99,4 +99,12 @@ abstract class FleximportPlugin {
     public function afterUpdate(SimpleORMap $object, $line)
     {
     }
+
+    /**
+     * Returns a description of what this plugin is doing.
+     * @return null\string
+     */
+    public function getDescription() {
+        return null;
+    }
 }
