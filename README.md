@@ -2,7 +2,7 @@
 
 Ein Plugin für Stud.IP, um alle möglichen Dinge zu importieren wie Veranstaltungen, Nutzer, Termine, Einrichtungen und so weiter.
 
-Die Idee des Plugins ist einfach: Man importiert erst einmal Daten wie aus einer CSV-Datei oder einer externen Quelle wie einem Google-Doc-Spreadsheet in die Stud.IP-Datenbank und anschließend werden die Daten Zeile für Zeile importiert. Da solche Rohdaten meist aus anderen Systemen kommen und ganz eigene Bezeichner haben, müssen die Daten entsprechend auf die Zieltabelle gemapped werden. Das macht man im Plugin über die Oberfläche. Man kann für jedes Attribut der Stud.IP-Tabelle (zum Beispiel auth_user_md5 für einen Nutzer) festlegen, welcher Wert aus der Datentabelle verwendet werden soll. Dadurch ist es unerheblich, ob in der Datentabelle die Emailadresse in der Spalte "email" oder "E-Mail" oder "Email-Adresse" steht. Wichtig ist nur, dass die Daten gemapped werden und dann kommen die richtigen Werte ins Stud.IP. Ändert sich am Ende ein Bezeichner, oder soll noch die Matrikelnummer zusätzlich importiert werden, muss man nur kurz das Mapping über die Oberfläche anpassen, anstatt das Plugin umzuprogrammieren.
+Die Idee des Plugins ist einfach: Man importiert erst einmal Daten wie aus einer CSV-Datei oder einer externen Quelle wie einem Google-Doc-Spreadsheet als Rohdaten in die Stud.IP-Datenbank und anschließend werden die Daten Zeile für Zeile importiert. Da solche Rohdaten meist aus anderen Systemen kommen und ganz eigene Bezeichner haben, müssen die Daten entsprechend auf die Zieltabelle gemapped werden. Das macht man im Plugin über die Oberfläche. Man kann für jedes Attribut der Stud.IP-Tabelle (zum Beispiel das Feld Email der Tabelle auth_user_md5 für einen Nutzer) festlegen, welcher Wert aus der Datentabelle verwendet werden soll. Dadurch ist es unerheblich, ob in der Datentabelle die Emailadresse in der Spalte "email" oder "E-Mail" oder "Email-Adresse" steht. Wichtig ist nur, dass die Daten gemapped werden und dann kommen die richtigen Werte ins Stud.IP. Ändert sich am Ende ein Bezeichner, oder soll noch die Matrikelnummer zusätzlich importiert werden, muss man nur kurz das Mapping über die Oberfläche anpassen, anstatt das Plugin umzuprogrammieren.
 
 ## Prozesse
 
@@ -26,6 +26,27 @@ Einem Prozess kann man sodann die Tabellen zuordnen. Man fügt über die Sidebar
 
 **Synchronisierung**: Man kann sagen, ob die importierten Objekte ausschließlich importiert werden oder ob es auch eine Löschfunktion geben soll. Beispiel: Es wird in Excel eine Liste von Alumni gepflegt. Fällt einer weg, weil der Alumnus/die Alumna einfach nicht länger in der Datenbank geführt werden möchte, so streicht man die Person aus der Excel-Tabelle. Bei dem nächsten Import kann Fleximport dann feststellen, dass ein Datensatz fehlt und geht davon aus, dass dieser Datensatz gelöscht werden soll und tut das dann auch. Wer diese Löschfunktion haben möchte, muss nur das Häkchen hier ankreuzen. Dabei sollte gesagt werden, dass die Lösch- bzw. Synchronisationsfunktion gefährlich ist, wenn man CSV-Dateien importiert. Allzu leichtfertig könnte man auf den Gedanken kommen, dass man eben mal schnell nur diese drei Personen updaten will, bei denen sich etwas geändert hat. Blöd, wenn dann alle anderen 597 Personen, die zuvor importiert worden sind, plötzlich gelöscht wurden. Fleximport wird einen an der Stelle nicht warnen, falls man einen menschlichen Fehler macht!
 
+## Mapping der Tabellen
+
+Sind die Rohdaten in Stud.IP drin (zum Beispiel nach dem ersten Upload der CSV-Datei), so kann man mit dem Mapping der Daten auf die Zieltabelle beginnen. Oben rechts der Datentabelle taucht das Symbol ![Kettenglied](https://develop.studip.de/studip/assets/images/icons/blue/group.svg) auf. Klickt man auf dieses Kettengliedicon, öffnet sich ein Dialogfenster, in dem man das Mapping durchführen kann. Tabellarisch sieht man jedes Feld der Zieltabelle und kann auf der rechten Seite der Tabelle einstellen, welchen Wert dieses Feld annehmen soll. Dabei kann man auswählen aus *nicht* (also es wird nichts gemappt, was meistens okay ist), einem festen Eintrag, den man darunter noch genauer angibt, einem Feld aus der Datentabelle und vielleicht noch Spezialmapping, sofern für dieses Feld welche verfügbar sind.
+
+### Mapping eines festen Werts
+
+Oft erscheinen bestimmte Dinge selbstverständlich. Alumni, die man importieren möchte, sollten zum Beispiel immer den Status "autor" haben und nicht "dozent". Das kann man mappen, indem man in der Rohdatentabelle eine Spalte einbaut, die "Status" heißt und in jeder Zeile "autor" stehen hat. Aber das ist nervig, weil man ja die CSV-Datei nicht unnötig groß werden lassen möchte. Stattdessen kann man im Mapping `[Fester Eintrag]` auswählen und den Wert "autor" definieren.
+
+### Mapping eines Feldes mit besonderer Formatierung
+
+Manche Felder (in der Regel sind das Spezialfelder, siehe unten) kann man ganz normal mit einem festen Wert oder einer Tabellenspalte mappen, muss aber noch das Format angeben. Das liegt daran, dass die wenigsten wissen, welche `institut_id` die Heimateinrichtung hat. Stattdessen will man wohl eher den Namen der Einrichtung eingeben und geht davon aus, dass es keine Namensdoppelungen gibt. In dem Fall gibt man im Format an "Name der Einrichtung" statt "Institut_id". Aber beides würde gehen.
+
+### Mapping durch "Von XYZ ermitteln"
+
+Dieses ist ein Spezialmapping, das sehr *sehr* wichtig ist, um Objekte nicht nur anzulegen, sondern auch durch einen mehrmaligen Import updaten zu können. Dies betrifft in der Regel Felder wie `Seminar_id` oder `user_id`, also oft den Primärschlüsseln von Tabellen.
+
+Beispiel Veranstaltungsimport: Wenn eine Veranstaltung des erste Mal angelegt wird, wird die `Seminar_id` neu erstellt. Das passiert magisch, ohne dass man etwas dazu tun muss. Danach ist die `Seminar_id` eine kryptische Zahlenbuchstabenfolge wie `9844ed33137d1aaed615fe650cd2921e`. Es ist superumständlich, wenn in der CSV-Datei ebendiese `Seminar_id` eingetragen werden soll, damit beim nächsten Import der Daten nicht das gleiche Seminar noch einmal eingetragen wird.
+
+Stattdessen überlegt man sich einen besonderen Schlüssel, mit dem man die Veranstaltung identifizieren kann, auch wenn man die `Seminar_id` nicht kennt. Das könnte die Veranstaltungsnummer sein oder ein Datenfeldeintrag wie "lsf_id" - nur so als Beispiel. Jetzt muss man ein Spezialmapping "Von Veranstaltungsnummer ermitteln" für das Feld `Seminar_id` auswählen und definiert dann noch, welches Feld aus der Rohdatentabelle der Veranstaltungsnummer entspricht.
+
+Hat man das gemacht, werden die Veranstaltungen bei einem erneuten Import immer geupdated anstatt neu angelegt zu werden. So kann man natürlich auch den Namen der Veranstaltung ändern, solange die Veranstaltungsnummer gleich bleibt. Und genau für diese Updateprozesse ist dieses Spezialmapping so enorm wichtig. Theoretisch kann man dieses Spezialmapping aber auch für andere Dinge setzen, wie wenn bei einem Terminimport die `Seminar_id`, die dort nicht der Primärschlüssel ist, gesetzt werden soll. Auch da könnte man einfach die Veranstaltungsnummer in die Rohdatentabelle packen und dann entsprechend mappen.
 
 ## Konfigurationen
 
