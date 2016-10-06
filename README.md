@@ -4,7 +4,7 @@ Ein Plugin für Stud.IP, um alle möglichen Dinge zu importieren wie Veranstaltu
 
 Die Idee des Plugins ist einfach: Man importiert erst einmal Daten wie aus einer CSV-Datei oder einer externen Quelle wie einem Google-Doc-Spreadsheet als Rohdaten in die Stud.IP-Datenbank und anschließend werden die Daten Zeile für Zeile importiert. Da solche Rohdaten meist aus anderen Systemen kommen und ganz eigene Bezeichner haben, müssen die Daten entsprechend auf die Zieltabelle gemapped werden. Das macht man im Plugin über die Oberfläche. Man kann für jedes Attribut der Stud.IP-Tabelle (zum Beispiel das Feld Email der Tabelle auth_user_md5 für einen Nutzer) festlegen, welcher Wert aus der Datentabelle verwendet werden soll. Dadurch ist es unerheblich, ob in der Datentabelle die Emailadresse in der Spalte "email" oder "E-Mail" oder "Email-Adresse" steht. Wichtig ist nur, dass die Daten gemapped werden und dann kommen die richtigen Werte ins Stud.IP. Ändert sich am Ende ein Bezeichner, oder soll noch die Matrikelnummer zusätzlich importiert werden, muss man nur kurz das Mapping über die Oberfläche anpassen, anstatt das Plugin umzuprogrammieren.
 
-## Prozesse
+## 1) Prozesse
 
 Da Fleximport ein sehr mächtiges Importtool ist, möchte man vielleicht verschiedene Dinge gleichzeitig jeden Tag über einen Cronjob importieren, andere Dinge aber nur einmal pro Semester per Knopfdruck. Dazu gibt es in Fleximport Prozesse. Jeder Prozess ist im Grunde ein Importtool, das man frei konfigurieren kann. So kann ein Import aus einem Fremdsystem über drei Tabellen (Veranstaltungen, Nutzer und Teilnehmerdaten) ein einzelner Prozess mit drei Tabellen sein. Aber vielleicht will man die Freiheiten haben, Fleximport auch hin und wieder mit einer CSV-Datei zu befüttern, wodurch externe Accounts für eine spezielle Nutzerdomäne (zum Beispiel Alumni) angelegt werden. Das wäre dann ein zweiter Prozess.
 
@@ -14,7 +14,7 @@ Jedem Prozess kann man mehrere Tabellen zuordnen, die in diesem Prozess nach und
 
 Sowohl Prozesse als auch Tabellen innerhalb der Prozesse werden überdies in alphabetischer Reihenfolger abgearbeitet. Will man also die Reihenfolge verändern, muss man entweder den Prozess oder die Tabelle umbennen, was in der Regel kein Problem sein sollte.
 
-## Importtabellen
+## 2) Importtabellen
 
 Einem Prozess kann man sodann die Tabellen zuordnen. Man fügt über die Sidebar-Aktion "Tabelle hinzufügen" eine neue Tabelle hinzu. Folgende Angaben sind dabei wichtig:
 
@@ -26,7 +26,7 @@ Einem Prozess kann man sodann die Tabellen zuordnen. Man fügt über die Sidebar
 
 **Synchronisierung**: Man kann sagen, ob die importierten Objekte ausschließlich importiert werden oder ob es auch eine Löschfunktion geben soll. Beispiel: Es wird in Excel eine Liste von Alumni gepflegt. Fällt einer weg, weil der Alumnus/die Alumna einfach nicht länger in der Datenbank geführt werden möchte, so streicht man die Person aus der Excel-Tabelle. Bei dem nächsten Import kann Fleximport dann feststellen, dass ein Datensatz fehlt und geht davon aus, dass dieser Datensatz gelöscht werden soll und tut das dann auch. Wer diese Löschfunktion haben möchte, muss nur das Häkchen hier ankreuzen. Dabei sollte gesagt werden, dass die Lösch- bzw. Synchronisationsfunktion gefährlich ist, wenn man CSV-Dateien importiert. Allzu leichtfertig könnte man auf den Gedanken kommen, dass man eben mal schnell nur diese drei Personen updaten will, bei denen sich etwas geändert hat. Blöd, wenn dann alle anderen 597 Personen, die zuvor importiert worden sind, plötzlich gelöscht wurden. Fleximport wird einen an der Stelle nicht warnen, falls man einen menschlichen Fehler macht!
 
-## Mapping der Tabellen
+## 3) Mapping der Tabellen
 
 Sind die Rohdaten in Stud.IP drin (zum Beispiel nach dem ersten Upload der CSV-Datei), so kann man mit dem Mapping der Daten auf die Zieltabelle beginnen. Oben rechts der Datentabelle taucht das Symbol ![Kettenglied](https://develop.studip.de/studip/assets/images/icons/blue/group.svg) auf. Klickt man auf dieses Kettengliedicon, öffnet sich ein Dialogfenster, in dem man das Mapping durchführen kann. Tabellarisch sieht man jedes Feld der Zieltabelle und kann auf der rechten Seite der Tabelle einstellen, welchen Wert dieses Feld annehmen soll. Dabei kann man auswählen aus *nicht* (also es wird nichts gemappt, was meistens okay ist), einem festen Eintrag, den man darunter noch genauer angibt, einem Feld aus der Datentabelle und vielleicht noch Spezialmapping, sofern für dieses Feld welche verfügbar sind.
 
@@ -48,7 +48,15 @@ Stattdessen überlegt man sich einen besonderen Schlüssel, mit dem man die Vera
 
 Hat man das gemacht, werden die Veranstaltungen bei einem erneuten Import immer geupdated anstatt neu angelegt zu werden. So kann man natürlich auch den Namen der Veranstaltung ändern, solange die Veranstaltungsnummer gleich bleibt. Und genau für diese Updateprozesse ist dieses Spezialmapping so enorm wichtig. Theoretisch kann man dieses Spezialmapping aber auch für andere Dinge setzen, wie wenn bei einem Terminimport die `Seminar_id`, die dort nicht der Primärschlüssel ist, gesetzt werden soll. Auch da könnte man einfach die Veranstaltungsnummer in die Rohdatentabelle packen und dann entsprechend mappen.
 
-## Konfigurationen
+### Mapping von Datenfeldern
+
+Datenfelder spielen eine wichtige Rolle in Stud.IP. Sie können ganz normal gemapped werden, als wären sie Felder der Zieltabelle. Zudem kann man in Spezialmappings Objekte anhand ihrer Einträge in einem Datenfeld wie der Matrikelnummer identifizieren.
+
+### Spezialfelder mappen
+
+Manche Felder sind nicht wirklich Felder der Zieltabelle. Ihre Feldnamen beginnen stets mit `fleximport_...`, damit man sie unterscheiden kann. Sie haben aber eine besondere Bedeutung. Zum Beispiel kann man damit die importierten Veranstaltungen gleich sperren. Wenn das so ist, wird Fleximport automatisch die Veranstaltung mit einem speziellen Anmeldeset, der gesperrten Anmeldung, verknüpfen. Da diese Verknüpfung kein einfacher Eintrag in der Tabelle `seminare` ist, sondern eine weitere Tabelle, wird das der Einfachheit halber über so ein Spezialmapping behandelt. Theoretisch könnte man auch einen zweiten Import nur für die Verknüpfungstabelle starten. Das wäre aber arg kompliziert für diesen häufigen Anwendungsfall. Die Spezialfelder machen die Importe daher sehr viel einfacher.
+
+## 4) Konfigurationen
 
 Es gibt immer den Reiter "Konfiguration", mit dem man frei Variablen definieren kann, die im Fleximport vielleicht Verwendung finden. Welche Variablen es gibt, wird hier dokumentiert.
 
