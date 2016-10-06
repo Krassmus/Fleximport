@@ -175,7 +175,6 @@ class FleximportTable extends SimpleORMap {
         }
 
         $output = array();
-        $output[] = $columns;
         foreach ($values as $data) {
             $line = array();
             foreach ($columns as $column) {
@@ -184,7 +183,7 @@ class FleximportTable extends SimpleORMap {
             $output[] = $line;
         }
 
-        $this->createTable($output);
+        $this->createTable($columns, $output);
     }
 
     public function fetchDataFromWeblink()
@@ -201,7 +200,7 @@ class FleximportTable extends SimpleORMap {
         $create_sql = "CREATE TABLE `".addslashes($this['name'])."` (";
         $create_sql .= "`IMPORT_TABLE_PRIMARY_KEY` BIGINT NOT NULL AUTO_INCREMENT ";
         foreach ($headers as $key => $fieldname) {
-            $fieldname = strtolower($this->reduceDiakritikaFromIso88591($fieldname));
+            $fieldname = strtolower(self::reduceDiakritikaFromIso88591($fieldname));
             $create_sql .= ", ";
             $create_sql .= "`".addslashes($fieldname)."` TEXT NOT NULL";
         }
@@ -214,14 +213,14 @@ class FleximportTable extends SimpleORMap {
             foreach ($headers as $key => $field) {
                 $key < 1 || $insert_sql .= ", ";
                 $value = trim($line[$key]);
-                $field = strtolower($this->reduceDiakritikaFromIso88591($field));
+                $field = strtolower(self::reduceDiakritikaFromIso88591($field));
                 $insert_sql .= "`".addslashes($field)."` = ".$db->quote($value)." ";
             }
             $db->exec($insert_sql);
         }
     }
 
-    public function reduceDiakritikaFromIso88591($text) {
+    static public function reduceDiakritikaFromIso88591($text) {
         $text = str_replace(array("ä","Ä","ö","Ö","ü","Ü","ß"), array('ae','Ae','oe','Oe','ue','Ue','ss'), $text);
         $text = str_replace(array('À','Á','Â','Ã','Å','Æ'), 'A' , $text);
         $text = str_replace(array('à','á','â','ã','å','æ'), 'a' , $text);

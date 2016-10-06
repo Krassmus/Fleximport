@@ -1,8 +1,7 @@
-<form action="<?= PluginEngine::getLink($plugin, array(), "import/process/".$process->getId()) ?>"
-      method="post"
-      enctype="multipart/form-data">
-
-    <? if ($process) : ?>
+<? if ($process) : ?>
+    <form action="<?= PluginEngine::getLink($plugin, array(), "import/process/".$process->getId()) ?>"
+          method="post"
+          enctype="multipart/form-data">
         <? foreach ($tables as $table) : ?>
             <? if ($table->isInDatabase()) : ?>
                 <div id="table_<?= $table->getId() ?>_container">
@@ -57,9 +56,9 @@
         <div style="text-align: center;">
             <?= \Studip\Button::create(_("Import starten"), 'start', array('onClick' => "return window.confirm('"._("Wirklich importieren?")."');")) ?>
         </div>
-    <? endif ?>
 
-</form>
+    </form>
+<? endif ?>
 
 <?
 $actions = new ActionsWidget();

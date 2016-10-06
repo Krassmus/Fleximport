@@ -12,6 +12,7 @@ if (file_exists(dirname(__FILE__) . '/Fleximport.class.php')) {
 }
 
 $GLOBALS['IS_CLI'] = true;
+$GLOBALS['FLEXIMPORT_IS_CRONJOB'] = true;
 
 echo sprintf(_("Um %s fängt ein neuer Durchlauf des Importscripts an."), date("H:i:s")._(" Uhr am ").date("j.n.Y"))."\n";
 

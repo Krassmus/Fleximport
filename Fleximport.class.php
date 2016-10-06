@@ -71,7 +71,11 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
             Navigation::addItem('/fleximport/config', $navigation);
 
             if (FleximportConfig::get("DISPLAY_AT_HEADER")) {
-                Navigation::getItem('/fleximport')->setImage(Assets::image_path("icons/lightblue/install.svg"));
+                if (is_numeric(FleximportConfig::get("DISPLAY_AT_HEADER"))) {
+                    Navigation::getItem('/fleximport')->setImage(Assets::image_path("icons/lightblue/install.svg"));
+                } else {
+                    Navigation::getItem('/fleximport')->setImage(FleximportConfig::get("DISPLAY_AT_HEADER"));
+                }
             }
         }
     }
