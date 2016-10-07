@@ -566,40 +566,44 @@ class FleximportTable extends SimpleORMap {
         }
 
         if ($classname === "Course") {
-            //Studienbereiche:
-            $remove = DBManager::get()->prepare("
-                DELETE FROM seminar_sem_tree
-                WHERE seminar_id = :seminar_id
-            ");
-            $remove->execute(array(
-                'seminar_id' => $object->getId()
-            ));
+            if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column']) {
+                //Studienbereiche:
+                $remove = DBManager::get()->prepare("
+                    DELETE FROM seminar_sem_tree
+                    WHERE seminar_id = :seminar_id
+                ");
+                $remove->execute(array(
+                    'seminar_id' => $object->getId()
+                ));
 
-            if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$data['status']]['class']]['bereiche']) {
-                foreach ($data['fleximport_studyarea'] as $sem_tree_id) {
-                    $insert = DBManager::get()->prepare("
-                        INSERT IGNORE INTO seminar_sem_tree
-                        SET sem_tree_id = :sem_tree_id,
-                            seminar_id = :seminar_id
-                    ");
-                    $insert->execute(array(
-                        'sem_tree_id' => $sem_tree_id,
-                        'seminar_id' => $object->getId()
-                    ));
+                if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$data['status']]['class']]['bereiche']) {
+                    foreach ($data['fleximport_studyarea'] as $sem_tree_id) {
+                        $insert = DBManager::get()->prepare("
+                            INSERT IGNORE INTO seminar_sem_tree
+                            SET sem_tree_id = :sem_tree_id,
+                                seminar_id = :seminar_id
+                        ");
+                        $insert->execute(array(
+                            'sem_tree_id' => $sem_tree_id,
+                            'seminar_id' => $object->getId()
+                        ));
+                    }
                 }
             }
 
-            //Lock or unlock course
-            if ($data['fleximport_locked']) {
-                CourseSet::addCourseToSet(
-                    CourseSet::getGlobalLockedAdmissionSetId(),
-                    $object->getId()
-                );
-            } elseif (in_array($data['fleximport_locked'], array("0", 0)) && ($data['fleximport_locked'] !== "")) {
-                CourseSet::removeCourseFromSet(
-                    CourseSet::getGlobalLockedAdmissionSetId(),
-                    $object->getId()
-                );
+            if ($this['tabledata']['simplematching']["fleximport_locked"]['column']) {
+                //Lock or unlock course
+                if ($data['fleximport_locked']) {
+                    CourseSet::addCourseToSet(
+                        CourseSet::getGlobalLockedAdmissionSetId(),
+                        $object->getId()
+                    );
+                } elseif (in_array($data['fleximport_locked'], array("0", 0)) && ($data['fleximport_locked'] !== "")) {
+                    CourseSet::removeCourseFromSet(
+                        CourseSet::getGlobalLockedAdmissionSetId(),
+                        $object->getId()
+                    );
+                }
             }
 
             $folder_exist = DBManager::get()->prepare("
@@ -676,19 +680,28 @@ class FleximportTable extends SimpleORMap {
                         //use a static value
                         $data[$field] = $this['tabledata']['simplematching'][$field]['static'];
                     } else {
-                        //use a matched column
-                        $data[$field] = $line[$this['tabledata']['simplematching'][$field]['column']];
+                        if (strpos($this['tabledata']['simplematching'][$field]['column'], "fleximportconfig_") === 0) {
+                            $config = substr($this['tabledata']['simplematching'][$field]['column'], strlen("fleximportconfig_"));
+                            $template = FleximportConfig::get($config);
+                            foreach ($data as $index => $value) {
+                                $template = str_replace("{{".$index."}}", $value, $template);
+                            }
+                            foreach ($line as $index => $value) {
+                                if (!in_array($index, $data)) {
+                                    $template = str_replace("{{".$index."}}", $value, $template);
+                                }
+                            }
+                            $data[$field] = $template;
+                        } else {
+                            //use a matched column
+                            $data[$field] = $line[$this['tabledata']['simplematching'][$field]['column']];
+                        }
                     }
                 } else {
-                    //just use a field with the same name if there is one
-                    if (isset($line[$field])) {
-                        //$data[$field] = $line[$field];
-                    }
                     //else no mapping, don't even overwrite old value.
                 }
             }
         }
-
 
 
         //special mapping
@@ -708,8 +721,6 @@ class FleximportTable extends SimpleORMap {
                 } elseif ($this['tabledata']['simplematching']["start_time"]['format']) {
                     if ($this['tabledata']['simplematching']["start_time"]['format'] === "name") {
                         $semester = Semester::findOneBySQL("name = ?", array($data['start_time']));
-                        //var_dump($data['start_time']);
-                        //die();
                         if ($semester) {
                             $data['start_time'] = $semester->beginn;
                         } else {

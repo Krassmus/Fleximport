@@ -46,6 +46,12 @@
                     }
                 } ?>
 
+                <? foreach (FleximportConfig::all() as $configname => $value) : ?>
+                    <option value="fleximportconfig_<?= htmlReady($configname) ?>"<?= "fleximportconfig_".$configname === $table['tabledata']['simplematching'][$field]['column'] ? " selected" : ""?>>
+                        <?= _("Konfiguration: ").htmlReady($configname) ?>
+                    </option>
+                <? endforeach ?>
+
 
                 <? if (in_array($table['import_type'], (array) array("Course", "CourseMember"))) : ?>
                     <? if ($field === "seminar_id") : ?>
