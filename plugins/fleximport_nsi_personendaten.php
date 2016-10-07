@@ -29,7 +29,11 @@ class fleximport_nsi_personendaten extends FleximportPlugin
     
     public function fieldsToBeMapped()
     {
-        return array('username', 'geschlecht');
+        return array(
+            'user_id',
+            'username',
+            'geschlecht'
+        );
     }
     
     public function mapField($field, $line)
@@ -61,17 +65,17 @@ class fleximport_nsi_personendaten extends FleximportPlugin
                 . "." .
                 str_replace(" ", "", FleximportTable::reduceDiakritikaFromIso88591($line['nachname']))
             );
-            
-            
-            $userId = $this->getUserIdByDatafield($db, 'fp_idnr', $line['fp_idnr']);
+
+
+            $user_id = $this->getUserIdByDatafield($db, 'fp_idnr', $line['fp_idnr']);
                 
-            if(!$userId) {
+            if(!$user_id) {
                 //datafield not found: check for safo key:
                 $userId = $this->getUserIdByDatafield($db, 'safo_key', $line['safo_key']);
             }
             
             $pureUsername = $userName;
-            if(!$userId) {
+            if(!$user_id) {
                 
                 $i = 1;
                 while ($db->query(
@@ -98,7 +102,7 @@ class fleximport_nsi_personendaten extends FleximportPlugin
             } else {
                 //user-ID was found: return the existing username from the database:
                 $userName = $db->query(
-                    "SELECT username FROM auth_user_md5 WHERE user_id = " . $db->quote($userId)
+                    "SELECT username FROM auth_user_md5 WHERE user_id = " . $db->quote($user_id)
                     )->fetch(PDO::FETCH_BOTH);
                 return $userName[0];
             }
