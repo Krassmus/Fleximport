@@ -51,16 +51,16 @@
 
 
     <thead>
-    <tr>
-        <th></th>
-        <th></th>
-        <? $tableHeader = $table->getTableHeader() ?>
-        <? foreach ($tableHeader as $column) : ?>
-            <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY" && (!$table['tabledata']['display_only_columns'] || in_array($column, $table['tabledata']['display_only_columns']))) : ?>
-                <th><?= htmlReady($column) ?></th>
-            <? endif ?>
-        <? endforeach ?>
-    </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            <? $tableHeader = $table->getTableHeader() ?>
+            <? foreach ($tableHeader as $column) : ?>
+                <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY" && (!$table['tabledata']['display_only_columns'] || in_array($column, $table['tabledata']['display_only_columns']))) : ?>
+                    <th><?= htmlReady($column) ?></th>
+                <? endif ?>
+            <? endforeach ?>
+        </tr>
     </thead>
     <tbody>
     <? if ($table['display_lines'] !== "ondemand") : ?>
@@ -72,15 +72,14 @@
             <? if (($count < (int) $limit || $report['errors']) || $limit === false) : ?>
                 <tr>
                     <td>
-                        <? if ($report['found']) : ?>
-                            <a href="<?= PluginEngine::getLink($plugin, array('table' => $table['name']), "import/targetdetails/".$line['IMPORT_TABLE_PRIMARY_KEY']) ?>" data-dialog>
-                                <? if ($report['errors']) : ?>
-                                    <?= Assets::img("icons/20/lightblue/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden"))) ?>
-                                <? else :?>
-                                    <?= Assets::img("icons/20/blue/accept", array('title' => _("Datensatz wurde in Stud.IP gefunden und wird geupdated"))) ?>
-                                <? endif ?>
-                            </a>
-                        <? endif ?>
+                        <a href="<?= PluginEngine::getLink($plugin, array('table' => $table['name']), "import/targetdetails/".$line['IMPORT_TABLE_PRIMARY_KEY']) ?>" data-dialog>
+                            <? $icon = $report['found'] ? "accept" : "star" ?>
+                            <? if ($report['errors']) : ?>
+                                <?= Assets::img("icons/20/lightblue/".$icon, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden") : _("Datenvorschau"))) ?>
+                            <? else :?>
+                                <?= Assets::img("icons/20/blue/".$icon, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden und wird geupdated") : _("Datenvorschau der Daten, die neu angelegt werden würden."))) ?>
+                            <? endif ?>
+                        </a>
                     </td>
                     <td>
                         <? if ($report['errors']) : ?>

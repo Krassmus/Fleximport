@@ -1,4 +1,4 @@
-<? if (in_array($table['import_type'], array("Course", "User", "CourseMember")) || method_exists($object, "getURL")) : ?>
+<? if ((in_array($table['import_type'], array("Course", "User", "CourseMember")) || method_exists($object, "getURL")) && !$object->isNew()) : ?>
 <div style="text-align: center; padding: 30px;">
     <? switch ($table['import_type']) {
         case "Course":
@@ -26,12 +26,18 @@
 
 <table class="default">
     <caption>
-        <?= _("Datenvergleich") ?>
+        <? if (!$object->isNew()) : ?>
+            <?= _("Datenvergleich") ?>
+        <? else : ?>
+            <?= _("Datenübersicht") ?>
+        <? endif ?>
     </caption>
     <thead>
         <tr>
             <th><?= _("Feldname") ?></th>
-            <th><?= _("Bestehende Daten") ?></th>
+            <? if (!$object->isNew()) : ?>
+                <th><?= _("Bestehende Daten") ?></th>
+            <? endif ?>
             <th><?= _("Zu importierende Daten") ?></th>
         </tr>
     </thead>
@@ -45,7 +51,9 @@
                         <?= Assets::img("icons/20/black/exclaim", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
                     <? endif ?>
                 </td>
-                <td><?= htmlReady($object[$field]) ?></td>
+                <? if (!$object->isNew()) : ?>
+                    <td><?= htmlReady($object[$field]) ?></td>
+                <? endif ?>
                 <td>
                     <? if (!$overwrite) : ?>
                         <?= Assets::img("icons/20/grey/decline", array('title' => _("Wert wird nicht überschrieben."))) ?>
