@@ -782,28 +782,6 @@ class FleximportTable extends SimpleORMap {
                 }
             }
 
-            //Map Institute:
-            if ($this['tabledata']['simplematching']["institut_id"]['format']) {
-                if ($this['tabledata']['simplematching']["institut_id"]['format'] === "name") {
-                    $institut = Institute::findOneBySQL("Name = ?", array($data['institut_id']));
-                    if ($institut) {
-                        $data['institut_id'] = $institut->getId();
-                    } else {
-                        $data['institut_id'] = null;
-                    }
-                } else {
-                    $entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND content = ?", array(
-                        $this['tabledata']['simplematching']["institut_id"]['format'],
-                        $data['institut_id']
-                    ));
-                    if ($entry) {
-                        $data['institut_id'] = $entry['range_id'];
-                    } else {
-                        $data['institut_id'] = null;
-                    }
-                }
-            }
-
             //Map sem_type:
             if ($this['tabledata']['simplematching']["status"]['format']) {
                 if ($this['tabledata']['simplematching']["status"]['format'] === "name") {

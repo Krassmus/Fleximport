@@ -98,19 +98,6 @@
                     </select>
                 </div>
             <? endif ?>
-            <? if (($table['import_type'] === "Course") && ($field === "institut_id")) : ?>
-                <div class="format" id="simplematching_<?= htmlReady($field) ?>_format">
-                    <select name="tabledata[simplematching][<?= htmlReady($field) ?>][format]">
-                        <option value=""><?= _("Format: Institut_id") ?></option>
-                        <option value="name"<?= $table['tabledata']['simplematching'][$field]['format'] === "name" ? " selected" : "" ?>><?= _("Format: Name") ?></option>
-                        <? foreach (Datafield::findBySQL("object_type = 'inst' ORDER BY name") as $datafield) : ?>
-                            <option value="<?= $datafield->getId() ?>"<?= $table['tabledata']['simplematching'][$field]['format'] === $datafield->getId() ? " selected" : "" ?>>
-                                <?= htmlReady(_("Format: ").$datafield['name']) ?>
-                            </option>
-                        <? endforeach ?>
-                    </select>
-                </div>
-            <? endif ?>
             <? if (($table['import_type'] === "Course") && ($field === "start_time")) : ?>
                 <div class="format" id="simplematching_<?= htmlReady($field) ?>_format">
                     <select name="tabledata[simplematching][<?= htmlReady($field) ?>][format]">
