@@ -38,6 +38,14 @@ Oft erscheinen bestimmte Dinge selbstverständlich. Alumni, die man importieren 
 
 Manche Felder (in der Regel sind das Spezialfelder, siehe unten) kann man ganz normal mit einem festen Wert oder einer Tabellenspalte mappen, muss aber noch das Format angeben. Das liegt daran, dass die wenigsten wissen, welche `institut_id` die Heimateinrichtung hat. Stattdessen will man wohl eher den Namen der Einrichtung eingeben und geht davon aus, dass es keine Namensdoppelungen gibt. In dem Fall gibt man im Format an "Name der Einrichtung" statt "Institut_id". Aber beides würde gehen.
 
+### Mapping mit Templates
+
+Manchmal muss man Beschreibungsfelder mappen, in denen mehrere Angaben stehen. So zum Beispiel für eine Veranstaltung "Findet am xxx zum ersten Mal statt und am yyy zum letzten Mal". 
+
+Um das zu bauen, kann man in Fleximport im Reiter Konfiguration eine Konfigurationsvariable anlegen, die später als Template fungiert. Innerhalb des Templates kann man Platzhalter einsetzen, die etwa so aussehen: ``{{Spalte aus Tabelle}}`` Also immer zwei geschweifte Klammern, den Namen eines Feldes aus der Datentabelle oder der Zieltabelle und dann wieder zwei geschweifte Klammern.
+
+Zurück zum Mapping der Zieltabellenfelder: Dort erscheint nun "Konfiguration: Templatename" als mögliches Mapping in dem Auswahlfeld. Die Werte der Rohdatentabelle werden in das Template eingesetzt und der erzeugte Endtext dann in das Feld der Zieltabelle eingetragen.
+
 ### Mapping durch "Von XYZ ermitteln"
 
 Dieses ist ein Spezialmapping, das sehr *sehr* wichtig ist, um Objekte nicht nur anzulegen, sondern auch durch einen mehrmaligen Import updaten zu können. Dies betrifft in der Regel Felder wie `Seminar_id` oder `user_id`, also oft den Primärschlüsseln von Tabellen.
