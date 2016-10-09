@@ -89,9 +89,14 @@ Angenommen, Sie haben eine Rohdatentabelle für den Import von Veranstaltungen. 
                 INNER JOIN datafields_entries AS de ON (de.range_id = seminare.Seminar_id)
                 INNER JOIN datafields AS d ON (d.datafield_id = de.datafield_id)
             WHERE seminare.VeranstaltungsNummer = fleximport_kurse_rohdaten.v_nr
+                AND d.name = 'fach_nr'
+                AND d.object_type = 'sem'
+                AND de.content = fleximport_kurse_rohdaten.fach_nr
             LIMIT 1
         ) AS Seminar_id
     FROM fleximport_kurse_rohdaten
+
+Mit dieser View bekommt man die Rohdatentabelle plus eine weitere Spalte mit der Seminar_id (oder Null, wenn keine Seminar_id gefunden werden kann). Damit kann man Updates auch immer gut hinbekommen.
 
 ## 6) Plugins im Plugin
 
