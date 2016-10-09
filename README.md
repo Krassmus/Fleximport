@@ -96,8 +96,12 @@ Angenommen, Sie haben eine Rohdatentabelle für den Import von Veranstaltungen. 
         ) AS Seminar_id
     FROM fleximport_kurse_rohdaten
 
-Mit dieser View bekommt man die Rohdatentabelle plus eine weitere Spalte mit der Seminar_id (oder Null, wenn keine Seminar_id gefunden werden kann). Damit kann man Updates auch immer gut hinbekommen.
+Mit dieser View bekommt man die Rohdatentabelle plus eine weitere Spalte mit der Seminar_id (oder Null, wenn keine Seminar_id gefunden werden kann). Damit muss man die Spalte Seminar_id nicht mehr besonders mappen, sondern einfach aus dem View übernehmen. Das View hat in dem Fall das Mapping übernommen.
+
+Der Trick ist am Ende nur noch, dass die Rohdatentabelle gar nicht importiert wird, sondern nur noch das View (das natürlich aus den Rohdaten berechnet wird).
 
 ## 6) Plugins im Plugin
 
-Gelegentlich reichen die Möglichkeiten
+Gelegentlich reichen die Möglichkeiten des Fleximportplugins immer noch nicht aus. Glauben Sie mir: Importe sind tückisch und jeder Import hat seine eigenen Fallstricke, die kein anderer Import vorher hatte. Für diese hartnäckigen Fälle gibt es die Möglichkeit, Plugins für das Fleximportplugin zu programmieren. Plugins im Plugin sozusagen.
+
+Diese Plugins liegen alle im plugins-Ordner und sind Klassen, die von `FleximportPluginFleximportPlugin` erben. Sie müssen zudem exakt den Klassennamen haben, die auch die Tabelle trägt, die von dem Plugin betroffen sein soll.
