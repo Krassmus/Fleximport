@@ -38,6 +38,14 @@ Oft erscheinen bestimmte Dinge selbstverständlich. Alumni, die man importieren 
 
 Manche Felder (in der Regel sind das Spezialfelder, siehe unten) kann man ganz normal mit einem festen Wert oder einer Tabellenspalte mappen, muss aber noch das Format angeben. Das liegt daran, dass die wenigsten wissen, welche `institut_id` die Heimateinrichtung hat. Stattdessen will man wohl eher den Namen der Einrichtung eingeben und geht davon aus, dass es keine Namensdoppelungen gibt. In dem Fall gibt man im Format an "Name der Einrichtung" statt "Institut_id". Aber beides würde gehen.
 
+### Mapping mit Templates
+
+Manchmal muss man Beschreibungsfelder mappen, in denen mehrere Angaben stehen. So zum Beispiel für eine Veranstaltung "Findet am xxx zum ersten Mal statt und am yyy zum letzten Mal". 
+
+Um das zu bauen, kann man in Fleximport im Reiter Konfiguration eine Konfigurationsvariable anlegen, die später als Template fungiert. Innerhalb des Templates kann man Platzhalter einsetzen, die etwa so aussehen: ``{{Spalte aus Tabelle}}`` Also immer zwei geschweifte Klammern, den Namen eines Feldes aus der Datentabelle oder der Zieltabelle und dann wieder zwei geschweifte Klammern.
+
+Zurück zum Mapping der Zieltabellenfelder: Dort erscheint nun "Konfiguration: Templatename" als mögliches Mapping in dem Auswahlfeld. Die Werte der Rohdatentabelle werden in das Template eingesetzt und der erzeugte Endtext dann in das Feld der Zieltabelle eingetragen.
+
 ### Mapping durch "Von XYZ ermitteln"
 
 Dieses ist ein Spezialmapping, das sehr *sehr* wichtig ist, um Objekte nicht nur anzulegen, sondern auch durch einen mehrmaligen Import updaten zu können. Dies betrifft in der Regel Felder wie `Seminar_id` oder `user_id`, also oft den Primärschlüsseln von Tabellen.
@@ -65,4 +73,35 @@ Variablenname | Bedeutung
 `DISPLAY_AT_HEADER` | Soll Fleximport in der Kopfzeile von Stud.IP auftauchen? 1 für ja und 0 (oder keine Angabe) für nein. Man kann auch eine URL eines Bildes angeben, um das Icon in der Kopfzeile zu definieren. Sieht vielleicht manchmal besser aus. Sollte ein SVG-Icon sein.
 `REPORT_CRONJOB_ERRORS` | Falls Fleximport per Cronjob ausgeführt wird, fallen Fehler eventuell nicht so leicht auf, weil es ja niemanden mehr gibt, der/die aktiv die Datensätze und Fehlermeldungen durchgeht. In dem Fall kann man mit dieser Konfiguration definieren, welche Personen einen Fehlerbericht per Email bekommen sollen. Der Wert kann eine oder mehrere mit Komma oder Semikolon oder einfach nur einem Space oder Enter getrennte Emailadressen sein. Alle diese Personen bekommen eine Email mit allen Fehlern zugeschickt, falls es denn Fehler gegeben hat. Falls keine Fehler aufgetreten sind, wird keine Email versendet.
 Willkommensnachricht | Eine Willkommensnachricht für neue Nutzer. Normalerweise werden neu importierte Nutzer in Stud.IP eine Nachricht bekommen, in der ihr Nutzername und Passwort stehen und ein Link, um sich das erste Mal anzumelden. Diese Nachricht kann aber auch verändert werden. Das passiert über das Mapping des Feldes `fleximport_welcome_message` in der Nutzerimporttabelle. Dort kann man sagen, dass entweder die Standardnachricht verwendet werden soll oder gar keine Nachricht oder eben eine Textnachricht aus der Fleximport-Konfiguration. Dazu muss erst einmal eine Konfigurationsvariable angelegt werden. Wie die heißt, ist dabei völlig egal, aber vermutlich wäre `fleximport_welcome_message` ein sinniger Name. Danach kann man im Mapping der Tabelle bzw. des Feldes `fleximport_welcome_message` die Konfiguration auswählen. Der Text, der in der Konfiguration hinterlegt wird, kann überdies Template-Variablen enthalten. So wäre `{{password}}` das Passwort, das der Nutzer sieht oder `{{email}}` seine Emailadresse `{{vorname}}` oder `{{nachname}}` können benutzt werden, um ihn direkt anzusprechen. Oder man schreibt zwischen den beiden geschweiften Klammern ein Feld aus der Datentabelle (der CSV-Quelle), um ganz andere Dinge in die Willkommensnachricht zu schreiben.
+Templates zum Mappen | Wie oben bei *Mapping mit Templates* beschrieben, kann man Konfigurationsvariablen anlegen, um deren Inhalt als Mappingwert für die Zieltabelle festzulegen. So kann zum Beispiel die Beschreibung einer Veranstaltung anstatt eines feste Wertes den Wert einer Konfigurationsvariablen bekommen. Der Clue dabei ist, dass die Konfigurationsvariable wie ein Template funktioniert. Das heißt, man kann wie bei der Willkommensnachricht Felder der Datentabelle oder auch der Zieltabelle referenzieren, indem man ihn in zwei geschweiften Klammern einschließt. Zum Beispiel könnte im Template stehen: "Diese Veranstaltung gibt {{ects}} Punkte und ist im Modul {{Modul1}} verfügbar." So würden bei jeder importierten Veranstaltung die ECTS-Punkte und das korrekte Modul eingefügt werden, sodass die Beschreibungstexte auf jede Veranstaltung individuell angepasst sind.
 
+## 7) Profitipp: SQL-Views
+
+Viel zu oft liegen die Rohdaten in ungünstigen Formaten vor. Klar, irgendwie kann man alles mappen, aber selbst die vielfältigen Mappingmöglichkeiten mit dynamischem Mapping *aus anderen Werten ermitteln*, mit Spezialmappings oder mit Mappings über Templates reicht viel zu oft immer noch nicht aus. In vielen Fällen hilft einem ein SQL-View weiter.
+
+Im Fleximport haben Sie die Möglichkeit, selbst SQL-Views anzulegen und deren "Inhalt" anschließend zu importieren. Das lässt sich am besten über ein Beispiel erklären.
+
+Angenommen, Sie haben eine Rohdatentabelle für den Import von Veranstaltungen. Damit lassen sich auch prima Veranstaltungen neu anlegen. Aber wenn es zum Update kommt, passen die Rohdaten nicht, um die Seminar_id der bereits importierten Veranstaltungen zu berechnen. Das liegt ganz konkret daran, dass als eindeutiger Schlüssel bei den Rohdaten zwei Werte fungieren müssen, zum Beispiel `v_nr`, was der Veranstaltungsnummer entspricht, und `fach_nr`, was in einem Datenfeld gespeichert wird und sowas wie eine Modulbezeichnung sein könnte. Es ist bisher unmöglich, diese beiden Werte auf eine Seminar_id zu mappen. Unten stellen wir noch Plugin in Plugins vor, womit es gehen würde. Aber dazu müsste man programmieren. In diesem Fall kommen wir ohne Programmierung aus und können alles über die Oberfläche von Stud.IP erledigen, wenn wir SQL-Views anlegen. Klicken Sie in der Sidebar auf "Neue Tabelle anlegen" und wählen Sie als Datenquelle "SQL-View" aus. Darunter müssen Sie noch ein SELECT-Statement angeben, das wie folgt aussieht:
+
+    SELECT fleximport_kurse_rohdaten.*, (
+            SELECT seminare.Seminar_id 
+            FROM seminare 
+                INNER JOIN datafields_entries AS de ON (de.range_id = seminare.Seminar_id)
+                INNER JOIN datafields AS d ON (d.datafield_id = de.datafield_id)
+            WHERE seminare.VeranstaltungsNummer = fleximport_kurse_rohdaten.v_nr
+                AND d.name = 'fach_nr'
+                AND d.object_type = 'sem'
+                AND de.content = fleximport_kurse_rohdaten.fach_nr
+            LIMIT 1
+        ) AS Seminar_id
+    FROM fleximport_kurse_rohdaten
+
+Mit dieser View bekommt man die Rohdatentabelle plus eine weitere Spalte mit der Seminar_id (oder Null, wenn keine Seminar_id gefunden werden kann). Damit muss man die Spalte Seminar_id nicht mehr besonders mappen, sondern einfach aus dem View übernehmen. Das View hat in dem Fall das Mapping übernommen.
+
+Der Trick ist am Ende nur noch, dass die Rohdatentabelle gar nicht importiert wird, sondern nur noch das View (das natürlich aus den Rohdaten berechnet wird).
+
+## 6) Plugins im Plugin
+
+Gelegentlich reichen die Möglichkeiten des Fleximportplugins immer noch nicht aus. Glauben Sie mir: Importe sind tückisch und jeder Import hat seine eigenen Fallstricke, die kein anderer Import vorher hatte. Für diese hartnäckigen Fälle gibt es die Möglichkeit, Plugins für das Fleximportplugin zu programmieren. Plugins im Plugin sozusagen.
+
+Diese Plugins liegen alle im plugins-Ordner und sind Klassen, die von `FleximportPluginFleximportPlugin` erben. Sie müssen zudem exakt den Klassennamen haben, die auch die Tabelle trägt, die von dem Plugin betroffen sein soll.
