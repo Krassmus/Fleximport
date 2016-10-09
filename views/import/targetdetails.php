@@ -34,6 +34,7 @@
     </caption>
     <thead>
         <tr>
+            <th></th>
             <th><?= _("Feldname") ?></th>
             <? if (!$object->isNew()) : ?>
                 <th><?= _("Bestehende Daten") ?></th>
@@ -44,19 +45,21 @@
     <tbody>
         <? foreach ($table->getTargetFields() as $field) : ?>
             <? $overwrite = isset($data[$field]) && ($data[$field] !== false) && !in_array($field, (array) $table['tabledata']['ignoreonupdate']) ?>
-            <tr>
-                <td style="font-family: MONOSPACE;">
-                    <?= htmlReady($field) ?>
+            <tr<?= $overwrite ? "" : ' style="opacity: 0.5;"' ?>>
+                <td>
                     <? if ($overwrite && ($object[$field] !== $data[$field])) : ?>
                         <?= Assets::img("icons/20/black/exclaim", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
                     <? endif ?>
+                </td>
+                <td style="font-family: MONOSPACE;">
+                    <?= htmlReady($field) ?>
                 </td>
                 <? if (!$object->isNew()) : ?>
                     <td><?= htmlReady($object[$field]) ?></td>
                 <? endif ?>
                 <td>
                     <? if (!$overwrite) : ?>
-                        <?= Assets::img("icons/20/grey/decline", array('title' => _("Wert wird nicht überschrieben."))) ?>
+                        <?= Assets::img("icons/16/grey/decline", array('title' => _("Wert wird nicht überschrieben."))) ?>
                     <? else : ?>
                         <?= htmlReady($data[$field]) ?>
                     <? endif ?>
