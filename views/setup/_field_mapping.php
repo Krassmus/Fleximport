@@ -59,14 +59,6 @@
                             <?= _("Von Veranstaltungsnummer und Semester ermitteln") ?>
                         </option>
                     <? endif ?>
-                    <? if ($field === "start_time") : ?>
-                        <option value="fleximport_current_semester"<?= $table['tabledata']['simplematching']['start_time']['column'] === "fleximport_current_semester" ? " selected" : "" ?>>
-                            <?= _("Aktuelles Semester") ?>
-                        </option>
-                        <option value="fleximport_next_semester"<?= $table['tabledata']['simplematching']['start_time']['column'] === "fleximport_next_semester" ? " selected" : "" ?>>
-                            <?= _("Kommendes Semester") ?>
-                        </option>
-                    <? endif ?>
                 <? endif ?>
             </select>
             <div id="simplematching_<?= htmlReady($field) ?>_static" style="<?= $table['tabledata']['simplematching'][$field]['column'] !== "static value" ? "display: none;" : "" ?>">
@@ -101,14 +93,6 @@
                         <? foreach (Datafield::findBySQL("object_type = 'user'") as $datafield) : ?>
                             <option value="<?= htmlReady($datafield->getId()) ?>"<?= $table['tabledata']['simplematching'][$field]['format'] === $datafield->getId() ? " selected" : "" ?>><?= htmlReady(sprintf(_("Format: %s (mit Leerzeichen getrennt)"), $datafield['name'])) ?></option>
                         <? endforeach ?>
-                    </select>
-                </div>
-            <? endif ?>
-            <? if (($table['import_type'] === "Course") && ($field === "start_time")) : ?>
-                <div class="format" id="simplematching_<?= htmlReady($field) ?>_format">
-                    <select name="tabledata[simplematching][<?= htmlReady($field) ?>][format]">
-                        <option value=""><?= _("Format: Unix-Timestamp") ?></option>
-                        <option value="name"<?= $table['tabledata']['simplematching'][$field]['format'] === "name" ? " selected" : "" ?>><?= _("Format: Name") ?></option>
                     </select>
                 </div>
             <? endif ?>

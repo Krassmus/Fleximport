@@ -703,33 +703,25 @@ class FleximportTable extends SimpleORMap {
             }
         }
 
+        foreach ($fields as $field) {
+            //mapper:
+            if (strpos($this['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") === 0) {
+                list($prefix, $mapperclass, $format) = explode("__", $this['tabledata']['simplematching'][$field]['column']);
+                if (class_exists($mapperclass)) {
+                    $mapper = new $mapperclass();
+                    if (is_a($mapper, "FleximportMapper")) {
+                        $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'];
+                        $data[$field] = $mapper->map(
+                            $format,
+                            $data[$mapfrom] ?: $line[$mapfrom]
+                        );
+                    }
+                }
+            }
+        }
 
         //special mapping
         if ($this['import_type'] === "Course") {
-            //Map start_time
-            if ($this['tabledata']['simplematching']["start_time"]['column']) {
-                if ($this['tabledata']['simplematching']["start_time"]['column'] === "fleximport_current_semester") {
-                    $semester = Semester::findCurrent();
-                    if ($semester) {
-                        $data['start_time'] = $semester->beginn;
-                    }
-                } elseif ($this['tabledata']['simplematching']["start_time"]['column'] === "fleximport_next_semester") {
-                    $semester = Semester::findNext();
-                    if ($semester) {
-                        $data['start_time'] = $semester->beginn;
-                    }
-                } elseif ($this['tabledata']['simplematching']["start_time"]['format']) {
-                    if ($this['tabledata']['simplematching']["start_time"]['format'] === "name") {
-                        $semester = Semester::findOneBySQL("name = ?", array($data['start_time']));
-                        if ($semester) {
-                            $data['start_time'] = $semester->beginn;
-                        } else {
-                            $data['start_time'] = null;
-                        }
-                    } //else $data['start_time'] is already a unix-timestamp
-                }
-            }
-
             //Map seminar_id :
             if (!$data['seminar_id'] && $this['tabledata']['simplematching']["seminar_id"]['column'] === "fleximport_map_from_veranstaltungsnummer_and_semester") {
                 $course = Course::findOneBySQL("name = ? AND start_time = ?", array($data['name'], $data['start_time']));
@@ -885,23 +877,6 @@ class FleximportTable extends SimpleORMap {
             if ($this['tabledata']['simplematching']["fleximport_expiration_date"]['column'] && !in_array("fleximport_expiration_date", $this->fieldsToBeDynamicallyMapped())) {
                 if (!is_numeric($data['fleximport_expiration_date'])) {
                     $data['fleximport_expiration_date'] = strtotime($data['fleximport_expiration_date']);
-                }
-            }
-        }
-
-        foreach ($fields as $field) {
-            //mapper:
-            if (strpos($this['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") === 0) {
-                list($prefix, $mapperclass, $format) = explode("__", $this['tabledata']['simplematching'][$field]['column']);
-                if (class_exists($mapperclass)) {
-                    $mapper = new $mapperclass();
-                    if (is_a($mapper, "FleximportMapper")) {
-                        $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'];
-                        $data[$field] = $mapper->map(
-                            $format,
-                            $data[$mapfrom] ?: $line[$mapfrom]
-                        );
-                    }
                 }
             }
         }
