@@ -34,7 +34,9 @@
     </caption>
     <thead>
         <tr>
-            <th></th>
+            <? if (!$object->isNew()) : ?>
+                <th></th>
+            <? endif ?>
             <th><?= _("Feldname") ?></th>
             <? if (!$object->isNew()) : ?>
                 <th><?= _("Bestehende Daten") ?></th>
@@ -46,11 +48,13 @@
         <? foreach ($table->getTargetFields() as $field) : ?>
             <? $overwrite = isset($data[$field]) && ($data[$field] !== false) && !in_array($field, (array) $table['tabledata']['ignoreonupdate']) ?>
             <tr<?= $overwrite ? "" : ' style="opacity: 0.5;"' ?>>
+                <? if (!$object->isNew()) : ?>
                 <td>
                     <? if ($overwrite && ($object[$field] !== $data[$field])) : ?>
                         <?= Assets::img("icons/20/black/exclaim", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
                     <? endif ?>
                 </td>
+                <? endif ?>
                 <td style="font-family: MONOSPACE;">
                     <?= htmlReady($field) ?>
                 </td>

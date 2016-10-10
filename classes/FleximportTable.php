@@ -566,7 +566,8 @@ class FleximportTable extends SimpleORMap {
         }
 
         if ($classname === "Course") {
-            if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column']) {
+            if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column']
+                    || in_array("fleximport_studyarea", $this->fieldsToBeDynamicallyMapped())) {
                 //Studienbereiche:
                 $remove = DBManager::get()->prepare("
                     DELETE FROM seminar_sem_tree
@@ -591,7 +592,8 @@ class FleximportTable extends SimpleORMap {
                 }
             }
 
-            if ($this['tabledata']['simplematching']["fleximport_locked"]['column']) {
+            if ($this['tabledata']['simplematching']["fleximport_locked"]['column']
+                    || in_array("fleximport_locked", $this->fieldsToBeDynamicallyMapped())) {
                 //Lock or unlock course
                 if ($data['fleximport_locked']) {
                     CourseSet::addCourseToSet(

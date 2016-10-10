@@ -61,7 +61,9 @@
 
     <label id="sqlview_info" style="<?= $table['source'] !== "sqlview" ? "display: none;" : "" ?>">
         <?= _("SELECT-Statement") ?>
-        <textarea style="font-family: Monospace;" placeholder="SELECT * FROM ...." name="table[tabledata][sqlview][select]"><?= htmlReady($table['tabledata']['sqlview']['select']) ?></textarea>
+        <textarea style="font-family: Monospace; font-size: 0.8em; min-height: 12em;"
+                  placeholder="SELECT * FROM ...."
+                  name="table[tabledata][sqlview][select]"><?= htmlReady($table['tabledata']['sqlview']['select']) ?></textarea>
     </label>
 
     <table id="server_settings" class="default nohover" style="<?= $table['source'] !== "database" ? "display: none;" : "" ?>">

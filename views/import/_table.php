@@ -1,4 +1,4 @@
-<? $limit = ($limit === false) || ($limit > 0) ? $limit : 20 ?>
+<? $limit = ($limit === false) || ($limit > 0) ? $limit : (FleximportConfig::get("FLEXIMPORT_DISPLAY_LINES") ?: 20) ?>
 <? $count = $table->fetchCount() ?>
 <? $displayed_lines = 0 ?>
 <table class="default" style="margin-bottom: 50px;" id="<?= $table->getId() ?>">

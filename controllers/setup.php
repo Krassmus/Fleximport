@@ -37,7 +37,9 @@ class SetupController extends PluginController {
                 DBManager::get()->exec("DROP VIEW IF EXISTS `".addslashes($data['name'])."`");
                 DBManager::get()->exec("DROP TABLE IF EXISTS `".addslashes($data['name'])."`");
                 DBManager::get()->exec("
-                    CREATE VIEW `".addslashes($data['name'])."` AS ".$data['tabledata']['sqlview']['select']."; 
+                    CREATE VIEW `".addslashes($data['name'])."` AS (
+                        ".$data['tabledata']['sqlview']['select']."
+                    );
                 ");
             }
             $this->table->store();
