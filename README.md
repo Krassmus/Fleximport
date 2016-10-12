@@ -70,6 +70,7 @@ Es gibt immer den Reiter "Konfiguration", mit dem man frei Variablen definieren 
 
 Variablenname | Bedeutung
 --------------|-----------
+`FLEXIMPORT_NAME` | Der Name von Fleximport, der angezeigt wird.
 `DISPLAY_AT_HEADER` | Soll Fleximport in der Kopfzeile von Stud.IP auftauchen? 1 für ja und 0 (oder keine Angabe) für nein. Man kann auch eine URL eines Bildes angeben, um das Icon in der Kopfzeile zu definieren. Sieht vielleicht manchmal besser aus. Sollte ein SVG-Icon sein.
 `FLEXIMPORT_DISPLAY_LINES` | Wieviele Zeilen einer Tabelle sollen beim Laden der Seite angezeigt werden? Meistens will man nur 20 Zeilen exemplarisch sehen. Den Rest kann man bei Bedarf nachladen.
 `REPORT_CRONJOB_ERRORS` | Falls Fleximport per Cronjob ausgeführt wird, fallen Fehler eventuell nicht so leicht auf, weil es ja niemanden mehr gibt, der/die aktiv die Datensätze und Fehlermeldungen durchgeht. In dem Fall kann man mit dieser Konfiguration definieren, welche Personen einen Fehlerbericht per Email bekommen sollen. Der Wert kann eine oder mehrere mit Komma oder Semikolon oder einfach nur einem Space oder Enter getrennte Emailadressen sein. Alle diese Personen bekommen eine Email mit allen Fehlern zugeschickt, falls es denn Fehler gegeben hat. Falls keine Fehler aufgetreten sind, wird keine Email versendet.
