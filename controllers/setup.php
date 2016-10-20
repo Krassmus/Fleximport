@@ -9,6 +9,7 @@ class SetupController extends PluginController {
     function before_filter(&$action, &$args)
     {
         parent::before_filter($action, $args);
+        PageLayout::addScript($this->plugin->getPluginURL()."/assets/fleximport.js");
         Navigation::activateItem("/fleximport");
     }
 
@@ -44,18 +45,34 @@ class SetupController extends PluginController {
             }
             $this->table->store();
 
-            PageLayout::postMessage(MessageBox::success(_("Daten wurden gespeichert.")));
+            if (Request::isAjax()) {
+                $output = array(
+                    'func' => "STUDIP.Fleximport.updateTable",
+                    'payload' => array(
+                        'table_id' => $this->table->getId(),
+                        'name' => $this->table['name'],
+                        'html' => $this->render_template_as_string("import/_table.php")
+                    )
+                );
+                $this->response->add_header("X-Dialog-Execute", json_encode(studip_utf8encode($output)));
+            } else {
+                PageLayout::postMessage(MessageBox::success(_("Daten wurden gespeichert.")));
+            }
         }
     }
 
     public function removetable_action($table_id)
     {
-        $process_id = $this->table['process_id'];
         $this->table = new FleximportTable($table_id);
+        $process_id = $this->table['process_id'];
         $this->table->drop();
         $this->table->delete();
-        PageLayout::postMessage(MessageBox::success(_("Tabelle gelöscht.")));
-        $this->redirect("import/overview/".$process_id);
+        if (Request::isAjax()) {
+            $this->render_nothing();
+        } else {
+            PageLayout::postMessage(MessageBox::success(_("Tabelle gelöscht.")));
+            $this->redirect("import/overview/" . $process_id);
+        }
     }
 
     public function tablemapping_action($table_id)
@@ -78,6 +95,17 @@ class SetupController extends PluginController {
         $this->datafields = Datafield::findBySQL("object_type = :object_type", array(
             'object_type' => $datafield_object_types[$this->table['import_type']]
         ));
+        if (Request::isAjax()) {
+            $output = array(
+                'func' => "STUDIP.Fleximport.updateTable",
+                'payload' => array(
+                    'table_id' => $table_id,
+                    'name' => $this->table['name'],
+                    'html' => $this->render_template_as_string("import/_table.php")
+                )
+            );
+            $this->response->add_header("X-Dialog-Execute", json_encode(studip_utf8encode($output)));
+        }
     }
 
 }

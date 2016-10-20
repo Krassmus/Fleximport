@@ -12,7 +12,7 @@ class FleximportInstitut_idMapper implements FleximportMapper {
 
     public function possibleFormats() {
         $formats = array(
-            "name" => "Name"
+            "name" => "Einrichtungsname"
         );
         $datafields = DataField::findBySQL("object_type = 'inst' ORDER BY name ASC");
         foreach ($datafields as $datafield) {
@@ -24,7 +24,7 @@ class FleximportInstitut_idMapper implements FleximportMapper {
     public function map($format, $value) {
         switch ($format) {
             case "name":
-                $inst = Institute::findOneByName($value);
+                $inst = Institute::findOneBySQL("Name = ?", array($value));
                 if ($inst) {
                     return $inst->getId();
                 }

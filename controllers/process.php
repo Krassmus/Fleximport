@@ -7,6 +7,7 @@ class ProcessController extends PluginController {
     function before_filter(&$action, &$args)
     {
         parent::before_filter($action, $args);
+        PageLayout::addScript($this->plugin->getPluginURL()."/assets/fleximport.js");
         Navigation::activateItem("/fleximport/config");
     }
 

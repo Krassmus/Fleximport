@@ -19,6 +19,9 @@ class fleximport_pan_userimport extends FleximportPlugin {
             if (!in_array($domain_id, $old_domains)) {
                 $deleted = false;
                 if ($domain_id === "alumni") {
+                    if (count($new_domains) == 1) {
+                        //TODO: aus allen VA austragen, die nichts mit der Alumni-Domäne zu tun haben
+                    }
                     $datafield = Datafield::findOneBySQL("name = 'Ich will weiterhin als Alumni in Stud.IP geführt werden' AND object_type = 'user'");
                     $user_wants_to_stay = DatafieldEntry::findOneBySQL("datafield_id = ? AND range_id = ?", array($datafield->getId(), $object->getId()));
                     if ($user_wants_to_stay['content']) {

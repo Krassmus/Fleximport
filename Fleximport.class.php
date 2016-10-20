@@ -87,21 +87,31 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
     public function triggerImport()
     {
         $processes = FleximportProcess::findBySQL("triggered_by_cronjob = '1' ORDER BY name ASC");
+        if ($GLOBALS['FLEXIMPORT_IS_CRONJOB']) {
+            echo "Starting Import at ".date("c")."\n\n";
+        }
         foreach ($processes as $process) {
             foreach ($process->tables as $table) {
-                $table->isInDatabase();
+                //import data if needed
+                $table->fetchData();
             }
+        }
+        if ($GLOBALS['FLEXIMPORT_IS_CRONJOB']) {
+            echo "Fetching data finished at ".date("c")."\n";
         }
         $protocol = array();
         foreach ($processes as $process) {
             foreach ($process->tables as $table) {
+                if ($GLOBALS['FLEXIMPORT_IS_CRONJOB']) {
+                    echo "\nStarting Import of ".$table['name']." at ".date("c")."\n";
+                }
                 $protocol = array_merge($protocol, $table->doImport());
             }
         }
         if (count($protocol) && $GLOBALS['FLEXIMPORT_IS_CRONJOB'] && FleximportConfig::get("REPORT_CRONJOB_ERRORS")) {
             $message = _("Es hat folgende Probleme beim Import gegeben:");
 
-            $message .= "\n\n".implode("\n\n", $protocol);
+            $message .= "\n".implode("\n", $protocol);
             $mail = new StudipMail();
             $mail->setSubject(_("Fleximport Fehlerbericht von Stud.IP"));
             $mail->setBodyText($message);
@@ -110,6 +120,13 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
                 $mail->addRecipient($email);
             }
             $mail->send();
+        }
+        if ($GLOBALS['FLEXIMPORT_IS_CRONJOB']) {
+            echo implode("\n", $protocol);
+        }
+
+        if ($GLOBALS['FLEXIMPORT_IS_CRONJOB']) {
+            echo "\nImport ends at ".date("c")."\n";
         }
     }
 }

@@ -45,7 +45,7 @@ class InitProcesses extends Migration {
             ALTER TABLE `fleximport_tables` CHANGE `source` 
                 `source` enum('csv_upload','csv_weblink','csv_studipfile','database','extern','sqlview') NOT NULL DEFAULT 'csv_upload';
         ");
-
+        SimpleORMap::expireTableScheme();
     }
 
     function down()

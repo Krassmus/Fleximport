@@ -309,7 +309,7 @@ class FleximportTable extends SimpleORMap {
             }
         }
         if ($GLOBALS['FLEXIMPORT_IS_CRONJOB']) {
-            echo sprintf(_("%s von %s Datensätzen der Tabelle %s erfolgreich importiert."), $count_successful, $count, $this['name'])." \n";
+            echo sprintf(_("%s von %s Datensätze der Tabelle %s erfolgreich importiert."), $count_successful, $count, $this['name'])." \n";
         }
         if ($this['synchronization']) {
             $import_type = $this['import_type'];
@@ -370,11 +370,11 @@ class FleximportTable extends SimpleORMap {
         if (!$classname) {
             return array();
         }
-        //Last chance to quit:
-        $error = $this->checkLine($line);
-
         $data = $this->getMappedData($line);
         $pk = $this->getPrimaryKey($data);
+        //Last chance to quit:
+        $error = $this->checkLine($line, $data, $pk);
+
         $output = array();
 
         $object = new $classname($pk);
@@ -404,6 +404,7 @@ class FleximportTable extends SimpleORMap {
         }
 
         if ($error && $error['errors']) {
+            //exit here to have the name of the object in the log
             return $error;
         }
 
@@ -892,7 +893,13 @@ class FleximportTable extends SimpleORMap {
         return $data;
     }
 
-    public function checkLine($line)
+    /**
+     * @param $line : associative array of raw data
+     * @param null $data : only needed for performance if you already have the data
+     * @param null $pk : only needed for performance if you already have the primary key
+     * @return array : associative array like array('found' => true, 'pk' => array(), 'errors' => "bla")
+     */
+    public function checkLine($line, $data = null, $pk = null)
     {
         $plugin = $this->getPlugin();
         $classname = $this['import_type'];
@@ -905,8 +912,12 @@ class FleximportTable extends SimpleORMap {
 
         if ($classname) {
             try {
-                $data = $this->getMappedData($line);
-                $pk = $this->getPrimaryKey($data);
+                if ($data === null) {
+                    $data = $this->getMappedData($line);
+                }
+                if ($pk === null) {
+                    $pk = $this->getPrimaryKey($data);
+                }
             } catch (Exception $e) {
                 return array('errors' => "Tabellenmapping ist vermutlich falsch konfiguriert: ".$e->getMessage()." ".$e->getTraceAsString());
             }

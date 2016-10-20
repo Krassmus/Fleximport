@@ -7,6 +7,10 @@ class ImportController extends PluginController {
     function before_filter(&$action, &$args)
     {
         parent::before_filter($action, $args);
+        if (FleximportConfig::get("MAXIMUM_EXECUTION_TIME")) {
+            set_time_limit(FleximportConfig::get("MAXIMUM_EXECUTION_TIME"));
+        }
+        PageLayout::addScript($this->plugin->getPluginURL()."/assets/fleximport.js");
         Navigation::activateItem("/fleximport");
     }
 
@@ -15,7 +19,7 @@ class ImportController extends PluginController {
         $this->process = FleximportProcess::find($process_id);
         if ($this->process) {
             Navigation::activateItem("/fleximport/process_".$process_id);
-            $this->tables = FleximportTable::findByProcess_id($process_id);
+            $this->tables = $this->process->tables;
             if ($this->process['description']) {
                 PageLayout::postMessage(MessageBox::info($this->process['description']));
             }
@@ -30,11 +34,19 @@ class ImportController extends PluginController {
         if (Request::isPost()) {
             if (Request::submitted("start")) {
                 $protocol = array();
-                $this->tables = FleximportTable::findByProcess_id($process_id);
+                $starttime = time();
+                $this->process = FleximportProcess::find($process_id);
+                $this->tables = $this->process->tables;
                 foreach ($this->tables as $table) {
                     $table->doImport();
                 }
-                PageLayout::postMessage(MessageBox::success(_("Import wurde durchgeführt"), $protocol));
+                $duration = time() - $starttime;
+                if ($duration >= 60) {
+                    PageLayout::postMessage(MessageBox::success(sprintf(_("Import wurde durchgeführt und dauerte %s Minuten"), floor($duration / 60)), $protocol));
+                } else {
+                    PageLayout::postMessage(MessageBox::success(_("Import wurde durchgeführt"), $protocol));
+                }
+
             } elseif ($_FILES['tableupload']) {
                 foreach ($_FILES['tableupload']['tmp_name'] as $table_id => $tmp_name) {
                     if ($tmp_name) {

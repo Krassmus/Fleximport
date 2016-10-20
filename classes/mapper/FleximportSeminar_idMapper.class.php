@@ -25,13 +25,13 @@ class FleximportSeminar_idMapper implements FleximportMapper {
     public function map($format, $value) {
         switch ($format) {
             case "number":
-                $course = Course::findOneByVeranstaltungsnummer($value);
+                $course = Course::findOneBySQL("VeranstaltungsNummer = ?", array($value));
                 if ($course) {
                     return $course->getId();
                 }
                 break;
             case "name":
-                $course = Course::findOneByName($value);
+                $course = Course::findOneBySQL("name = ?", array($value));
                 if ($course) {
                     return $course->getId();
                 }
