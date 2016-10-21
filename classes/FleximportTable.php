@@ -56,7 +56,7 @@ class FleximportTable extends SimpleORMap {
 
     public function isInDatabase()
     {
-        $this->fetchData();
+        //$this->fetchData();
 
         $statement = DBManager::get()->prepare("
             SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
@@ -283,6 +283,11 @@ class FleximportTable extends SimpleORMap {
         if (!$this['import_type']) {
             return array();
         }
+        if ($this['import_type'] === "fleximport_mysql_command") {
+            $statement = DBManager::get()->prepare($this['tabledata']['fleximport_mysql_command']);
+            $statement->execute();
+            return array();
+        }
         $statement = DBManager::get()->prepare("
             SELECT * FROM `".addslashes($this['name'])."`
         ");
@@ -473,7 +478,7 @@ class FleximportTable extends SimpleORMap {
                 if ($this['tabledata']['simplematching']["fleximport_userdomains"]['column'] || in_array("fleximport_userdomains", $this->fieldsToBeDynamicallyMapped())) {
                     $olddomains = UserDomain::getUserDomainsForUser($object->getId());
                     foreach ($olddomains as $olddomain) {
-                        if (!in_array($olddomain->getID(), (array)$data['fleximport_userdomains'])) {
+                        if (!in_array($olddomain->getID(), (array) $data['fleximport_userdomains'])) {
                             $olddomain->removeUser($object->getId());
                         }
                     }
@@ -482,6 +487,40 @@ class FleximportTable extends SimpleORMap {
                         $domain->addUser($object->getId());
                     }
                     AutoInsert::instance()->saveUser($object->getId());
+
+                    foreach ($data['fleximport_userdomains'] as $domain_id) {
+                        if (!in_array($domain_id, $olddomains)) {
+                            $welcome = FleximportConfig::get("USERDOMAIN_WELCOME_" . $domain_id);
+                            if ($welcome) {
+                                foreach ($object->toArray() as $field => $value) {
+                                    $welcome = str_replace("{{" . $field . "}}", $value, $welcome);
+                                }
+                                foreach ($line as $field => $value) {
+                                    $welcome = str_replace("{{" . $field . "}}", $value, $welcome);
+                                }
+                                if (strpos($welcome, "\n") === false) {
+                                    $subject = _("Willkommen!");
+                                } else {
+                                    $subject = strstr($welcome, "\n", true);
+                                    $welcome = substr($welcome, strpos($welcome, "\n") + 1);
+                                }
+                                $messaging = new messaging();
+                                $count = $messaging->insert_message(
+                                    $welcome,
+                                    $object->username,
+                                    '____%system%____',
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    $subject,
+                                    true,
+                                    'normal'
+                                );
+                            }
+                        }
+                    }
+
                 }
                 if ($this['tabledata']['simplematching']["fleximport_expiration_date"]['column'] || in_array("fleximport_expiration_date", $this->fieldsToBeDynamicallyMapped())) {
                     if ($data['fleximport_expiration_date']) {
@@ -493,7 +532,7 @@ class FleximportTable extends SimpleORMap {
                 if (($output['found'] === false) && ($data['fleximport_welcome_message'] !== "none")) {
                     $user_language = getUserLanguagePath($object->getId());
                     setTempLanguage(false, $user_language);
-                    if ($data['fleximport_welcome_message']) {
+                    if ($data['fleximport_welcome_message'] && FleximportConfig::get($data['fleximport_welcome_message'])) {
                         $message = FleximportConfig::get($data['fleximport_welcome_message']);
                         foreach ($data as $field => $value) {
                             $message = str_replace("{{".$field."}}", $value, $message);
@@ -910,7 +949,7 @@ class FleximportTable extends SimpleORMap {
             'errors' => ""
         );
 
-        if ($classname) {
+        if ($classname && $classname !== "fleximport_mysql_command") {
             try {
                 if ($data === null) {
                     $data = $this->getMappedData($line);
@@ -966,7 +1005,7 @@ class FleximportTable extends SimpleORMap {
     public function getTargetFields()
     {
         $classname = $this['import_type'];
-        if ($classname) {
+        if ($classname && $classname !== "fleximport_mysql_command") {
             $object = new $classname();
             $this->sorm_metadata = $object->getTableMetadata();
             $fields = $this->sorm_metadata['fields'];
@@ -982,7 +1021,7 @@ class FleximportTable extends SimpleORMap {
 
     public function getTargetPK()
     {
-        if (count($this->sorm_metadata) === 0) {
+        if (count($this->sorm_metadata) === 0 && $classname && $classname !== "fleximport_mysql_command") {
             $classname = $this['import_type'];
             $object = new $classname();
             $this->sorm_metadata = $object->getTableMetadata();

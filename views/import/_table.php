@@ -20,8 +20,14 @@
                 case "CourseMember":
                     echo Assets::img("icons/20/black/group2", array('class' => "text-bottom"));
                     break;
+                case "CourseDate":
+                    echo Assets::img("icons/20/black/date", array('class' => "text-bottom"));
+                    break;
                 case "Course":
                     echo Assets::img("icons/20/black/seminar", array('class' => "text-bottom"));
+                    break;
+                case "fleximport_mysql_command":
+                    echo Assets::img("icons/20/black/unit-test", array('class' => "text-bottom"));
                     break;
                 case "":
                     echo Assets::img("icons/20/black/remove-circle", array('class' => "text-bottom"));

@@ -95,7 +95,7 @@ class SetupController extends PluginController {
         $this->datafields = Datafield::findBySQL("object_type = :object_type", array(
             'object_type' => $datafield_object_types[$this->table['import_type']]
         ));
-        if (Request::isAjax()) {
+        if (Request::isAjax() && Request::isPost()) {
             $output = array(
                 'func' => "STUDIP.Fleximport.updateTable",
                 'payload' => array(

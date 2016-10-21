@@ -36,9 +36,11 @@
                         <input type="file" name="tableupload[<?= $table->getId() ?>]" onChange="jQuery(this).closest('form').submit();" style="display: none;">
                     </label>
                 <? endif ?>
-                <a href="<?= PluginEngine::getLink($plugin, array(), "setup/tablemapping/".$table->getId()) ?>" data-dialog title="<?= _("Datenmapping einstellen") ?>">
-                    <?= Assets::img("icons/20/blue/group") ?>
-                </a>
+                <? if ($table['import_type'] && !in_array($table['import_type'], array("fleximport_mysql_command"))) : ?>
+                    <a href="<?= PluginEngine::getLink($plugin, array(), "setup/tablemapping/".$table->getId()) ?>" data-dialog title="<?= _("Datenmapping einstellen") ?>">
+                        <?= Assets::img("icons/20/blue/group") ?>
+                    </a>
+                <? endif ?>
                 <a href="<?= PluginEngine::getLink($plugin, array(), "setup/table/".$table->getId()) ?>" data-dialog title="<?= _("Tabelleneinstellung bearbeiten") ?>">
                     <?= Assets::img("icons/20/blue/admin") ?>
                 </a>

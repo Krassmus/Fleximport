@@ -1,5 +1,8 @@
 <?php
 
+require_once 'lib/models/Datafield.class.php';
+require_once 'lib/models/DatafieldEntryModel.class.php';
+
 require_once __DIR__."/classes/FleximportTable.php";
 require_once __DIR__."/classes/FleximportConfig.php";
 require_once __DIR__."/classes/FleximportProcess.php";

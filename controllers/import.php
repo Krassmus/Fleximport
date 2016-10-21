@@ -18,6 +18,9 @@ class ImportController extends PluginController {
     {
         $this->process = FleximportProcess::find($process_id);
         if ($this->process) {
+            foreach ($this->process->tables as $table) {
+                $table->fetchData();
+            }
             Navigation::activateItem("/fleximport/process_".$process_id);
             $this->tables = $this->process->tables;
             if ($this->process['description']) {
@@ -37,6 +40,9 @@ class ImportController extends PluginController {
                 $starttime = time();
                 $this->process = FleximportProcess::find($process_id);
                 $this->tables = $this->process->tables;
+                foreach ($this->tables as $table) {
+                    $table->fetchData();
+                }
                 foreach ($this->tables as $table) {
                     $table->doImport();
                 }
