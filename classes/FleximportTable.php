@@ -200,9 +200,11 @@ class FleximportTable extends SimpleORMap {
         $create_sql = "CREATE TABLE `".addslashes($this['name'])."` (";
         $create_sql .= "`IMPORT_TABLE_PRIMARY_KEY` BIGINT NOT NULL AUTO_INCREMENT ";
         foreach ($headers as $key => $fieldname) {
-            $fieldname = strtolower(self::reduceDiakritikaFromIso88591($fieldname));
-            $create_sql .= ", ";
-            $create_sql .= "`".addslashes($fieldname)."` TEXT NOT NULL";
+            if ($fieldname) {
+                $fieldname = strtolower(self::reduceDiakritikaFromIso88591($fieldname));
+                $create_sql .= ", ";
+                $create_sql .= "`" . addslashes($fieldname) . "` TEXT NOT NULL";
+            }
         }
         $create_sql .= ", PRIMARY KEY (`IMPORT_TABLE_PRIMARY_KEY`) ";
         $create_sql .= ") ENGINE=MyISAM";
@@ -211,10 +213,12 @@ class FleximportTable extends SimpleORMap {
         foreach ($entries as $line) {
             $insert_sql = "INSERT INTO `".addslashes($this['name'])."` SET ";
             foreach ($headers as $key => $field) {
-                $key < 1 || $insert_sql .= ", ";
-                $value = trim($line[$key]);
-                $field = strtolower(self::reduceDiakritikaFromIso88591($field));
-                $insert_sql .= "`".addslashes($field)."` = ".$db->quote($value)." ";
+                if ($field) {
+                    $key < 1 || $insert_sql .= ", ";
+                    $value = trim($line[$key]);
+                    $field = strtolower(self::reduceDiakritikaFromIso88591($field));
+                    $insert_sql .= "`" . addslashes($field) . "` = " . $db->quote($value) . " ";
+                }
             }
             $db->exec($insert_sql);
         }
@@ -318,13 +322,7 @@ class FleximportTable extends SimpleORMap {
         }
         if ($this['synchronization']) {
             $import_type = $this['import_type'];
-            $items = FleximportMappedItem::findBySQL(
-                "import_type = :import_type AND item_id NOT IN (:ids)",
-                array(
-                    'import_type' => $this['import_type'],
-                    'ids' => $item_ids ?: ""
-                )
-            );
+            $items = $this->findDeletableItems($item_ids);
 
             foreach ($items as $item) {
                 if (class_exists($import_type)) {
@@ -345,6 +343,26 @@ class FleximportTable extends SimpleORMap {
             }
         }
         return $protocol;
+    }
+
+    public function findDeletableItems($not = array()) {
+        return FleximportMappedItem::findBySQL(
+            "import_type = :import_type AND item_id NOT IN (:ids)",
+            array(
+                'import_type' => $this['import_type'],
+                'ids' => $not ?: ""
+            )
+        );
+    }
+
+    public function countDeletableItems($not = array()) {
+        return FleximportMappedItem::countBySQL(
+            "import_type = :import_type AND item_id NOT IN (:ids)",
+            array(
+                'import_type' => $this['import_type'],
+                'ids' => $not ?: ""
+            )
+        );
     }
 
     /**

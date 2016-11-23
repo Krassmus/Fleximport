@@ -18,7 +18,9 @@
             $text = _("Zum Objekt");
     } ?>
     <a href="<?= URLHelper::getURL($url) ?>">
-        <?= Assets::img("icons/16/blue/link-intern", array('class' => "text-bottom")) ?>
+        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+            ? Icon::create("link-intern", "clickable")->asImg(16, array('class' => "text-bottom"))
+            : Assets::img("icons/16/blue/link-intern", array('class' => "text-bottom")) ?>
         <?= htmlReady($text) ?>
     </a>
 </div>
@@ -51,7 +53,9 @@
                 <? if (!$object->isNew()) : ?>
                 <td>
                     <? if ($overwrite && ($object[$field] !== $data[$field])) : ?>
-                        <?= Assets::img("icons/20/black/exclaim", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
+                        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                            ? Icon::create("exclaim", "info")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld.")))
+                            : Assets::img("icons/20/black/exclaim", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
                     <? endif ?>
                 </td>
                 <? endif ?>
@@ -63,7 +67,9 @@
                 <? endif ?>
                 <td>
                     <? if (!$overwrite) : ?>
-                        <?= Assets::img("icons/16/grey/decline", array('title' => _("Wert wird nicht überschrieben."))) ?>
+                        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                            ? Icon::create("decline", "inactive")->asImg(16, array('title' => _("Wert wird nicht überschrieben.")))
+                            : Assets::img("icons/16/grey/decline", array('title' => _("Wert wird nicht überschrieben."))) ?>
                     <? else : ?>
                         <?= htmlReady($data[$field]) ?>
                     <? endif ?>
