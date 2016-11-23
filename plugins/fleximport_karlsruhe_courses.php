@@ -117,7 +117,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                         ));
 
                         $mapped = new FleximportMappedItem();
-                        $mapped['import_type'] = $import_type_metadates;
+                        $mapped['table_id'] = $import_type_metadates;
                         $mapped['item_id'] = $cycle_id;
                         $mapped->store();
 
@@ -180,7 +180,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                     $date->store();
 
                     $mapped = new FleximportMappedItem();
-                    $mapped['import_type'] = $import_type_dates;
+                    $mapped['table_id'] = $import_type_dates;
                     $mapped['item_id'] = $date->getId();
                     $mapped->store();
 
@@ -189,9 +189,9 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
             }
         }
         $items = FleximportMappedItem::findBySQL(
-            "import_type = :import_type AND item_id NOT IN (:ids)",
+            "table_id = :table_id AND item_id NOT IN (:ids)",
             array(
-                'import_type' => $import_type_dates,
+                'table_id' => $import_type_dates,
                 'ids' => $singledates ?: ""
             )
         );
@@ -202,9 +202,9 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
         }
 
         $items = FleximportMappedItem::findBySQL(
-            "import_type = :import_type AND item_id NOT IN (:ids)",
+            "table_id = :table_id AND item_id NOT IN (:ids)",
             array(
-                'import_type' => $import_type_metadates,
+                'table_id' => $import_type_metadates,
                 'ids' => $metadates ?: ""
             )
         );

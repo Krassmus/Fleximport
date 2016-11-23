@@ -8,9 +8,9 @@ class FleximportMappedItem extends SimpleORMap {
         parent::configure($config);
     }
 
-    static public function findbyItemId($item_id, $import_type)
+    static public function findbyItemId($item_id, $table_id)
     {
-        return self::findOneBySQL("item_id = ? AND import_type = ?", array($item_id, $import_type));
+        return self::findOneBySQL("item_id = ? AND table_id = ?", array($item_id, $table_id));
     }
 
 }

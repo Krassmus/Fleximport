@@ -335,8 +335,8 @@ class FleximportTable extends SimpleORMap {
                 $item->delete();
             }
             foreach ($item_ids as $item_id) {
-                $mapped = FleximportMappedItem::findbyItemId($item_id, $this['import_type']) ?: new FleximportMappedItem();
-                $mapped['import_type'] = $this['import_type'];
+                $mapped = FleximportMappedItem::findbyItemId($item_id, $this->getId()) ?: new FleximportMappedItem();
+                $mapped['table_id'] = $this->getId();
                 $mapped['item_id'] = $item_id;
                 $mapped['chdate'] = time();
                 $mapped->store();
@@ -347,9 +347,9 @@ class FleximportTable extends SimpleORMap {
 
     public function findDeletableItems($not = array()) {
         return FleximportMappedItem::findBySQL(
-            "import_type = :import_type AND item_id NOT IN (:ids)",
+            "table_id = :table_id AND item_id NOT IN (:ids)",
             array(
-                'import_type' => $this['import_type'],
+                'table_id' => $this->getId(),
                 'ids' => $not ?: ""
             )
         );
@@ -357,9 +357,9 @@ class FleximportTable extends SimpleORMap {
 
     public function countDeletableItems($not = array()) {
         return FleximportMappedItem::countBySQL(
-            "import_type = :import_type AND item_id NOT IN (:ids)",
+            "table_id = :table_id AND item_id NOT IN (:ids)",
             array(
-                'import_type' => $this['import_type'],
+                'table_id' => $this->getId(),
                 'ids' => $not ?: ""
             )
         );
