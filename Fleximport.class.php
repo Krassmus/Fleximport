@@ -1,6 +1,6 @@
 <?php
 
-require_once 'lib/models/Datafield.class.php';
+require_once 'lib/models/DataField.class.php';
 require_once 'lib/models/DatafieldEntryModel.class.php';
 
 require_once __DIR__."/classes/FleximportTable.php";
