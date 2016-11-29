@@ -25,6 +25,9 @@ class ExportController extends PluginController {
     {
         $output = array();
         $header = $this->table->getTableHeader();
+        array_shift($header);
+        //remove import_table_primary_key
+
         $output[] = $header;
         foreach ($this->table->fetchLines() as $line) {
             $output_line = array();
