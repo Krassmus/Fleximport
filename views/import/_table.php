@@ -75,7 +75,7 @@
                         <a href="<?= PluginEngine::getLink($plugin, array('table' => $table['name']), "import/targetdetails/".$line['IMPORT_TABLE_PRIMARY_KEY']) ?>" data-dialog>
                             <? $icon = $report['found'] ? "accept" : "star" ?>
                             <? if ($report['errors']) : ?>
-                                <?= Assets::img("icons/20/lightblue/".$icon, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden") : _("Datenvorschau"))) ?>
+                                <?= Assets::img("icons/20/lightblue/".$icon, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden") : _("Neues Objekt. Datenvorschau."))) ?>
                             <? else :?>
                                 <?= Assets::img("icons/20/blue/".$icon, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden und wird geupdated") : _("Datenvorschau der Daten, die neu angelegt werden würden."))) ?>
                             <? endif ?>
