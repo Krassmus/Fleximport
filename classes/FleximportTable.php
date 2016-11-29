@@ -101,6 +101,11 @@ class FleximportTable extends SimpleORMap {
         }
     }
 
+    public function getExportSecret()
+    {
+        return md5($this->getId().$GLOBALS['STUDIP_INSTALLATION_ID']);
+    }
+
     public function customImportEnabled()
     {
         $plugin = $this->getPlugin();

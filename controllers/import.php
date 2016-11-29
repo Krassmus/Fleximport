@@ -7,6 +7,9 @@ class ImportController extends PluginController {
     function before_filter(&$action, &$args)
     {
         parent::before_filter($action, $args);
+        if (!$GLOBALS['perm']->have_perm("root")) {
+            throw new AccessDeniedException();
+        }
         if (FleximportConfig::get("MAXIMUM_EXECUTION_TIME")) {
             set_time_limit(FleximportConfig::get("MAXIMUM_EXECUTION_TIME"));
         }

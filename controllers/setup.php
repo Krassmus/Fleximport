@@ -9,6 +9,9 @@ class SetupController extends PluginController {
     function before_filter(&$action, &$args)
     {
         parent::before_filter($action, $args);
+        if (!$GLOBALS['perm']->have_perm("root")) {
+            throw new AccessDeniedException();
+        }
         PageLayout::addScript($this->plugin->getPluginURL()."/assets/fleximport.js");
         Navigation::activateItem("/fleximport");
     }

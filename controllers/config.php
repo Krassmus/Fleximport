@@ -7,6 +7,9 @@ class ConfigController extends PluginController {
     function before_filter(&$action, &$args)
     {
         parent::before_filter($action, $args);
+        if (!$GLOBALS['perm']->have_perm("root")) {
+            throw new AccessDeniedException();
+        }
         Navigation::activateItem("/fleximport/config");
     }
 

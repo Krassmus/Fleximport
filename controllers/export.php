@@ -10,13 +10,14 @@ class ExportController extends PluginController {
         if (FleximportConfig::get("MAXIMUM_EXECUTION_TIME")) {
             set_time_limit(FleximportConfig::get("MAXIMUM_EXECUTION_TIME"));
         }
-        PageLayout::addScript($this->plugin->getPluginURL()."/assets/fleximport.js");
-        Navigation::activateItem("/fleximport");
     }
 
     public function export_action($id)
     {
         $this->table = FleximportTable::find($id);
+        if ((Request::option("secret") !== $this->table->getExportSecret())) {
+            throw new AccessDeniedException();
+        }
         $this->table->fetchData();
         $this->render_csv();
     }

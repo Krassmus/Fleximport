@@ -51,7 +51,7 @@
                     </label>
                 <? endif ?>
                 <? if ($table->isInDatabase()) : ?>
-                    <a href="<?= PluginEngine::getLink($plugin, array(), "export/export/".$table->getId()) ?>" title="<?= _("Als CSV-Datei herunterladen") ?>">
+                    <a href="<?= PluginEngine::getLink($plugin, array('secret' => $table->getExportSecret()), "export/export/".$table->getId()) ?>" title="<?= _("Als CSV-Datei herunterladen") ?>">
                         <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
                             ? Icon::create("download", "clickable")->asImg(20)
                             : Assets::img("icons/20/blue/download") ?>
