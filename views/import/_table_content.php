@@ -50,6 +50,13 @@
                         <input type="file" name="tableupload[<?= $table->getId() ?>]" onChange="jQuery(this).closest('form').submit();" style="display: none;">
                     </label>
                 <? endif ?>
+                <? if ($table->isInDatabase()) : ?>
+                    <a href="<?= PluginEngine::getLink($plugin, array(), "export/export/".$table->getId()) ?>" title="<?= _("Als CSV-Datei herunterladen") ?>">
+                        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                            ? Icon::create("download", "clickable")->asImg(20)
+                            : Assets::img("icons/20/blue/download") ?>
+                    </a>
+                <? endif ?>
                 <? if ($table['import_type'] && !in_array($table['import_type'], array("fleximport_mysql_command"))) : ?>
                     <a href="<?= PluginEngine::getLink($plugin, array(), "setup/tablemapping/".$table->getId()) ?>" data-dialog title="<?= _("Datenmapping einstellen") ?>">
                         <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
