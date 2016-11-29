@@ -17,8 +17,23 @@ class fleximport_pan_userimport extends FleximportPlugin {
         $new_domains = UserDomain::getUserDomainsForUser($object->getId());
         foreach ($new_domains as $domain_id) {
             if (!in_array($domain_id, $old_domains)) {
-                $deleted = false;
                 if ($domain_id === "alumni") {
+                    if (count($new_domains) == 1) {
+                        $statement = DBManager::get()->prepare("
+                            SELECT seminar_user.Seminar_id 
+                            FROM seminar_user
+                                LEFT JOIN seminar_userdomain ON (seminar_user.Seminar_id = seminar_userdomain.Seminar_id)
+                            WHERE seminar_user.user_id = :user_id
+                                AND seminar_user.Seminar_id NOT IN (SELECT seminar_id FROM seminar_userdomain WHERE userdomain_id = 'alumni')
+                        ");
+                        $statement->execute(array(
+                            'user_id' => $object->getId()
+                        ));
+                        foreach ($statement->fetchAll(PDO::FETCH_COLUMN, 0) as $seminar_id) {
+                            $seminar = new Seminar($seminar_id);
+                            $seminar->deleteMember($object->getId());
+                        }
+                    }
                     $datafield = Datafield::findOneBySQL("name = 'Ich will weiterhin als Alumni in Stud.IP geführt werden' AND object_type = 'user'");
                     $user_wants_to_stay = DatafieldEntry::findOneBySQL("datafield_id = ? AND range_id = ?", array($datafield->getId(), $object->getId()));
                     if ($user_wants_to_stay['content']) {
@@ -44,49 +59,13 @@ class fleximport_pan_userimport extends FleximportPlugin {
                         $deleted = true;
                     }
                 }
-
-                if (!$deleted) {
-                    $welcome = FleximportConfig::get("USERDOMAIN_WELCOME_" . $domain_id);
-                    if ($welcome) {
-                        foreach ($object->toArray() as $field => $value) {
-                            $welcome = str_replace("{{" . $field . "}}", $value, $welcome);
-                        }
-                        foreach ($line as $field => $value) {
-                            $welcome = str_replace("{{" . $field . "}}", $value, $welcome);
-                        }
-                        if (strpos($welcome, "\n") === false) {
-                            $subject = _("Willkommen!");
-                        } else {
-                            $subject = strstr($welcome, "\n", true);
-                            $welcome = substr($welcome, strpos($welcome, "\n") + 1);
-                        }
-                        $messaging = new messaging();
-                        $count = $messaging->insert_message(
-                            $welcome,
-                            $object->username,
-                            '____%system%____',
-                            null,
-                            null,
-                            null,
-                            null,
-                            $subject,
-                            true,
-                            'normal'
-                        );
-                    }
-                }
             }
         }
     }
 
     public function getDescription()
     {
-        return "Den Nutzern werden, wenn sie in eine neue Domäne eingetragen werden, Willkommensnachrichten zugesendet. " .
-            "Diese sind Konfgurationsvariablen mit dem Namen USERDOMAIN_WELCOME_domainid. Falls es diese Konfigurationsvariablen " .
-            "zu der passenden Domäne nicht gibt. wird keine Nachricht verschickt. Die erste Zeile in der Konfigurationsvariablen " .
-            "ist der Betreff, alle anderen Zeilen die Nachricht selbst. " .
-            "Es können in der Nachricht Variablen der Tabelle oder des User-Objektes verwendet werden mit z.B. {{vorname}} als Schreibweise. " .
-            "Zudem werden alle neuen Alumni in der Veranstaltung ALUMNI in die entsprechende Statusgruppe eingetragen. " .
+        return "Es werden alle neuen Alumni in der Veranstaltung ALUMNI in die entsprechende Statusgruppe eingetragen. " .
             "Falls die Studenten nicht einverstanden sind, als Alumni weiter geführt zu werden, werden die Nutzer gelöscht, " .
             "anstatt in die Alumni-Domäne übertragen zu werden.";
     }

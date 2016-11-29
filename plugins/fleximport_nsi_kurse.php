@@ -173,7 +173,5 @@ class fleximport_nsi_kurse extends FleximportPlugin
                 return "";
             }
         }
-
-
     }
 }

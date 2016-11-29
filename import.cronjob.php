@@ -30,7 +30,7 @@ class FleximportJob extends CronJob
     }
 
     /**
-     * Return the paremeters for this cronjob.
+     * Return the parameters for this cronjob.
      *
      * @return Array Parameters.
      */

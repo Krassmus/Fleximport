@@ -7,6 +7,7 @@ class FleximportProcess extends SimpleORMap {
         $config['db_table'] = 'fleximport_processes';
         $config['has_many']['tables'] = array(
             'class_name' => 'FleximportTable',
+            'order_by' => 'ORDER BY name ASC',
             'on_delete' => 'delete',
             'on_store' => 'store'
         );

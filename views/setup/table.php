@@ -14,16 +14,23 @@
 
     <label>
         <?= _("Zweck der Tabelle") ?>
-        <select name="table[import_type]" onChange="jQuery('#other_import_type').toggle(this.value === 'other'); ">
+        <select name="table[import_type]" onChange="jQuery('#other_import_type').toggle(this.value === 'other'); jQuery('#fleximport_mysql_command').toggle(this.value === 'fleximport_mysql_command'); ">
             <option value="User"<?= $table['import_type'] === "User" ? " selected" : "" ?>><?= _("Nutzerimport") ?></option>
             <option value="Course"<?= $table['import_type'] === "Course" ? " selected" : "" ?>><?= _("Veranstaltungsimport") ?></option>
             <option value="CourseMember"<?= $table['import_type'] === "CourseMember" ? " selected" : "" ?>><?= _("Teilnehmerimport") ?></option>
             <option value="CourseDate"<?= $table['import_type'] === "CourseDate" ? " selected" : "" ?>><?= _("Veranstaltungstermine") ?></option>
             <option value=""<?= !$table['import_type'] && !$table->isNew() ? " selected" : "" ?>><?= _("Tabelle nicht importieren") ?></option>
-            <option value="other"<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course")) ? " selected" : "" ?>><?= _("SORM-Objekt") ?></option>
+            <option value="fleximport_mysql_command"<?= $table['import_type'] === "fleximport_mysql_command" ? " selected" : "" ?>><?= _("MySQL-Anweisung") ?></option>
+            <option value="other"<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course", "CourseDate", "fleximport_mysql_command")) ? " selected" : "" ?>><?= _("SORM-Objekt") ?></option>
         </select>
-        <div id="other_import_type" style="<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course")) ? "" : "display: none; " ?>">
-            <input type="text" name="other_import_type" value="<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course")) ? htmlReady($table['import_type']) : "" ?>" placeholder="<?= _("Name der SORM-Klasse") ?>">
+        <div id="other_import_type" style="<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course", "CourseDate", "fleximport_mysql_command")) ? "" : "display: none; " ?>">
+            <input type="text" name="other_import_type" value="<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course", "CourseDate", "fleximport_mysql_command")) ? htmlReady($table['import_type']) : "" ?>" placeholder="<?= _("Name der SORM-Klasse") ?>">
+        </div>
+        <div id="fleximport_mysql_command" style="<?= $table['import_type'] === "fleximport_mysql_command" ? "" : "display: none; " ?>">
+            <textarea name="table[tabledata][fleximport_mysql_command]"
+                      placeholder="<?= _("INSERT IGNORE INTO ....") ?>"
+                      style="font-family: Monospace; font-size: 0.8em; min-height: 12em;"
+            ><?= htmlReady($table['tabledata']['fleximport_mysql_command']) ?></textarea>
         </div>
     </label>
 
@@ -61,7 +68,9 @@
 
     <label id="sqlview_info" style="<?= $table['source'] !== "sqlview" ? "display: none;" : "" ?>">
         <?= _("SELECT-Statement") ?>
-        <textarea style="font-family: Monospace;" placeholder="SELECT * FROM ...." name="table[tabledata][sqlview][select]"><?= htmlReady($table['tabledata']['sqlview']['select']) ?></textarea>
+        <textarea style="font-family: Monospace; font-size: 0.8em; min-height: 12em;"
+                  placeholder="SELECT * FROM ...."
+                  name="table[tabledata][sqlview][select]"><?= htmlReady($table['tabledata']['sqlview']['select']) ?></textarea>
     </label>
 
     <table id="server_settings" class="default nohover" style="<?= $table['source'] !== "database" ? "display: none;" : "" ?>">

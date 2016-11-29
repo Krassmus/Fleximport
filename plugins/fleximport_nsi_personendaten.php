@@ -54,8 +54,13 @@ class fleximport_nsi_personendaten extends FleximportPlugin
                 } else {
                     return $userId;
                 }
-            } else {
-                return false;
+            } elseif ($line['safo_key']) {
+                $userId = $this->getUserIdByDatafield($db, 'safo_key', $line['safo_key']);
+                if(!$userId) {
+                    return false;
+                } else {
+                    return $userId;
+                }
             }
             
         } elseif($field === 'username') {

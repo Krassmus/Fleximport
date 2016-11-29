@@ -18,7 +18,9 @@
             $text = _("Zum Objekt");
     } ?>
     <a href="<?= URLHelper::getURL($url) ?>">
-        <?= Assets::img("icons/16/blue/link-intern", array('class' => "text-bottom")) ?>
+        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+            ? Icon::create("link-intern", "clickable")->asImg(16, array('class' => "text-bottom"))
+            : Assets::img("icons/16/blue/link-intern", array('class' => "text-bottom")) ?>
         <?= htmlReady($text) ?>
     </a>
 </div>
@@ -34,7 +36,9 @@
     </caption>
     <thead>
         <tr>
-            <th></th>
+            <? if (!$object->isNew()) : ?>
+                <th></th>
+            <? endif ?>
             <th><?= _("Feldname") ?></th>
             <? if (!$object->isNew()) : ?>
                 <th><?= _("Bestehende Daten") ?></th>
@@ -46,11 +50,15 @@
         <? foreach ($table->getTargetFields() as $field) : ?>
             <? $overwrite = isset($data[$field]) && ($data[$field] !== false) && !in_array($field, (array) $table['tabledata']['ignoreonupdate']) ?>
             <tr<?= $overwrite ? "" : ' style="opacity: 0.5;"' ?>>
+                <? if (!$object->isNew()) : ?>
                 <td>
                     <? if ($overwrite && ($object[$field] !== $data[$field])) : ?>
-                        <?= Assets::img("icons/20/black/exclaim", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
+                        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                            ? Icon::create("exclaim", "info")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld.")))
+                            : Assets::img("icons/20/black/exclaim", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
                     <? endif ?>
                 </td>
+                <? endif ?>
                 <td style="font-family: MONOSPACE;">
                     <?= htmlReady($field) ?>
                 </td>
@@ -59,7 +67,9 @@
                 <? endif ?>
                 <td>
                     <? if (!$overwrite) : ?>
-                        <?= Assets::img("icons/16/grey/decline", array('title' => _("Wert wird nicht überschrieben."))) ?>
+                        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                            ? Icon::create("decline", "inactive")->asImg(16, array('title' => _("Wert wird nicht überschrieben.")))
+                            : Assets::img("icons/16/grey/decline", array('title' => _("Wert wird nicht überschrieben."))) ?>
                     <? else : ?>
                         <?= htmlReady($data[$field]) ?>
                     <? endif ?>
