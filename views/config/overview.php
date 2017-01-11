@@ -1,5 +1,7 @@
 <? $already_configs = array() ?>
-<form action="<?= PluginEngine::getLink($plugin, array(), "config/edit") ?>" method="post" class="default importconfigs">
+<form action="<?= PluginEngine::getLink($plugin, array(), "config/edit") ?>"
+      method="post"
+      class="<?= Fleximport::getCSSFormClass() ?> importconfigs">
     <table class="default">
         <thead>
             <tr>
