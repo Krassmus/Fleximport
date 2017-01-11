@@ -1,8 +1,11 @@
 <?php
 
-require_once 'lib/models/DataField.class.php';
-require_once 'lib/models/DatafieldEntryModel.class.php';
-
+if (file_exists('lib/models/DataField.class.php')) {
+    require_once 'lib/models/DataField.class.php';
+}
+if (file_exists('lib/models/DatafieldEntryModel.class.php')) {
+    require_once 'lib/models/DatafieldEntryModel.class.php';
+}
 require_once __DIR__."/classes/FleximportTable.php";
 require_once __DIR__."/classes/FleximportConfig.php";
 require_once __DIR__."/classes/FleximportProcess.php";
