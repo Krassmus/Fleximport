@@ -789,7 +789,7 @@ class FleximportTable extends SimpleORMap {
         if ($this['import_type'] === "Course") {
             //Map seminar_id :
             if (!$data['seminar_id'] && $this['tabledata']['simplematching']["seminar_id"]['column'] === "fleximport_map_from_veranstaltungsnummer_and_semester") {
-                $course = Course::findOneBySQL("name = ? AND start_time = ?", array($data['name'], $data['start_time']));
+                $course = Course::findOneBySQL("VeranstaltungsNummer = ? AND start_time = ?", array($data['veranstaltungsnummer'], $data['start_time']));
                 if ($course) {
                     $data['seminar_id'] = $course->getId();
                 }
