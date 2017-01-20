@@ -214,5 +214,9 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
         }
 
     }
+
+    public function getDescription() {
+        return "Mapped Dozenten nach dem Nachnamen. Mehrere Dozenten bitte per Komma trennen. Das Feld 'zeit' wird verwendet, um regelmäßige Termine zu erzeugen. Beim Update werden die regelmäßigen Termine auch geupdated (also eventuell auch gelöscht).";
+    }
 }
 

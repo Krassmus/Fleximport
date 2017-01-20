@@ -23,7 +23,7 @@ class FleximportStarttimeMapper implements FleximportMapper {
     public function map($format, $value) {
         switch ($format) {
             case "name":
-                $semester =  Semester::findOneByName($value);
+                $semester =  Semester::findOneBySQL("name = ?", array($value));
                 return $semester ? $semester['beginn'] : null;
                 break;
             case "timestamp":
@@ -37,7 +37,7 @@ class FleximportStarttimeMapper implements FleximportMapper {
                 $semester =  Semester::findCurrent();
                 return $semester ? $semester['beginn'] : null;
             case "next":
-                $semester =  Semester::findCurrent();
+                $semester =  Semester::findNext();
                 return $semester ? $semester['beginn'] : null;
         }
     }

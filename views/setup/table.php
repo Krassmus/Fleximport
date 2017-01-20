@@ -1,7 +1,7 @@
 <form
     action="<?= PluginEngine::getLink($plugin, array(), "setup/table" . ($table->isNew() ? "" : "/" . $table->getId())) ?>"
     method="post"
-    class="studip_form default"
+    class="<?= Fleximport::getCSSFormClass() ?>"
     data-dialog xmlns="http://www.w3.org/1999/html">
 
     <input type="hidden" name="table[process_id]" value="<?= htmlReady($table['process_id']) ?>">

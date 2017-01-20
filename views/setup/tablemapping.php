@@ -1,6 +1,6 @@
 <form action="<?= PluginEngine::getLink($plugin, array(), "setup/tablemapping/".$table->getId()) ?>"
       method="post"
-      class="studip_form"
+      class="<?= Fleximport::getCSSFormClass() ?>"
       data-dialog>
 
     <table class="default nohover">
