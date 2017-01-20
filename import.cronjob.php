@@ -7,7 +7,7 @@ class FleximportJob extends CronJob
      */
     public static function getName()
     {
-        return _('Fleximport');
+        return _('Fleximport (Import)');
     }
 
     /**

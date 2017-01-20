@@ -1078,4 +1078,31 @@ class FleximportTable extends SimpleORMap {
         }
     }
 
+    public function hasChangedHash()
+    {
+        return true;
+    }
+
+    public function updateChangeHash()
+    {
+        $this['change_hash'] = $this->calculateChangeHash();
+    }
+
+    public function calculateChangeHash()
+    {
+        $statement = DBManager::get()->prepare("CHECKSUM TABLE `".addslashes($this['name'])."`");
+        $statement->execute();
+        $data = $statement->fetch(PDO::FETCH_ASSOC);
+        if ($data['Checksum']) {
+            return $data['Checksum'];
+        } else {
+            //wir haben vermutlich einen View und müssen den Hash selbst berechnen
+
+            $statement = DBManager::get()->prepare("SELECT CRC32(SUM(CRC32(CONCAT_WS(`".implode("`,`", $this->getTableHeader())."`)))) AS hash FROM `".addslashes($this['name'])."`;");
+            $statement->execute();
+            $data = $statement->fetch(PDO::FETCH_COLUMN, 0);
+            return $data ?: floor(time() / (60 * 15));
+        }
+    }
+
 }

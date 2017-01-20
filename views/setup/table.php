@@ -128,6 +128,11 @@
         <?= _("Synchronisierung (Importierte Objekte werden beim Update gelöscht, wenn sie beim neuen Import nicht mit mehr auftauchen)") ?>
     </label>
 
+    <label data-change_hash="<?= htmlReady($table->calculateChangeHash()) ?>">
+        <?= _("Bei Änderungen an den Tabellendaten einen Webhook an folgende URL verschicken (mehrere durch Leerzeichen trennen)") ?>
+        <input type="text" name="table[webhook_urls]" value="<?= htmlReady($table['webhook_urls']) ?>" placeholder="https://...">
+    </label>
+
     <? if ($table->isInDatabase()) : ?>
         <div>
             <?= _("Nur folgende Spalten anzeigen") ?>
