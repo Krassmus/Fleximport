@@ -335,6 +335,15 @@ class FleximportTable extends SimpleORMap {
                         ? explode("-", $item['item_id'])
                         : $item['item_id'];
                     $object = new $import_type($pk);
+                    //logging:
+                    if ($import_type === "User") {
+                        StudipLog::log(
+                            "USER_DEL",
+                            $object->getId(),
+                            NULL,
+                            "Durch Fleximport-Sync der Tabelle ".$this['name'].": " . join(';', $object->toArray('username vorname nachname perms email'))
+                        );
+                    }
                     $object->delete();
                 }
                 $item->delete();
@@ -597,6 +606,14 @@ class FleximportTable extends SimpleORMap {
                         }
                     }
                     restoreLanguage();
+                }
+                if ($output['found'] === false) {
+                    StudipLog::log(
+                        "USER_CREATE",
+                        $object->getId(),
+                        null,
+                        "Durch Fleximport der Tabelle ".$this['name'].": " . join(';', $object->toArray('username vorname nachname perms email'))
+                    );
                 }
                 break;
         }
