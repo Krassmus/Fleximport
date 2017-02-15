@@ -52,10 +52,10 @@
             <tr<?= $overwrite ? "" : ' style="opacity: 0.5;"' ?>>
                 <? if (!$object->isNew()) : ?>
                 <td>
-                    <? if ($overwrite && ($object[$field] !== $data[$field])) : ?>
+                    <? if ($overwrite && ($object[$field] != $data[$field])) : ?>
                         <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                            ? Icon::create("exclaim", "info")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld.")))
-                            : Assets::img("icons/20/black/exclaim", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
+                            ? Icon::create("arr_2right", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld.")))
+                            : Assets::img("icons/20/grey/arr_2right", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
                     <? endif ?>
                 </td>
                 <? endif ?>

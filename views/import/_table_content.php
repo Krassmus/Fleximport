@@ -16,6 +16,11 @@
                             ? Icon::create("group2", "info")->asImg(20, array('class' => "text-bottom", 'title' => _("Es werden Teilnehmer an veranstaltungen import.")))
                             : Assets::img("icons/20/black/group2", array('class' => "text-bottom", 'title' => _("Es werden Teilnehmer an veranstaltungen import.")));
                         break;
+                    case "CourseDate":
+                        echo version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                            ? Icon::create("date", "info")->asImg(20, array('class' => "text-bottom"))
+                            : Assets::img("icons/20/black/date", array('class' => "text-bottom"));
+                        break;
                     case "Course":
                         echo version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
                             ? Icon::create("seminar", "info")->asImg(20, array('class' => "text-bottom", 'title' => _("Es werden Veranstaltungen import.")))
@@ -105,18 +110,20 @@
             <? if (($count < (int) $limit || $report['errors']) || $limit === false) : ?>
                 <tr>
                     <td>
-                        <a href="<?= PluginEngine::getLink($plugin, array('table' => $table['name']), "import/targetdetails/".$line['IMPORT_TABLE_PRIMARY_KEY']) ?>" data-dialog>
-                            <? $icon = $report['found'] ? "accept" : "star" ?>
-                            <? if ($report['errors']) : ?>
-                                <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                                        ? Icon::create($icon, "navigation")->asImg(20, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden") : _("Objekt würde neu angelegt werden. Zur Datenvorschau.")))
-                                        : Assets::img("icons/20/lightblue/".$icon, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden") : _("Objekt würde neu angelegt werden. Zur Datenvorschau."))) ?>
-                            <? else :?>
-                                <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                                    ? Icon::create($icon, "clickable")->asImg(20, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden und wird geupdated") : _("Objekt wird neu angelegt werden. Zur Datenvorschau.")))
-                                    : Assets::img("icons/20/blue/".$icon, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden und wird geupdated") : _("Objekt wird neu angelegt werden. Zur Datenvorschau."))) ?>
-                            <? endif ?>
-                        </a>
+                        <? if ($table['import_type']) : ?>
+                            <a href="<?= PluginEngine::getLink($plugin, array('table' => $table['name']), "import/targetdetails/".$line['IMPORT_TABLE_PRIMARY_KEY']) ?>" data-dialog>
+                                <? $icon = $report['found'] ? "accept" : "star" ?>
+                                <? if ($report['errors']) : ?>
+                                    <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                                            ? Icon::create($icon, "navigation")->asImg(20, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden") : _("Objekt würde neu angelegt werden. Zur Datenvorschau.")))
+                                            : Assets::img("icons/20/lightblue/".$icon, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden") : _("Objekt würde neu angelegt werden. Zur Datenvorschau."))) ?>
+                                <? else :?>
+                                    <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                                        ? Icon::create($icon, "clickable")->asImg(20, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden und wird geupdated") : _("Objekt wird neu angelegt werden. Zur Datenvorschau.")))
+                                        : Assets::img("icons/20/blue/".$icon, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden und wird geupdated") : _("Objekt wird neu angelegt werden. Zur Datenvorschau."))) ?>
+                                <? endif ?>
+                            </a>
+                        <? endif ?>
                     </td>
                     <td>
                         <? if ($report['errors']) : ?>
@@ -151,7 +158,7 @@
         <tfoot>
             <tr>
                 <td colspan="100">
-                    <?= sprintf("Synchronisation: %s Datensätzen werden bei diesem Import gelöscht.", $table->countDeletableItems($item_ids)) ?>
+                    <?= sprintf("Synchronisation: %s Datensätze werden bei diesem Import gelöscht.", $table->countDeletableItems($item_ids)) ?>
                 </td>
             </tr>
         </tfoot>

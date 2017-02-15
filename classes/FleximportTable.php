@@ -497,6 +497,33 @@ class FleximportTable extends SimpleORMap {
                     }
                 }
                 break;
+            case "CourseDate":
+                if ($this['tabledata']['simplematching']["fleximport_dategroups"]['column']
+                        || in_array("fleximport_dategroups", $this->fieldsToBeDynamicallyMapped())) {
+                    $statement = DBManager::get()->prepare("
+                        DELETE FROM termin_related_groups
+                        WHERE termin_id = ?
+                    ");
+                    $statement->execute(array($object->getId()));
+                    $statement = DBManager::get()->prepare("
+                        INSERT IGNORE INTO termin_related_groups
+                        SET termin_id = :termin_id,
+                            statusgruppe_id = :statusgruppe_id
+                    ");
+                    foreach ($data['fleximport_dategroups'] as $groupname) {
+                        $statusgruppe = Statusgruppen::findOneBySQL("range_id = :seminar_id AND name = :name OR statusgruppe_id = :name", array(
+                            'seminar_id' => $object['range_id'],
+                            'name' => $groupname
+                        ));
+                        if ($statusgruppe) {
+                            $statement->execute(array(
+                                'termin_id' => $object->getId(),
+                                'statusgruppe_id' => $statusgruppe->getId()
+                            ));
+                        }
+                    }
+                }
+                break;
             case "User":
                 if ($this['tabledata']['simplematching']["fleximport_user_inst"]['column'] || in_array("fleximport_user_inst", $this->fieldsToBeDynamicallyMapped())) {
                     if ($object['perms'] !== "root") {
@@ -735,6 +762,8 @@ class FleximportTable extends SimpleORMap {
                 $fields[] = "fleximport_locked";
                 $fields[] = "fleximport_course_userdomains";
                 break;
+            case "CourseDate":
+                $fields[] = "fleximport_dategroups";
             case "User":
                 foreach (Datafield::findBySQL("object_type = 'user'") as $datafield) {
                     $fields[] = $datafield['name'];
@@ -763,6 +792,7 @@ class FleximportTable extends SimpleORMap {
                         $data[$field] = $this['tabledata']['simplematching'][$field]['static'];
                     } else {
                         if (strpos($this['tabledata']['simplematching'][$field]['column'], "fleximportconfig_") === 0) {
+                            //Mapping with templates:
                             $config = substr($this['tabledata']['simplematching'][$field]['column'], strlen("fleximportconfig_"));
                             $template = FleximportConfig::get($config);
                             foreach ($data as $index => $value) {
@@ -772,6 +802,17 @@ class FleximportTable extends SimpleORMap {
                                 if (!in_array($index, $data)) {
                                     $template = str_replace("{{".$index."}}", $value, $template);
                                 }
+                            }
+                            $functions = array("md5", "urlencode");
+                            foreach ($functions as $function) {
+                                $template = preg_replace_callback(
+                                    "/".strtoupper($function)."\((.*)\)/",
+                                    function ($match) use ($function) {
+                                        return $function($match[1]);
+                                    },
+                                    $template
+                                );
+                                //$template = preg_match_all("fghgjfjhgfhf", $function."(\"\\1\")", $template);
                             }
                             $data[$field] = $template;
                         } else {
@@ -911,6 +952,18 @@ class FleximportTable extends SimpleORMap {
                 $statement = DBManager::get()->prepare("SELECT userdomain_id FROM userdomains WHERE name IN (:domains) OR userdomain_id IN (:domains)");
                 $statement->execute(array('domains' => $data['fleximport_course_userdomains']));
                 $data['fleximport_course_userdomains'] = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
+            }
+        }
+
+        if (($this['import_type'] === "CourseDate")) {
+            if ($this['tabledata']['simplematching']["fleximport_dategroups"]['column']
+                    && !in_array("fleximport_dategroups", $this->fieldsToBeDynamicallyMapped())) {
+                $data['fleximport_dategroups'] = (array) preg_split(
+                    "/\s*;\s*/",
+                    $data['fleximport_dategroups'],
+                    null,
+                    PREG_SPLIT_NO_EMPTY
+                );
             }
         }
 

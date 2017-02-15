@@ -51,6 +51,13 @@
                 'placeholder' => _("kommaseparierte Domänennamen oder Domänen-IDs")
             )) ?>
         <? endif ?>
+        <? if ($table['import_type'] === "CourseDate") : ?>
+            <?= $this->render_partial("setup/_field_mapping.php", array(
+                'field' => "fleximport_dategroups",
+                'table' => $table,
+                'placeholder' => _("Namen von Veranstaltungsgruppen")
+            )) ?>
+        <? endif ?>
         <? if ($table['import_type'] === "User") : ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_username_prefix",
