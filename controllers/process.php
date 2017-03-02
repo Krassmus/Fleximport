@@ -24,7 +24,10 @@ class ProcessController extends PluginController {
                 $processes = FleximportProcess::findBySQL("1=1 ORDER BY name ASC");
                 $this->redirect("import/overview" . (count($processes) ? "/".$processes[0]['process_id'] : ""));
             } else {
-                $this->process->setData(Request::getArray("data"));
+                $data = Request::getArray("data");
+                $data['triggered_by_cronjob'] = $data['triggered_by_cronjob'] ? 1 : 0;
+                $data['webhookable'] = $data['webhookable'] ? 1 : 0;
+                $this->process->setData($data);
                 $this->process->store();
                 PageLayout::postMessage(MessageBox::success(_("Prozess wurde gespeichert")));
                 $this->redirect("import/overview/" . $this->process->getId());
