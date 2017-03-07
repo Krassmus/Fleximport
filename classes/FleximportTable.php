@@ -931,20 +931,35 @@ class FleximportTable extends SimpleORMap {
             if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column'] && !in_array("fleximport_studyarea", $this->fieldsToBeDynamicallyMapped())) {
                 if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column'] === "static value") {
                     $data['fleximport_studyarea'] = (array) explode(";", $this['tabledata']['simplematching']["fleximport_studyarea"]['static']);
-                } else {
-                    $data['fleximport_studyarea'] = (array) explode(";", $data['fleximport_studyarea']);
-                    $study_areas = array();
-                    foreach ($data['fleximport_studyarea'] as $key => $name) {
-                        foreach (StudipStudyArea::findBySQL("name = ?", array($name)) as $study_area) {
-                            $study_areas[] = $study_area->getId();
-                        }
-                    }
-                    $data['fleximport_studyarea'] = $study_areas;
                 }
+                $data['fleximport_studyarea'] = (array) preg_split(
+                    "/\s*;\s*/",
+                    $data['fleximport_studyarea'],
+                    null,
+                    PREG_SPLIT_NO_EMPTY
+                );
+                $study_areas = array();
+                foreach ($data['fleximport_studyarea'] as $key => $name) {
+                    $statement = DBManager::get()->prepare("
+                        SELECT sem_tree_id
+                        FROM sem_tree
+                            LEFT JOIN Institute ON (Institute.Institut_id = sem_tree.studip_object_id)
+                        WHERE
+                            sem_tree.name = :name 
+                            OR sem_tree_id = :name 
+                            OR Institute.Name = :name
+                    ");
+                    $statement->execute(array('name' => $name));
+
+                    foreach ($statement->fetchAll(PDO::FETCH_COLUMN, 0) as $sem_tree_id) {
+                        $study_areas[] = $sem_tree_id;
+                    }
+                }
+                $data['fleximport_studyarea'] = $study_areas;
             }
             if ($this['tabledata']['simplematching']["fleximport_course_userdomains"]['column'] && !in_array("fleximport_course_userdomains", $this->fieldsToBeDynamicallyMapped())) {
                 $data['fleximport_course_userdomains'] = (array) preg_split(
-                    "/\s*,\s*/",
+                    "/\s*[,;]\s*/",
                     $data['fleximport_course_userdomains'],
                     null,
                     PREG_SPLIT_NO_EMPTY

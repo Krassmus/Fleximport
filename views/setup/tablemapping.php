@@ -38,7 +38,7 @@
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_studyarea",
                 'table' => $table,
-                'placeholder' => _("semikolonseparierte sem_tree_ids")
+                'placeholder' => _("semikolonseparierte sem_tree_ids oder Namen")
             )) ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_locked",

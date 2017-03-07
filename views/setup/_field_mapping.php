@@ -21,43 +21,64 @@
             } ?>
             <select name="tabledata[simplematching][<?= htmlReady($field) ?>][column]"
                     id="simplematching_<?= htmlReady($field) ?>"
-                    onChange="jQuery('#simplematching_<?= htmlReady($field) ?>_static').toggle(this.value === 'static value'); jQuery('#simplematching_<?= htmlReady($field) ?>_mapfrom').toggle(this.value.indexOf('fleximport_mapper__') === 0); jQuery('#simplematching_<?= htmlReady($field) ?>_format').toggle(this.value !== '');">
+                    onChange="jQuery('#simplematching_<?= htmlReady($field) ?>_static').toggle(this.value === 'static value'); jQuery('#simplematching_<?= htmlReady($field) ?>_mapfrom').toggle(this.value.indexOf('fleximport_mapper__') === 0); jQuery('#simplematching_<?= htmlReady($field) ?>_format').toggle(this.value !== '');"
+                    title="<?= htmlReady($placeholder) ?>">
                 <option value="" title="<?= _("Wert wird nicht gemapped") ?>"></option>
                 <option value="static value"<?= $table['tabledata']['simplematching'][$field]['column'] === "static value" ? " selected" : "" ?>>[<?= _("Fester Eintrag") ?>]</option>
-                <? foreach ($table->getTableHeader() as $header) : ?>
-                    <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
-                        <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching'][$field]['column'] ? " selected" : "" ?>>
-                            <?= htmlReady($header) ?>
-                        </option>
-                    <? endif ?>
-                <? endforeach ?>
 
-
-                <? foreach ($mapperclasses as $class) {
-                    $mapper = new $class();
-                    if (in_array($field, $mapper->possibleFieldnames())) {
-                        $mapper_exists = true;
-                        foreach ($mapper->possibleFormats() as $index => $value) : ?>
-                            <? $optionvalue = "fleximport_mapper__".$class."__".$index ?>
-                            <option value="<?= htmlReady($optionvalue) ?>"<?= $optionvalue === $table['tabledata']['simplematching'][$field]['column'] ? " selected" : "" ?>>
-                                <?= sprintf(_("Von %s ermitteln"), $value) ?>
+                <optgroup label="<?= _("Feldwerte") ?>">
+                    <? foreach ($table->getTableHeader() as $header) : ?>
+                        <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
+                            <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching'][$field]['column'] ? " selected" : "" ?>>
+                                <?= htmlReady($header) ?>
                             </option>
-                        <? endforeach;
-                    }
-                } ?>
+                        <? endif ?>
+                    <? endforeach ?>
+                </optgroup>
 
-                <? foreach (FleximportConfig::all() as $configname => $value) : ?>
-                    <option value="fleximportconfig_<?= htmlReady($configname) ?>"<?= "fleximportconfig_".$configname === $table['tabledata']['simplematching'][$field]['column'] ? " selected" : ""?>>
-                        <?= _("Konfiguration: ").htmlReady($configname) ?>
-                    </option>
-                <? endforeach ?>
+                <? if (count($mapperclasses)) : ?>
+                    <? $mapper_exists = false ?>
+                    <? foreach ($mapperclasses as $class) {
+                        $mapper = new $class();
+                        if (in_array(strtolower($field), $mapper->possibleFieldnames())) {
+                            $mapper_exists = true;
+                        }
+                    } ?>
+                    <? if ($mapper_exists) : ?>
+                    <optgroup label="<?= _("Spezialmapper") ?>">
+                    <? foreach ($mapperclasses as $class) {
+                        $mapper = new $class();
+                        if (in_array(strtolower($field), $mapper->possibleFieldnames())) {
+                            foreach ($mapper->possibleFormats() as $index => $value) : ?>
+                                <? $optionvalue = "fleximport_mapper__".$class."__".$index ?>
+                                <option value="<?= htmlReady($optionvalue) ?>"<?= $optionvalue === $table['tabledata']['simplematching'][$field]['column'] ? " selected" : "" ?>>
+                                    <?= sprintf(_("Von %s ermitteln"), $value) ?>
+                                </option>
+                            <? endforeach;
+                        }
+                    } ?>
+                    </optgroup>
+                    <? endif ?>
+                <? endif ?>
 
+                <? $configs = FleximportConfig::all() ?>
+                <? if (count($configs)) : ?>
+                    <optgroup label="<?= _("Templates") ?>">
+                    <? foreach ($configs as $configname => $value) : ?>
+                        <option value="fleximportconfig_<?= htmlReady($configname) ?>"<?= "fleximportconfig_".$configname === $table['tabledata']['simplematching'][$field]['column'] ? " selected" : ""?>>
+                            <?= _("Konfiguration: ").htmlReady($configname) ?>
+                        </option>
+                    <? endforeach ?>
+                    </optgroup>
+                <? endif ?>
 
                 <? if (in_array($table['import_type'], (array) array("Course", "CourseMember"))) : ?>
                     <? if ($field === "seminar_id") : ?>
-                        <option value="fleximport_map_from_veranstaltungsnummer_and_semester"<?= $table['tabledata']['simplematching']['seminar_id']['column'] === "fleximport_map_from_veranstaltungsnummer_and_semester" ? " selected" : "" ?>>
-                            <?= _("Von Veranstaltungsnummer und Semester ermitteln") ?>
-                        </option>
+                        <optgroup label="<?= _("Weitere") ?>">
+                            <option value="fleximport_map_from_veranstaltungsnummer_and_semester"<?= $table['tabledata']['simplematching']['seminar_id']['column'] === "fleximport_map_from_veranstaltungsnummer_and_semester" ? " selected" : "" ?>>
+                                <?= _("Von Veranstaltungsnummer und Semester ermitteln") ?>
+                            </option>
+                        </optgroup>
                     <? endif ?>
                 <? endif ?>
             </select>
