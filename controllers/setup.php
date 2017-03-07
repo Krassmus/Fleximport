@@ -95,7 +95,7 @@ class SetupController extends PluginController {
             'Course' => "sem",
             'CourseMember' => "usersemdata"
         );
-        $this->datafields = Datafield::findBySQL("object_type = :object_type", array(
+        $this->datafields = DataField::findBySQL("object_type = :object_type", array(
             'object_type' => $datafield_object_types[$this->table['import_type']]
         ));
         if (Request::isAjax() && Request::isPost()) {

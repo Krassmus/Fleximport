@@ -111,7 +111,7 @@
                         <option value="username"<?= $table['tabledata']['simplematching'][$field]['format'] === "username" ? " selected" : "" ?>><?= _("Format: Nutzernamen (mit Leerzeichen getrennt)") ?></option>
                         <option value="email"<?= $table['tabledata']['simplematching'][$field]['format'] === "email" ? " selected" : "" ?>><?= _("Format: Emails (mit Leerzeichen getrennt)") ?></option>
                         <option value="fullname"<?= $table['tabledata']['simplematching'][$field]['format'] === "fullname" ? " selected" : "" ?>><?= _("Format: Vorname Nachname (mit Kommata getrennt)") ?></option>
-                        <? foreach (Datafield::findBySQL("object_type = 'user'") as $datafield) : ?>
+                        <? foreach (DataField::findBySQL("object_type = 'user'") as $datafield) : ?>
                             <option value="<?= htmlReady($datafield->getId()) ?>"<?= $table['tabledata']['simplematching'][$field]['format'] === $datafield->getId() ? " selected" : "" ?>><?= htmlReady(sprintf(_("Format: %s (mit Leerzeichen getrennt)"), $datafield['name'])) ?></option>
                         <? endforeach ?>
                     </select>

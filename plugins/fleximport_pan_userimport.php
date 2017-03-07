@@ -34,11 +34,11 @@ class fleximport_pan_userimport extends FleximportPlugin {
                             $seminar->deleteMember($object->getId());
                         }
                     }
-                    $datafield = Datafield::findOneBySQL("name = 'Ich will weiterhin als Alumni in Stud.IP geführt werden' AND object_type = 'user'");
+                    $datafield = DataField::findOneBySQL("name = 'Ich will weiterhin als Alumni in Stud.IP geführt werden' AND object_type = 'user'");
                     $user_wants_to_stay = DatafieldEntry::findOneBySQL("datafield_id = ? AND range_id = ?", array($datafield->getId(), $object->getId()));
                     if ($user_wants_to_stay['content']) {
                         //In Veranstaltung ALUMNI die Statusgruppe anlegen:
-                        $datafield = Datafield::findOneBySQL("name = 'Alumni' AND object_type = 'user'");
+                        $datafield = DataField::findOneBySQL("name = 'Alumni' AND object_type = 'user'");
                         $entry = DatafieldEntry::findOneBySQL("datafield_id = ? AND range_id = ?", array($datafield->getId(), $object->getId()));
                         $course = Course::findOneByName("ALUMNI");
                         $gruppenname = $entry ? $entry['content'] : null;

@@ -143,7 +143,7 @@ class fleximport_semiro_course_import extends FleximportPlugin {
         $imported_items = array();
         if ($teilnehmergruppe && $object->getId()) {
             $seminar = new Seminar($object->getId());
-            $datafield = Datafield::findOneByName(FleximportConfig::get("SEMIRO_USER_DATAFIELD_NAME"));
+            $datafield = DataField::findOneByName(FleximportConfig::get("SEMIRO_USER_DATAFIELD_NAME"));
             $dilp_kennung_feld = FleximportConfig::get("SEMIRO_DILP_KENNUNG_FIELD");
             if (!$dilp_kennung_feld) {
                 $dilp_kennung_feld = "dilp_teilnehmer";

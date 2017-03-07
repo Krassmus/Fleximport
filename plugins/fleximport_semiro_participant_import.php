@@ -77,7 +77,7 @@ class fleximport_semiro_participant_import extends FleximportPlugin {
         if (!$line[$dilp_kennung_feld]) {
             $errors .= "Teilnehmer hat keinen Wert für '$dilp_kennung_feld''. ";
         } else {
-            $datafield = Datafield::findOneByName(FleximportConfig::get("SEMIRO_USER_DATAFIELD_NAME"));
+            $datafield = DataField::findOneByName(FleximportConfig::get("SEMIRO_USER_DATAFIELD_NAME"));
             if (!$datafield) {
                 $errors .= "System hat kein Datenfeld ".FleximportConfig::get("SEMIRO_USER_DATAFIELD_NAME").", womit die Nutzer identifiziert werden. ";
             } else {
