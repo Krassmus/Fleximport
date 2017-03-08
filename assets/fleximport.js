@@ -23,7 +23,9 @@ STUDIP.Fleximport = {
         } else {
             jQuery("#table_" + table_id + "_container").fadeOut(function () { jQuery(this).remove(); });
         }
-        window.setTimeout(STUDIP.Dialog.close, 100);
+        if (payload.close) {
+            window.setTimeout(STUDIP.Dialog.close, 100);
+        }
     },
     "deleteTable": function (table_id) {
         jQuery.ajax({

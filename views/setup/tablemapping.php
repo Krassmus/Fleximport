@@ -17,14 +17,16 @@
         <? foreach ($table->getTargetFields() as $fieldname) : ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => $fieldname,
-                'table' => $table
+                'table' => $table,
+                'mapperclasses' => $mapperclasses
             )) ?>
         <? endforeach ?>
 
         <? foreach ($datafields as $datafield) : ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => $datafield['name'],
-                'table' => $table
+                'table' => $table,
+                'mapperclasses' => $mapperclasses
             )) ?>
         <? endforeach ?>
 
@@ -33,51 +35,60 @@
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_dozenten",
                 'table' => $table,
-                'placeholder' => _("kommaseparierte user_ids")
+                'placeholder' => _("kommaseparierte user_ids"),
+                'mapperclasses' => $mapperclasses
             )) ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_studyarea",
                 'table' => $table,
-                'placeholder' => _("semikolonseparierte sem_tree_ids oder Namen")
+                'placeholder' => _("semikolonseparierte sem_tree_ids oder Namen"),
+                'mapperclasses' => $mapperclasses
             )) ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_locked",
                 'table' => $table,
-                'placeholder' => _("1 für gesperrt")
+                'placeholder' => _("1 für gesperrt"),
+                'mapperclasses' => $mapperclasses
             )) ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_course_userdomains",
                 'table' => $table,
-                'placeholder' => _("kommaseparierte Domänennamen oder Domänen-IDs")
+                'placeholder' => _("kommaseparierte Domänennamen oder Domänen-IDs"),
+                'mapperclasses' => $mapperclasses
             )) ?>
         <? endif ?>
         <? if ($table['import_type'] === "CourseDate") : ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_dategroups",
                 'table' => $table,
-                'placeholder' => _("Namen von Veranstaltungsgruppen")
+                'placeholder' => _("Namen von Veranstaltungsgruppen"),
+                'mapperclasses' => $mapperclasses
             )) ?>
         <? endif ?>
         <? if ($table['import_type'] === "User") : ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_username_prefix",
                 'table' => $table,
-                'placeholder' => _("Präfix für den Nutzernamen")
+                'placeholder' => _("Präfix für den Nutzernamen"),
+                'mapperclasses' => $mapperclasses
             )) ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_user_inst",
                 'table' => $table,
-                'placeholder' => _("kommaseparierte Einrichtungsnamen")
+                'placeholder' => _("kommaseparierte Einrichtungsnamen"),
+                'mapperclasses' => $mapperclasses
             )) ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_userdomains",
                 'table' => $table,
-                'placeholder' => _("kommaseparierte Domänennamen oder Domänen-IDs")
+                'placeholder' => _("kommaseparierte Domänennamen oder Domänen-IDs"),
+                'mapperclasses' => $mapperclasses
             )) ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_expiration_date",
                 'table' => $table,
-                'placeholder' => _("Datum")
+                'placeholder' => _("Datum"),
+                'mapperclasses' => $mapperclasses
             )) ?>
 
             <? $dynamically_mapped = in_array("fleximport_welcome_message", $table->fieldsToBeDynamicallyMapped()) ?>

@@ -25,6 +25,7 @@ class SetupController extends PluginController {
         }
         Navigation::activateItem("/fleximport/process_".$this->table['process_id']);
         if (Request::isPost()) {
+            $failed = false;
             $data = Request::getArray("table");
             $oldname = $this->table['name'];
             $data['tabledata'] = array_merge($this->table['tabledata'], $data['tabledata']);
@@ -37,16 +38,24 @@ class SetupController extends PluginController {
             }
             if ($this->table['import_type'] === "other") {
                 $this->table['import_type'] = Request::get("other_import_type");
-            } elseif ($this->table['source'] === "sqlview" && $GLOBALS['perm']->have_perm("root")) {
-                DBManager::get()->exec("DROP VIEW IF EXISTS `".addslashes($data['name'])."`");
-                DBManager::get()->exec("DROP TABLE IF EXISTS `".addslashes($data['name'])."`");
-                DBManager::get()->exec("
-                    CREATE VIEW `".addslashes($data['name'])."` AS (
-                        ".$data['tabledata']['sqlview']['select']."
-                    );
-                ");
             }
-            $this->table->store();
+            if ($this->table['source'] === "sqlview" && $GLOBALS['perm']->have_perm("root")) {
+                try {
+                    DBManager::get()->exec("DROP VIEW IF EXISTS `" . addslashes($data['name']) . "`");
+                    DBManager::get()->exec("DROP TABLE IF EXISTS `" . addslashes($data['name']) . "`");
+                    DBManager::get()->exec("
+                        CREATE VIEW `" . addslashes($data['name']) . "` AS (
+                            " . $data['tabledata']['sqlview']['select'] . "
+                        );
+                    ");
+                } catch(Exception $e) {
+                    $failed = true;
+                    PageLayout::postMessage(MessageBox::error(_("SQL-View kann nicht erzeugt werden."), array($e->getMessage())));
+                }
+            }
+            if (!$failed) {
+                $this->table->store();
+            }
 
             if (Request::isAjax()) {
                 $output = array(
@@ -54,7 +63,8 @@ class SetupController extends PluginController {
                     'payload' => array(
                         'table_id' => $this->table->getId(),
                         'name' => $this->table['name'],
-                        'html' => $this->render_template_as_string("import/_table.php")
+                        'html' => $this->render_template_as_string("import/_table.php"),
+                        'close' => $failed ? 0 : 1
                     )
                 );
                 $this->response->add_header("X-Dialog-Execute", json_encode(studip_utf8encode($output)));
@@ -108,6 +118,13 @@ class SetupController extends PluginController {
                 )
             );
             $this->response->add_header("X-Dialog-Execute", json_encode(studip_utf8encode($output)));
+        }
+        $this->mapperclasses = array();
+        foreach (get_declared_classes() as $class) {
+            $reflection = new ReflectionClass($class);
+            if ($reflection->implementsInterface('FleximportMapper') && ($class !== "FleximportMapper")) {
+                $this->mapperclasses[] = $class;
+            }
         }
     }
 

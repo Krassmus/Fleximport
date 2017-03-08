@@ -932,12 +932,14 @@ class FleximportTable extends SimpleORMap {
                 if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column'] === "static value") {
                     $data['fleximport_studyarea'] = (array) explode(";", $this['tabledata']['simplematching']["fleximport_studyarea"]['static']);
                 }
-                $data['fleximport_studyarea'] = (array) preg_split(
-                    "/\s*;\s*/",
-                    $data['fleximport_studyarea'],
-                    null,
-                    PREG_SPLIT_NO_EMPTY
-                );
+                if (is_string($data['fleximport_studyarea'])) {
+                    $data['fleximport_studyarea'] = (array)preg_split(
+                        "/\s*;\s*/",
+                        $data['fleximport_studyarea'],
+                        null,
+                        PREG_SPLIT_NO_EMPTY
+                    );
+                }
                 $study_areas = array();
                 foreach ($data['fleximport_studyarea'] as $key => $name) {
                     $statement = DBManager::get()->prepare("

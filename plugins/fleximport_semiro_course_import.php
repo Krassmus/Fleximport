@@ -194,6 +194,15 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                             $gruppe->store();
                         }
                         if (!$gruppe->isMember($entry['range_id'])) {
+                            $other_groups = Statusgruppen::findBySQL("range_id = ? AND name != ?", array(
+                                $object->getId(),
+                                $teilnehmergruppe
+                            ));
+                            foreach ($other_groups as $other_group) {
+                                if ($other_group->isMember($entry['range_id'])) {
+                                    $other_group->removeUser($entry['range_id']);
+                                }
+                            }
                             $gruppe->addUser($entry['range_id']);
                         }
                         //$gruppe->updateFolder(true);
@@ -210,7 +219,7 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                         $item_id = $entry['range_id'];
                         if (!in_array($item_id, $imported_items)) {
                             $mapped = FleximportMappedItem::findbyItemId($item_id, $import_type) ?: new FleximportMappedItem();
-                            $mapped['import_type'] = $import_type;
+                            $mapped['table_id'] = $import_type;
                             $mapped['item_id'] = $item_id;
                             $mapped['chdate'] = time();
                             $mapped->store();
@@ -225,15 +234,15 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                 $teilnehmergruppe
             ));
             foreach ($object->members->filter(function ($member, $value) { return $member['status'] === "dozent"; }) as $teacher) {
-                if (!$gruppe->isMember($teacher->getId())) {
-                    $gruppe->addUser($teacher->getId());
+                if (!$gruppe->isMember($teacher['user_id'])) {
+                    $gruppe->addUser($teacher['user_id']);
                 }
             }
 
             $items = FleximportMappedItem::findBySQL(
-                "import_type = :import_type AND item_id NOT IN (:ids)",
+                "table_id = :table_id AND item_id NOT IN (:ids)",
                 array(
-                    'import_type' => $import_type,
+                    'table_id' => $import_type,
                     'ids' => $imported_items ?: ""
                 )
             );

@@ -3,6 +3,12 @@
 if (file_exists('lib/models/DataField.class.php')) {
     require_once 'lib/models/DataField.class.php';
 }
+if (file_exists('lib/models/Datafield.class.php')) {
+    require_once 'lib/models/Datafield.class.php';
+}
+if (class_exists("Datafield") && !class_exists("DataField")) {
+    class DataField extends Datafield {}
+}
 if (file_exists('lib/models/DatafieldEntryModel.class.php')) {
     require_once 'lib/models/DatafieldEntryModel.class.php';
 }

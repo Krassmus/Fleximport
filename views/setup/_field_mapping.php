@@ -13,12 +13,6 @@
         <? if ($dynamically_mapped) : ?>
             <?= _("Wird vom Plugin dynamisch gemapped") ?>
         <? else : ?>
-            <? $mapperclasses = array();
-            foreach (get_declared_classes() as $class) {
-                if (is_subclass_of($class, "FleximportMapper") && $class !== "FleximportMapper") {
-                    $mapperclasses[] = $class;
-                }
-            } ?>
             <select name="tabledata[simplematching][<?= htmlReady($field) ?>][column]"
                     id="simplematching_<?= htmlReady($field) ?>"
                     onChange="jQuery('#simplematching_<?= htmlReady($field) ?>_static').toggle(this.value === 'static value'); jQuery('#simplematching_<?= htmlReady($field) ?>_mapfrom').toggle(this.value.indexOf('fleximport_mapper__') === 0); jQuery('#simplematching_<?= htmlReady($field) ?>_format').toggle(this.value !== '');"
