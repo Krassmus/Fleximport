@@ -233,9 +233,13 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                 $object->getId(),
                 $teilnehmergruppe
             ));
-            foreach ($object->members->filter(function ($member, $value) { return $member['status'] === "dozent"; }) as $teacher) {
-                if (!$gruppe->isMember($teacher['user_id'])) {
-                    $gruppe->addUser($teacher['user_id']);
+            if ($gruppe) {
+                foreach ($object->members->filter(function ($member, $value) {
+                    return $member['status'] === "dozent";
+                }) as $teacher) {
+                    if (!$gruppe->isMember($teacher['user_id'])) {
+                        $gruppe->addUser($teacher['user_id']);
+                    }
                 }
             }
 
