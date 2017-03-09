@@ -745,6 +745,11 @@ class FleximportTable extends SimpleORMap {
         return $output;
     }
 
+    /**
+     * Takes the raw data of the dataline and returns the mapped data as an associative array
+     * @param array $line
+     * @return array mapped data
+     */
     public function getMappedData($line)
     {
         $plugin = $this->getPlugin();
@@ -930,27 +935,25 @@ class FleximportTable extends SimpleORMap {
             //Map Studienbereiche
             if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column'] && !in_array("fleximport_studyarea", $this->fieldsToBeDynamicallyMapped())) {
                 if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column'] === "static value") {
-                    $data['fleximport_studyarea'] = (array) explode(";", $this['tabledata']['simplematching']["fleximport_studyarea"]['static']);
+                    $data['fleximport_studyarea'] = $this['tabledata']['simplematching']["fleximport_studyarea"]['static'];
                 }
-                if (is_string($data['fleximport_studyarea'])) {
-                    $data['fleximport_studyarea'] = (array)preg_split(
-                        "/\s*;\s*/",
-                        $data['fleximport_studyarea'],
-                        null,
-                        PREG_SPLIT_NO_EMPTY
-                    );
-                }
+                $data['fleximport_studyarea'] = (array) preg_split(
+                    "/\s*;\s*/",
+                    $data['fleximport_studyarea'],
+                    null,
+                    PREG_SPLIT_NO_EMPTY
+                );
                 $study_areas = array();
+                $statement = DBManager::get()->prepare("
+                    SELECT sem_tree_id
+                    FROM sem_tree
+                        LEFT JOIN Institute ON (Institute.Institut_id = sem_tree.studip_object_id)
+                    WHERE
+                        sem_tree.name = :name OR TRIM(sem_tree.name) = :name
+                        OR sem_tree_id = :name
+                        OR Institute.Name = :name OR TRIM(Institute.Name) = :name
+                ");
                 foreach ($data['fleximport_studyarea'] as $key => $name) {
-                    $statement = DBManager::get()->prepare("
-                        SELECT sem_tree_id
-                        FROM sem_tree
-                            LEFT JOIN Institute ON (Institute.Institut_id = sem_tree.studip_object_id)
-                        WHERE
-                            sem_tree.name = :name 
-                            OR sem_tree_id = :name 
-                            OR Institute.Name = :name
-                    ");
                     $statement->execute(array('name' => $name));
 
                     foreach ($statement->fetchAll(PDO::FETCH_COLUMN, 0) as $sem_tree_id) {
