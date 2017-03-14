@@ -551,12 +551,7 @@ class FleximportTable extends SimpleORMap {
                         if (!in_array($domain_id, $olddomains)) {
                             $welcome = FleximportConfig::get("USERDOMAIN_WELCOME_" . $domain_id);
                             if ($welcome) {
-                                foreach ($object->toArray() as $field => $value) {
-                                    $welcome = str_replace("{{" . $field . "}}", $value, $welcome);
-                                }
-                                foreach ($line as $field => $value) {
-                                    $welcome = str_replace("{{" . $field . "}}", $value, $welcome);
-                                }
+                                $welcome = FleximportConfig::template($welcome, $object->toArray(), $line);
                                 if (strpos($welcome, "\n") === false) {
                                     $subject = _("Willkommen!");
                                 } else {
@@ -593,14 +588,7 @@ class FleximportTable extends SimpleORMap {
                     setTempLanguage(false, $user_language);
                     if ($data['fleximport_welcome_message'] && FleximportConfig::get($data['fleximport_welcome_message'])) {
                         $message = FleximportConfig::get($data['fleximport_welcome_message']);
-                        foreach ($data as $field => $value) {
-                            $message = str_replace("{{".$field."}}", $value, $message);
-                        }
-                        foreach ($line as $field => $value) {
-                            if (!in_array($field, $data)) {
-                                $message = str_replace("{{".$field."}}", $value, $message);
-                            }
-                        }
+                        $message = FleximportConfig::template($message, $data, $line);
                         if (strpos($message, "\n") === false) {
                             $subject = dgettext($user_language, "Anmeldung Stud.IP-System");
                         } else {
@@ -800,26 +788,7 @@ class FleximportTable extends SimpleORMap {
                             //Mapping with templates:
                             $config = substr($this['tabledata']['simplematching'][$field]['column'], strlen("fleximportconfig_"));
                             $template = FleximportConfig::get($config);
-                            foreach ($data as $index => $value) {
-                                $template = str_replace("{{".$index."}}", $value, $template);
-                            }
-                            foreach ($line as $index => $value) {
-                                if (!in_array($index, $data)) {
-                                    $template = str_replace("{{".$index."}}", $value, $template);
-                                }
-                            }
-                            $functions = array("md5", "urlencode");
-                            foreach ($functions as $function) {
-                                $template = preg_replace_callback(
-                                    "/".strtoupper($function)."\((.*)\)/",
-                                    function ($match) use ($function) {
-                                        return $function($match[1]);
-                                    },
-                                    $template
-                                );
-                                //$template = preg_match_all("fghgjfjhgfhf", $function."(\"\\1\")", $template);
-                            }
-                            $data[$field] = $template;
+                            $data[$field] = FleximportConfig::template($template, $data, $line);
                         } else {
                             //use a matched column
                             $data[$field] = $line[$this['tabledata']['simplematching'][$field]['column']];

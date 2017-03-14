@@ -6,6 +6,30 @@ class FleximportConfig {
 
     protected $variables = null;
 
+    static public function template($text, $data, $rawline)
+    {
+        foreach ($data as $index => $value) {
+            $text = str_replace("{{".$index."}}", $value, $text);
+        }
+        foreach ($rawline as $index => $value) {
+            if (!in_array($index, $data)) {
+                $text = str_replace("{{".$index."}}", $value, $text);
+            }
+        }
+        $functions = array("md5", "urlencode");
+        foreach ($functions as $function) {
+            $text = preg_replace_callback(
+                "/".strtoupper($function)."\((.*)\)/",
+                function ($match) use ($function) {
+                    return $function($match[1]);
+                },
+                $text
+            );
+            //$template = preg_match_all("fghgjfjhgfhf", $function."(\"\\1\")", $template);
+        }
+        return $text;
+    }
+
     /**
      * Returns all configs as an associative array.
      * @return array

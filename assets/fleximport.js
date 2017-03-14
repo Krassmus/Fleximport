@@ -39,3 +39,4 @@ STUDIP.Fleximport = {
         });
     }
 };
+
