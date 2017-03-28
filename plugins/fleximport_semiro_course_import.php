@@ -228,7 +228,7 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                     }
                 }
             }
-            //Dozent zu Statusgruppe hinzufügen:
+            //Dozent zu Statusgruppe hinzufügen: Nicht mehr
             $gruppe = Statusgruppen::findOneBySQL("range_id = ? AND name = ?", array(
                 $object->getId(),
                 $teilnehmergruppe

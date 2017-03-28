@@ -19,6 +19,7 @@ require_once __DIR__."/classes/FleximportMappedItem.php";
 require_once __DIR__ . "/classes/FleximportPlugin.abstract.php";
 require_once __DIR__ . "/classes/mapper/FleximportMapper.interface.php";
 require_once __DIR__ . "/classes/checker/FleximportChecker.interface.php";
+require_once __DIR__ . "/classes/dynamics/FleximportDynamic.interface.php";
 foreach (scandir(__DIR__."/classes/checker") as $checker) {
     if ($checker[0] !== "." && substr($checker, -4) === ".php") {
         require_once __DIR__."/classes/checker/".$checker;
@@ -27,6 +28,11 @@ foreach (scandir(__DIR__."/classes/checker") as $checker) {
 foreach (scandir(__DIR__."/classes/mapper") as $mapper) {
     if ($mapper[0] !== "." && substr($mapper, -4) === ".php") {
         require_once __DIR__."/classes/mapper/".$mapper;
+    }
+}
+foreach (scandir(__DIR__."/classes/dynamics") as $dynamic) {
+    if ($dynamic[0] !== "." && substr($dynamic, -4) === ".php") {
+        require_once __DIR__."/classes/dynamics/".$dynamic;
     }
 }
 foreach (scandir(__DIR__."/plugins") as $plugin) {

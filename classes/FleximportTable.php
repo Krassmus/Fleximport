@@ -454,14 +454,25 @@ class FleximportTable extends SimpleORMap {
         $output['pk'] = (array) $object->getId();
 
         //Dynamic special fields:
+
+        $dynamics = array();
+        foreach (get_declared_classes() as $class) {
+            $reflection = new ReflectionClass($class);
+            if ($reflection->implementsInterface('FleximportDynamic') && ($class !== "FleximportDynamic")) {
+                $dynamics[] = new $class();
+            }
+        }
+        foreach ($dynamics as $dynamic) {
+            $for = $dynamic->forClassFields();
+            foreach ((array) $for[$classname] as $fieldname => $placeholder) {
+                if ($data[$fieldname]) {
+                    $dynamic->applyValue($object, $data[$fieldname]);
+                }
+            }
+        }
+
         switch ($classname) {
             case "Course":
-                //fleximport_dozenten
-                foreach ($data['fleximport_dozenten'] as $dozent_id) {
-                    $seminar = new Seminar($object->getId());
-                    $seminar->addMember($dozent_id, 'dozent');
-                }
-
                 //fleximport_related_institutes
                 if (!$data['fleximport_related_institutes']) {
                     $data['fleximport_related_institutes'] = array($object['institut_id']);
@@ -661,32 +672,6 @@ class FleximportTable extends SimpleORMap {
         }
 
         if ($classname === "Course") {
-            if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column']
-                    || in_array("fleximport_studyarea", $this->fieldsToBeDynamicallyMapped())) {
-                //Studienbereiche:
-                $remove = DBManager::get()->prepare("
-                    DELETE FROM seminar_sem_tree
-                    WHERE seminar_id = :seminar_id
-                ");
-                $remove->execute(array(
-                    'seminar_id' => $object->getId()
-                ));
-
-                if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$data['status']]['class']]['bereiche']) {
-                    foreach ($data['fleximport_studyarea'] as $sem_tree_id) {
-                        $insert = DBManager::get()->prepare("
-                            INSERT IGNORE INTO seminar_sem_tree
-                            SET sem_tree_id = :sem_tree_id,
-                                seminar_id = :seminar_id
-                        ");
-                        $insert->execute(array(
-                            'sem_tree_id' => $sem_tree_id,
-                            'seminar_id' => $object->getId()
-                        ));
-                    }
-                }
-            }
-
             if ($this['tabledata']['simplematching']["fleximport_locked"]['column']
                     || in_array("fleximport_locked", $this->fieldsToBeDynamicallyMapped())) {
                 //Lock or unlock course
@@ -800,18 +785,56 @@ class FleximportTable extends SimpleORMap {
             }
         }
 
+        $dynamics = array();
+        foreach (get_declared_classes() as $class) {
+            $reflection = new ReflectionClass($class);
+            if ($reflection->implementsInterface('FleximportDynamic') && ($class !== "FleximportDynamic")) {
+                $dynamics[] = new $class();
+            }
+        }
+
+        //Trennen der Werte der Felder, die multiple Werte enthalten sollen wie fleximport_dozenten
         foreach ($fields as $field) {
-            //mapper:
+            foreach ($dynamics as $dynamic) {
+                $for = $dynamic->forClassFields();
+                if (isset($for[$this['import_type']][$field]) && $dynamic->isMultiple()) {
+                    $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
+                    $value = $data[$mapfrom] ?: $line[$mapfrom];
+                    $delimiter = $this['tabledata']['simplematching'][$field]['delimiter'] ?: ";";
+                    $value = (array) preg_split(
+                        "/\s*".$delimiter."\s*/",
+                        $value,
+                        null,
+                        PREG_SPLIT_NO_EMPTY
+                    );
+                    $data[$field] = $value;
+                }
+            }
+        }
+
+        foreach ($fields as $field) {
+            //Mappen der Werte mit FleximportMappern:
             if (strpos($this['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") === 0) {
                 list($prefix, $mapperclass, $format) = explode("__", $this['tabledata']['simplematching'][$field]['column']);
                 if (class_exists($mapperclass)) {
                     $mapper = new $mapperclass();
                     if (is_a($mapper, "FleximportMapper")) {
-                        $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'];
-                        $data[$field] = $mapper->map(
-                            $format,
-                            $data[$mapfrom] ?: $line[$mapfrom]
-                        );
+                        $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
+                        $value = $data[$field] ?: ($data[$mapfrom] ?: $line[$mapfrom]);
+                        if (is_array($value)) {
+                            foreach ($value as $k => $v) {
+                                $value[$k] = $mapper->map(
+                                    $format,
+                                    $v
+                                );
+                            }
+                            $data[$field] = $value;
+                        } else {
+                            $data[$field] = $mapper->map(
+                                $format,
+                                $value
+                            );
+                        }
                     }
                 }
             }
@@ -824,66 +847,6 @@ class FleximportTable extends SimpleORMap {
                 $course = Course::findOneBySQL("VeranstaltungsNummer = ? AND start_time = ?", array($data['veranstaltungsnummer'], $data['start_time']));
                 if ($course) {
                     $data['seminar_id'] = $course->getId();
-                }
-            }
-
-            //Map dozenten:
-            if ($this['tabledata']['simplematching']["fleximport_dozenten"]['column']
-                    && !in_array("fleximport_dozenten", $this->fieldsToBeDynamicallyMapped())) {
-                $data['fleximport_dozenten'] = (array) preg_split(
-                    $this['tabledata']['simplematching']["fleximport_dozenten"]['format'] === "fullname" ? "/\s*,\s*/" : "/\s+/",
-                    $data['fleximport_dozenten'],
-                    null,
-                    PREG_SPLIT_NO_EMPTY
-                );
-
-                switch ($this['tabledata']['simplematching']["fleximport_dozenten"]['format']) {
-                    case "user_id":
-                        $data['fleximport_dozenten'] = array_map(function ($user_id) {
-                            $user = User::find($user_id);
-                            if ($user) {
-                                return $user->getId();
-                            } else {
-                                return null;
-                            }
-                        }, $data['fleximport_dozenten']);
-                        break;
-                    case "username":
-                        $data['fleximport_dozenten'] = array_map("get_userid", $data['fleximport_dozenten']);
-                        break;
-                    case "email":
-                        $data['fleximport_dozenten'] = array_map(function ($email) {
-                            $user = User::findOneByEmail($email);
-                            if ($user) {
-                                return $user->getId();
-                            } else {
-                                return null;
-                            }
-                        }, $data['fleximport_dozenten']);
-                        break;
-                    case "fullname":
-                        $data['fleximport_dozenten'] = array_map(function ($fullname) {
-                            list($vorname, $nachname) = (array) preg_split("/\s+/", $fullname, null, PREG_SPLIT_NO_EMPTY);
-                            $user = User::findOneBySQL("Vorname = ? AND Nachname = ? AND perms = 'dozent'", array($vorname, $nachname));
-                            if ($user) {
-                                return $user->getId();
-                            } else {
-                                return null;
-                            }
-                        }, $data['fleximport_dozenten']);
-                        break;
-                    default:
-                        //map by datafield
-                        $datafield_id = $this['tabledata']['simplematching']["fleximport_dozenten"]['format'];
-                        foreach ($data['fleximport_dozenten'] as $key => $value) {
-                            $entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND content = ?", array($datafield_id, $value));
-                            if ($entry) {
-                                $data['fleximport_dozenten'][$key] = $entry['range_id'];
-                            } else {
-                                unset($data['fleximport_dozenten'][$key]);
-                            }
-                        }
-                        break;
                 }
             }
 
@@ -901,36 +864,7 @@ class FleximportTable extends SimpleORMap {
                 }
             }
 
-            //Map Studienbereiche
-            if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column'] && !in_array("fleximport_studyarea", $this->fieldsToBeDynamicallyMapped())) {
-                if ($this['tabledata']['simplematching']["fleximport_studyarea"]['column'] === "static value") {
-                    $data['fleximport_studyarea'] = $this['tabledata']['simplematching']["fleximport_studyarea"]['static'];
-                }
-                $data['fleximport_studyarea'] = (array) preg_split(
-                    "/\s*;\s*/",
-                    $data['fleximport_studyarea'],
-                    null,
-                    PREG_SPLIT_NO_EMPTY
-                );
-                $study_areas = array();
-                $statement = DBManager::get()->prepare("
-                    SELECT sem_tree_id
-                    FROM sem_tree
-                        LEFT JOIN Institute ON (Institute.Institut_id = sem_tree.studip_object_id)
-                    WHERE
-                        sem_tree.name = :name OR TRIM(sem_tree.name) = :name
-                        OR sem_tree_id = :name
-                        OR Institute.Name = :name OR TRIM(Institute.Name) = :name
-                ");
-                foreach ($data['fleximport_studyarea'] as $key => $name) {
-                    $statement->execute(array('name' => $name));
-
-                    foreach ($statement->fetchAll(PDO::FETCH_COLUMN, 0) as $sem_tree_id) {
-                        $study_areas[] = $sem_tree_id;
-                    }
-                }
-                $data['fleximport_studyarea'] = $study_areas;
-            }
+            //Map Domains
             if ($this['tabledata']['simplematching']["fleximport_course_userdomains"]['column'] && !in_array("fleximport_course_userdomains", $this->fieldsToBeDynamicallyMapped())) {
                 $data['fleximport_course_userdomains'] = (array) preg_split(
                     "/\s*[,;]\s*/",

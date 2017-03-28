@@ -94,6 +94,19 @@ class ImportController extends PluginController {
         if ($classname) {
             $this->object = new $classname($pk);
         }
+        $this->additional_fields = array();
+        foreach (get_declared_classes() as $class) {
+            $reflection = new ReflectionClass($class);
+            if ($reflection->implementsInterface('FleximportDynamic') && ($class !== "FleximportDynamic")) {
+                $dynamic = new $class();
+                $for = $dynamic->forClassFields();
+                foreach ((array) $for[$classname] as $fieldname => $placeholder) {
+                    $this->additional_fields[$fieldname] = method_exists($dynamic, "currentValue")
+                        ? $dynamic->currentValue($this->object, $fieldname)
+                        : false;
+                }
+            }
+        }
     }
 
 }

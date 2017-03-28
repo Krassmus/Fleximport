@@ -98,19 +98,17 @@
                 </select>
             <? endif ?>
 
-            <? if (($table['import_type'] === "Course") && ($field === "fleximport_dozenten")) : ?>
-                <div id="simplematching_<?= htmlReady($field) ?>_format" style="<?= !$table['tabledata']['simplematching']['fleximport_dozenten']['column'] || $table['tabledata']['simplematching'][$field]['column'] === "static value" ? "display: none;" : "" ?>">
-                    <select name="tabledata[simplematching][<?= htmlReady($field) ?>][format]">
-                        <option value="user_id"<?= $table['tabledata']['simplematching'][$field]['format'] === "user_id" ? " selected" : "" ?>><?= _("Format: user_ids (mit Leerzeichen getrennt)") ?></option>
-                        <option value="username"<?= $table['tabledata']['simplematching'][$field]['format'] === "username" ? " selected" : "" ?>><?= _("Format: Nutzernamen (mit Leerzeichen getrennt)") ?></option>
-                        <option value="email"<?= $table['tabledata']['simplematching'][$field]['format'] === "email" ? " selected" : "" ?>><?= _("Format: Emails (mit Leerzeichen getrennt)") ?></option>
-                        <option value="fullname"<?= $table['tabledata']['simplematching'][$field]['format'] === "fullname" ? " selected" : "" ?>><?= _("Format: Vorname Nachname (mit Kommata getrennt)") ?></option>
-                        <? foreach (DataField::findBySQL("object_type = 'user'") as $datafield) : ?>
-                            <option value="<?= htmlReady($datafield->getId()) ?>"<?= $table['tabledata']['simplematching'][$field]['format'] === $datafield->getId() ? " selected" : "" ?>><?= htmlReady(sprintf(_("Format: %s (mit Leerzeichen getrennt)"), $datafield['name'])) ?></option>
-                        <? endforeach ?>
-                    </select>
-                </div>
+            <? if ($delimiter) : ?>
+                <label>
+                    <?= _("Trennzeichen") ?>
+                    <input type="text"
+                           name="tabledata[simplematching][<?= htmlReady($field) ?>][delimiter]"
+                           value="<?= htmlReady($table['tabledata']['simplematching'][$field]['delimiter']) ?>"
+                           placeholder="<?= _("; , | ") ?>"
+                           style="width: 50px; display: inline; vertical-align: baseline">
+                </label>
             <? endif ?>
+
             <? if (($table['import_type'] === "Course") && ($field === "status")) : ?>
                 <div class="format" id="simplematching_<?= htmlReady($field) ?>_format">
                     <select name="tabledata[simplematching][<?= htmlReady($field) ?>][format]">

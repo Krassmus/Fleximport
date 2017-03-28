@@ -126,6 +126,14 @@ class SetupController extends PluginController {
                 $this->mapperclasses[] = $class;
             }
         }
+
+        $this->dynamics = array();
+        foreach (get_declared_classes() as $class) {
+            $reflection = new ReflectionClass($class);
+            if ($reflection->implementsInterface('FleximportDynamic') && ($class !== "FleximportDynamic")) {
+                $this->dynamics[] = new $class();
+            }
+        }
     }
 
 }

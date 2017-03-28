@@ -7,13 +7,15 @@ class FleximportUser_idMapper implements FleximportMapper {
     }
 
     public function possibleFieldnames() {
-        return array("user_id", "range_id");
+        return array("user_id", "range_id", "fleximport_dozenten");
     }
 
     public function possibleFormats() {
         $formats = array(
             "username" => "Nutzername",
-            "email" => "Email"
+            "email" => "Email",
+            'fullname' => "Vorname Nachname",
+            'fullname_dozent' => "Vorname Nachname (nur Dozenten)"
         );
         $datafields = DataField::findBySQL("object_type = 'user' ORDER BY name ASC");
         foreach ($datafields as $datafield) {
@@ -34,6 +36,24 @@ class FleximportUser_idMapper implements FleximportMapper {
                 $user = User::findOneByEmail($value);
                 if ($user) {
                     return $user->getId();
+                }
+                break;
+            case "fullname":
+                list($vorname, $nachname) = (array) preg_split("/\s+/", $value, null, PREG_SPLIT_NO_EMPTY);
+                $user = User::findOneBySQL("Vorname = ? AND Nachname = ?", array($vorname, $nachname));
+                if ($user) {
+                    return $user->getId();
+                } else {
+                    return null;
+                }
+                break;
+            case "fullname_dozent":
+                list($vorname, $nachname) = (array) preg_split("/\s+/", $value, null, PREG_SPLIT_NO_EMPTY);
+                $user = User::findOneBySQL("Vorname = ? AND Nachname = ? AND perms = 'dozent' ", array($vorname, $nachname));
+                if ($user) {
+                    return $user->getId();
+                } else {
+                    return null;
                 }
                 break;
             default:

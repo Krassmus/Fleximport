@@ -31,19 +31,20 @@
         <? endforeach ?>
 
 
+        <? foreach ($dynamics as $dynamic) {
+            $for = $dynamic->forClassFields();
+            foreach ((array) $for[$table['import_type']] as $fieldname => $placeholder) {
+                echo $this->render_partial("setup/_field_mapping.php", array(
+                    'field' => $fieldname,
+                    'table' => $table,
+                    'placeholder' => $placeholder,
+                    'delimiter' => $dynamic->isMultiple(),
+                    'mapperclasses' => $mapperclasses
+                ));
+            }
+        } ?>
+
         <? if ($table['import_type'] === "Course") : ?>
-            <?= $this->render_partial("setup/_field_mapping.php", array(
-                'field' => "fleximport_dozenten",
-                'table' => $table,
-                'placeholder' => _("kommaseparierte user_ids"),
-                'mapperclasses' => $mapperclasses
-            )) ?>
-            <?= $this->render_partial("setup/_field_mapping.php", array(
-                'field' => "fleximport_studyarea",
-                'table' => $table,
-                'placeholder' => _("semikolonseparierte sem_tree_ids oder Namen"),
-                'mapperclasses' => $mapperclasses
-            )) ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_locked",
                 'table' => $table,

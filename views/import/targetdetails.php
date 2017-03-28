@@ -76,5 +76,41 @@
                 </td>
             </tr>
         <? endforeach ?>
+        <? foreach ((array) $additional_fields as $field => $currentValue) : ?>
+            <tr>
+                <td></td>
+                <td style="font-family: MONOSPACE;">
+                    <?= htmlReady($field) ?>
+                </td>
+                <? if (!$object->isNew()) : ?>
+                    <td>
+                        <? if ($currentValue !== false) : ?>
+                            <? if (is_array($currentValue)) : ?>
+                                <ul style="padding-left: 15px;">
+                                    <? foreach ($currentValue as $value) : ?>
+                                        <li><?= htmlReady($value) ?></li>
+                                    <? endforeach ?>
+                                </ul>
+                            <? else : ?>
+                                <?= htmlReady($currentValue) ?>
+                            <? endif ?>
+                        <? else : ?>
+
+                        <? endif ?>
+                    </td>
+                <? endif ?>
+                <td>
+                    <? if (is_array($data[$field])) : ?>
+                        <ul style="padding-left: 18px;">
+                            <? foreach ($data[$field] as $value) : ?>
+                                <li><?= htmlReady($value) ?></li>
+                            <? endforeach ?>
+                        </ul>
+                    <? else : ?>
+                    <?= htmlReady($data[$field]) ?>
+                    <? endif ?>
+                </td>
+            </tr>
+        <? endforeach ?>
     </tbody>
 </table>
