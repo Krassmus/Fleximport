@@ -78,7 +78,24 @@
         <? endforeach ?>
         <? foreach ((array) $additional_fields as $field => $currentValue) : ?>
             <tr>
-                <td></td>
+                <td>
+                    <? if (!$object->isNew()) : ?>
+                        <?
+                        $changed = false;
+                        if ($currentValue !== false) {
+                            if (is_array($currentValue)) {
+                                $changed = count(array_diff($currentValue, $data[$field])) + count(array_diff($data[$field], $currentValue)) > 0;
+                            } else {
+                                $changed = $data[$field] != $currentValue;
+                            }
+                        } ?>
+                        <? if ($changed) : ?>
+                            <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                                ? Icon::create("arr_2right", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld.")))
+                                : Assets::img("icons/20/grey/arr_2right", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
+                        <? endif?>
+                    <? endif ?>
+                </td>
                 <td style="font-family: MONOSPACE;">
                     <?= htmlReady($field) ?>
                 </td>

@@ -15,7 +15,7 @@
         <? else : ?>
             <select name="tabledata[simplematching][<?= htmlReady($field) ?>][column]"
                     id="simplematching_<?= htmlReady($field) ?>"
-                    onChange="jQuery('#simplematching_<?= htmlReady($field) ?>_static').toggle(this.value === 'static value'); jQuery('#simplematching_<?= htmlReady($field) ?>_mapfrom').toggle(this.value.indexOf('fleximport_mapper__') === 0); jQuery('#simplematching_<?= htmlReady($field) ?>_format').toggle(this.value !== '');"
+                    onChange="jQuery('#simplematching_<?= htmlReady($field) ?>_static').toggle(this.value === 'static value'); jQuery('#simplematching_<?= htmlReady($field) ?>_mapfrom').toggle(this.value.indexOf('fleximport_mapper__') === 0); jQuery('#simplematching_<?= htmlReady($field) ?>_format').toggle(this.value !== ''); jQuery('#simplematching_<?= htmlReady($field) ?>_delimiter').toggle(this.value !== '');"
                     title="<?= htmlReady($placeholder) ?>">
                 <option value="" title="<?= _("Wert wird nicht gemapped") ?>"></option>
                 <option value="static value"<?= $table['tabledata']['simplematching'][$field]['column'] === "static value" ? " selected" : "" ?>>[<?= _("Fester Eintrag") ?>]</option>
@@ -99,7 +99,7 @@
             <? endif ?>
 
             <? if ($delimiter) : ?>
-                <label>
+                <label id="simplematching_<?= htmlReady($field) ?>_delimiter"<?= $table['tabledata']['simplematching'][$field]['column'] ? "" : ' style="display: none;"' ?>>
                     <?= _("Trennzeichen") ?>
                     <input type="text"
                            name="tabledata[simplematching][<?= htmlReady($field) ?>][delimiter]"

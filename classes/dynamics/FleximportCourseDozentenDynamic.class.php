@@ -14,7 +14,7 @@ class FleximportCourseDozentenDynamic implements FleximportDynamic {
         return true;
     }
 
-    public function applyValue($object, $value)
+    public function applyValue($object, $value, $line)
     {
         foreach ((array) $value as $dozent_id) {
             $seminar = new Seminar($object->getId());

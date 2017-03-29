@@ -21,9 +21,11 @@ interface FleximportDynamic {
      * @param SimpleORMap $object : the object that this Dynamic applies to
      * @param mixed $value : an array or just one value.
      */
-    public function applyValue($object, $value);
+    public function applyValue($object, $value, $line);
 
-    //You can use this method to display the current values of an existing object
-    //public function currentValue($object, $field)
+    /**
+     * You can use this method to display the current values of an existing object
+     */
+    public function currentValue($object, $field);
 
 }

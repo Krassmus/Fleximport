@@ -14,7 +14,7 @@ class FleximportCourseStudyareaDynamic implements FleximportDynamic {
         return true;
     }
 
-    public function applyValue($object, $value)
+    public function applyValue($object, $value, $line)
     {
         $select = DBManager::get()->prepare("
             SELECT sem_tree_id

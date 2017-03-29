@@ -44,28 +44,6 @@
             }
         } ?>
 
-        <? if ($table['import_type'] === "Course") : ?>
-            <?= $this->render_partial("setup/_field_mapping.php", array(
-                'field' => "fleximport_locked",
-                'table' => $table,
-                'placeholder' => _("1 für gesperrt"),
-                'mapperclasses' => $mapperclasses
-            )) ?>
-            <?= $this->render_partial("setup/_field_mapping.php", array(
-                'field' => "fleximport_course_userdomains",
-                'table' => $table,
-                'placeholder' => _("kommaseparierte Domänennamen oder Domänen-IDs"),
-                'mapperclasses' => $mapperclasses
-            )) ?>
-        <? endif ?>
-        <? if ($table['import_type'] === "CourseDate") : ?>
-            <?= $this->render_partial("setup/_field_mapping.php", array(
-                'field' => "fleximport_dategroups",
-                'table' => $table,
-                'placeholder' => _("Namen von Veranstaltungsgruppen"),
-                'mapperclasses' => $mapperclasses
-            )) ?>
-        <? endif ?>
         <? if ($table['import_type'] === "User") : ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_username_prefix",
@@ -77,12 +55,6 @@
                 'field' => "fleximport_user_inst",
                 'table' => $table,
                 'placeholder' => _("kommaseparierte Einrichtungsnamen"),
-                'mapperclasses' => $mapperclasses
-            )) ?>
-            <?= $this->render_partial("setup/_field_mapping.php", array(
-                'field' => "fleximport_userdomains",
-                'table' => $table,
-                'placeholder' => _("kommaseparierte Domänennamen oder Domänen-IDs"),
                 'mapperclasses' => $mapperclasses
             )) ?>
             <?= $this->render_partial("setup/_field_mapping.php", array(

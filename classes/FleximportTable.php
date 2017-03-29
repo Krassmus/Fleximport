@@ -465,76 +465,13 @@ class FleximportTable extends SimpleORMap {
         foreach ($dynamics as $dynamic) {
             $for = $dynamic->forClassFields();
             foreach ((array) $for[$classname] as $fieldname => $placeholder) {
-                if ($data[$fieldname]) {
-                    $dynamic->applyValue($object, $data[$fieldname]);
+                if (isset($data[$fieldname])) {
+                    $dynamic->applyValue($object, $data[$fieldname], $line);
                 }
             }
         }
 
         switch ($classname) {
-            case "Course":
-                //fleximport_related_institutes
-                if (!$data['fleximport_related_institutes']) {
-                    $data['fleximport_related_institutes'] = array($object['institut_id']);
-                } else if(!in_array($object['institut_id'], $data['fleximport_related_institutes'])) {
-                    $data['fleximport_related_institutes'][] = $object['institut_id'];
-                }
-                foreach ($data['fleximport_related_institutes'] as $institut_id) {
-                    $insert = DBManager::get()->prepare("
-                        INSERT IGNORE INTO seminar_inst
-                        SET seminar_id = :seminar_id,
-                            institut_id = :institut_id
-                    ");
-                    $insert->execute(array(
-                        'seminar_id' => $object->getId(),
-                        'institut_id' => $institut_id
-                    ));
-                }
-                if ($this['tabledata']['simplematching']["fleximport_course_userdomains"]['column'] || in_array("fleximport_course_userdomains", $this->fieldsToBeDynamicallyMapped())) {
-                    $statement = DBManager::get()->prepare("
-                        SELECT userdomain_id
-                        FROM seminar_userdomains
-                        WHERE seminar_id = ?
-                    ");
-                    $statement->execute(array($object->getId()));
-                    $olddomains = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
-                    foreach (array_diff($data['fleximport_user_inst'], $olddomains) as $to_add) {
-                        $domain = new UserDomain($to_add);
-                        $domain->addSeminar($object->getId());
-                    }
-                    foreach (array_diff($olddomains, $data['fleximport_user_inst']) as $to_remove) {
-                        $domain = new UserDomain($to_remove);
-                        $domain->removeSeminar($object->getId());
-                    }
-                }
-                break;
-            case "CourseDate":
-                if ($this['tabledata']['simplematching']["fleximport_dategroups"]['column']
-                        || in_array("fleximport_dategroups", $this->fieldsToBeDynamicallyMapped())) {
-                    $statement = DBManager::get()->prepare("
-                        DELETE FROM termin_related_groups
-                        WHERE termin_id = ?
-                    ");
-                    $statement->execute(array($object->getId()));
-                    $statement = DBManager::get()->prepare("
-                        INSERT IGNORE INTO termin_related_groups
-                        SET termin_id = :termin_id,
-                            statusgruppe_id = :statusgruppe_id
-                    ");
-                    foreach ($data['fleximport_dategroups'] as $groupname) {
-                        $statusgruppe = Statusgruppen::findOneBySQL("range_id = :seminar_id AND name = :name OR statusgruppe_id = :name", array(
-                            'seminar_id' => $object['range_id'],
-                            'name' => $groupname
-                        ));
-                        if ($statusgruppe) {
-                            $statement->execute(array(
-                                'termin_id' => $object->getId(),
-                                'statusgruppe_id' => $statusgruppe->getId()
-                            ));
-                        }
-                    }
-                }
-                break;
             case "User":
                 if ($this['tabledata']['simplematching']["fleximport_user_inst"]['column'] || in_array("fleximport_user_inst", $this->fieldsToBeDynamicallyMapped())) {
                     if ($object['perms'] !== "root") {
@@ -544,48 +481,6 @@ class FleximportTable extends SimpleORMap {
                             $member->store();
                         }
                     }
-                }
-                if ($this['tabledata']['simplematching']["fleximport_userdomains"]['column'] || in_array("fleximport_userdomains", $this->fieldsToBeDynamicallyMapped())) {
-                    $olddomains = UserDomain::getUserDomainsForUser($object->getId());
-                    foreach ($olddomains as $olddomain) {
-                        if (!in_array($olddomain->getID(), (array) $data['fleximport_userdomains'])) {
-                            $olddomain->removeUser($object->getId());
-                        }
-                    }
-                    foreach ($data['fleximport_userdomains'] as $userdomain) {
-                        $domain = new UserDomain($userdomain);
-                        $domain->addUser($object->getId());
-                    }
-                    AutoInsert::instance()->saveUser($object->getId());
-
-                    foreach ($data['fleximport_userdomains'] as $domain_id) {
-                        if (!in_array($domain_id, $olddomains)) {
-                            $welcome = FleximportConfig::get("USERDOMAIN_WELCOME_" . $domain_id);
-                            if ($welcome) {
-                                $welcome = FleximportConfig::template($welcome, $object->toArray(), $line);
-                                if (strpos($welcome, "\n") === false) {
-                                    $subject = _("Willkommen!");
-                                } else {
-                                    $subject = strstr($welcome, "\n", true);
-                                    $welcome = substr($welcome, strpos($welcome, "\n") + 1);
-                                }
-                                $messaging = new messaging();
-                                $count = $messaging->insert_message(
-                                    $welcome,
-                                    $object->username,
-                                    '____%system%____',
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    $subject,
-                                    true,
-                                    'normal'
-                                );
-                            }
-                        }
-                    }
-
                 }
                 if ($this['tabledata']['simplematching']["fleximport_expiration_date"]['column'] || in_array("fleximport_expiration_date", $this->fieldsToBeDynamicallyMapped())) {
                     if ($data['fleximport_expiration_date']) {
@@ -672,22 +567,6 @@ class FleximportTable extends SimpleORMap {
         }
 
         if ($classname === "Course") {
-            if ($this['tabledata']['simplematching']["fleximport_locked"]['column']
-                    || in_array("fleximport_locked", $this->fieldsToBeDynamicallyMapped())) {
-                //Lock or unlock course
-                if ($data['fleximport_locked']) {
-                    CourseSet::addCourseToSet(
-                        CourseSet::getGlobalLockedAdmissionSetId(),
-                        $object->getId()
-                    );
-                } elseif (in_array($data['fleximport_locked'], array("0", 0)) && ($data['fleximport_locked'] !== "")) {
-                    CourseSet::removeCourseFromSet(
-                        CourseSet::getGlobalLockedAdmissionSetId(),
-                        $object->getId()
-                    );
-                }
-            }
-
             $folder_exist = DBManager::get()->prepare("
                 SELECT 1 FROM folder WHERE range_id = ?
             ");
@@ -728,30 +607,36 @@ class FleximportTable extends SimpleORMap {
         $plugin = $this->getPlugin();
         $fields = $this->getTargetFields();
 
+        $dynamics = array();
+        foreach (get_declared_classes() as $class) {
+            $reflection = new ReflectionClass($class);
+            if ($reflection->implementsInterface('FleximportDynamic') && ($class !== "FleximportDynamic")) {
+                $dynamics[] = new $class();
+            }
+        }
+
         //dynamic additional fields:
         switch ($this['import_type']) {
             case "Course":
                 foreach (DataField::findBySQL("object_type = 'sem'") as $datafield) {
                     $fields[] = $datafield['name'];
                 }
-                $fields[] = "fleximport_dozenten";
-                $fields[] = "fleximport_related_institutes";
-                $fields[] = "fleximport_studyarea";
-                $fields[] = "fleximport_locked";
-                $fields[] = "fleximport_course_userdomains";
                 break;
-            case "CourseDate":
-                $fields[] = "fleximport_dategroups";
             case "User":
                 foreach (DataField::findBySQL("object_type = 'user'") as $datafield) {
                     $fields[] = $datafield['name'];
                 }
                 $fields[] = "fleximport_username_prefix";
-                $fields[] = "fleximport_userdomains";
                 $fields[] = "fleximport_user_inst";
                 $fields[] = "fleximport_expiration_date";
                 $fields[] = "fleximport_welcome_message";
                 break;
+        }
+        foreach ($dynamics as $dynamic) {
+            $for = $dynamic->forClassFields();
+            foreach ((array) $for[$this['import_type']] as $fieldname => $placeholder) {
+                $fields[] = $fieldname;
+            }
         }
 
         $data = array();
@@ -782,14 +667,6 @@ class FleximportTable extends SimpleORMap {
                 } else {
                     //else no mapping, don't even overwrite old value.
                 }
-            }
-        }
-
-        $dynamics = array();
-        foreach (get_declared_classes() as $class) {
-            $reflection = new ReflectionClass($class);
-            if ($reflection->implementsInterface('FleximportDynamic') && ($class !== "FleximportDynamic")) {
-                $dynamics[] = new $class();
             }
         }
 
@@ -864,29 +741,11 @@ class FleximportTable extends SimpleORMap {
                 }
             }
 
-            //Map Domains
+            //Map Domains //TODO: change this to a mapper class
             if ($this['tabledata']['simplematching']["fleximport_course_userdomains"]['column'] && !in_array("fleximport_course_userdomains", $this->fieldsToBeDynamicallyMapped())) {
-                $data['fleximport_course_userdomains'] = (array) preg_split(
-                    "/\s*[,;]\s*/",
-                    $data['fleximport_course_userdomains'],
-                    null,
-                    PREG_SPLIT_NO_EMPTY
-                );
                 $statement = DBManager::get()->prepare("SELECT userdomain_id FROM userdomains WHERE name IN (:domains) OR userdomain_id IN (:domains)");
                 $statement->execute(array('domains' => $data['fleximport_course_userdomains']));
                 $data['fleximport_course_userdomains'] = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
-            }
-        }
-
-        if (($this['import_type'] === "CourseDate")) {
-            if ($this['tabledata']['simplematching']["fleximport_dategroups"]['column']
-                    && !in_array("fleximport_dategroups", $this->fieldsToBeDynamicallyMapped())) {
-                $data['fleximport_dategroups'] = (array) preg_split(
-                    "/\s*;\s*/",
-                    $data['fleximport_dategroups'],
-                    null,
-                    PREG_SPLIT_NO_EMPTY
-                );
             }
         }
 
@@ -922,12 +781,6 @@ class FleximportTable extends SimpleORMap {
                 $data['fleximport_user_inst'] = $institut_ids;
             }
             if ($this['tabledata']['simplematching']["fleximport_userdomains"]['column'] && !in_array("fleximport_userdomains", $this->fieldsToBeDynamicallyMapped())) {
-                $data['fleximport_userdomains'] = (array) preg_split(
-                    "/\s*,\s*/",
-                    $data['fleximport_userdomains'],
-                    null,
-                    PREG_SPLIT_NO_EMPTY
-                );
                 $statement = DBManager::get()->prepare("SELECT userdomain_id FROM userdomains WHERE name IN (:domains) OR userdomain_id IN (:domains)");
                 $statement->execute(array('domains' => $data['fleximport_userdomains']));
                 $data['fleximport_userdomains'] = $statement->fetchAll(PDO::FETCH_COLUMN, 0);

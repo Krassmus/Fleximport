@@ -101,9 +101,11 @@ class ImportController extends PluginController {
                 $dynamic = new $class();
                 $for = $dynamic->forClassFields();
                 foreach ((array) $for[$classname] as $fieldname => $placeholder) {
-                    $this->additional_fields[$fieldname] = method_exists($dynamic, "currentValue")
-                        ? $dynamic->currentValue($this->object, $fieldname)
-                        : false;
+                    if ($this->table['tabledata']['simplematching'][$fieldname]['column']) {
+                        $this->additional_fields[$fieldname] = method_exists($dynamic, "currentValue")
+                            ? $dynamic->currentValue($this->object, $fieldname)
+                            : false;
+                    }
                 }
             }
         }
