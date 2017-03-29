@@ -99,14 +99,20 @@
             <? endif ?>
 
             <? if ($delimiter) : ?>
-                <label id="simplematching_<?= htmlReady($field) ?>_delimiter"<?= $table['tabledata']['simplematching'][$field]['column'] ? "" : ' style="display: none;"' ?>>
-                    <?= _("Trennzeichen") ?>
-                    <input type="text"
-                           name="tabledata[simplematching][<?= htmlReady($field) ?>][delimiter]"
-                           value="<?= htmlReady($table['tabledata']['simplematching'][$field]['delimiter']) ?>"
-                           placeholder="<?= _("; , | ") ?>"
-                           style="width: 50px; display: inline; vertical-align: baseline">
-                </label>
+                <div id="simplematching_<?= htmlReady($field) ?>_delimiter" style="<?= $table['tabledata']['simplematching'][$field]['column'] ? "" : ' display: none;' ?>">
+                    <label style="display: inline;">
+                        <?= _("Trennzeichen") ?>
+                        <input type="text"
+                               name="tabledata[simplematching][<?= htmlReady($field) ?>][delimiter]"
+                               value="<?= htmlReady($table['tabledata']['simplematching'][$field]['delimiter'] ?: ";") ?>"
+                               placeholder="<?= _("Bspw. ; , |") ?>"
+                               style="width: 65px; display: inline; vertical-align: baseline">
+                    </label>
+                    <? $title = _("Dieses Feld kann mehrere Einträge haben. Sie können diese Einträge mit einem Zeichen trennen. Zum Beispiel ein Semikolon oder ein | Zeichen oder ein ganzes Wort. Auch reguläre Ausdrücke sind hier möglich.") ?>
+                    <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                        ? Icon::create("info-circle", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => $title, 'onclick' => "alert('".addslashes($title)."');", 'style' => "cursor: pointer"))
+                        : Assets::img("icons/20/grey/info-circle", array('class' => "text-bottom", 'title' => $title, 'onclick' => "alert('".addslashes($title)."');", 'style' => "cursor: pointer")) ?>
+                </div>
             <? endif ?>
 
             <? if (($table['import_type'] === "Course") && ($field === "status")) : ?>
