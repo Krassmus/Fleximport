@@ -472,6 +472,17 @@ class FleximportTable extends SimpleORMap {
         }
 
         switch ($classname) {
+            case "Course":
+                $insert = DBManager::get()->prepare("
+                    INSERT IGNORE INTO seminar_inst
+                    SET seminar_id = :seminar_id,
+                        institut_id = :institut_id
+                ");
+                $insert->execute(array(
+                    'seminar_id' => $object->getId(),
+                    'institut_id' => $object['institut_id']
+                ));
+                break;
             case "User":
                 if ($this['tabledata']['simplematching']["fleximport_user_inst"]['column'] || in_array("fleximport_user_inst", $this->fieldsToBeDynamicallyMapped())) {
                     if ($object['perms'] !== "root") {
