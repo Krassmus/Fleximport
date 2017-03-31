@@ -103,7 +103,7 @@ class ImportController extends PluginController {
                 foreach ((array) $for[$classname] as $fieldname => $placeholder) {
                     if ($this->table['tabledata']['simplematching'][$fieldname]['column']) {
                         $this->additional_fields[$fieldname] = method_exists($dynamic, "currentValue")
-                            ? $dynamic->currentValue($this->object, $fieldname)
+                            ? $dynamic->currentValue($this->object, $fieldname, (bool) $this->table['tabledata']['simplematching'][$fieldname]['sync'])
                             : false;
                     }
                 }

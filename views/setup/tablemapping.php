@@ -51,18 +51,6 @@
                 'placeholder' => _("Präfix für den Nutzernamen"),
                 'mapperclasses' => $mapperclasses
             )) ?>
-            <?= $this->render_partial("setup/_field_mapping.php", array(
-                'field' => "fleximport_user_inst",
-                'table' => $table,
-                'placeholder' => _("kommaseparierte Einrichtungsnamen"),
-                'mapperclasses' => $mapperclasses
-            )) ?>
-            <?= $this->render_partial("setup/_field_mapping.php", array(
-                'field' => "fleximport_expiration_date",
-                'table' => $table,
-                'placeholder' => _("Datum"),
-                'mapperclasses' => $mapperclasses
-            )) ?>
 
             <? $dynamically_mapped = in_array("fleximport_welcome_message", $table->fieldsToBeDynamicallyMapped()) ?>
             <tr style="<?= $dynamically_mapped ? "opacity: 0.5;" : "" ?>" class="<?= $dynamically_mapped ? "dynamically_mapped" : "" ?>">

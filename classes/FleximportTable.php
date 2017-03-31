@@ -485,22 +485,6 @@ class FleximportTable extends SimpleORMap {
                 ));
                 break;
             case "User":
-                if ($this['tabledata']['simplematching']["fleximport_user_inst"]['column'] || in_array("fleximport_user_inst", $this->fieldsToBeDynamicallyMapped())) {
-                    if ($object['perms'] !== "root") {
-                        foreach ($data['fleximport_user_inst'] as $institut_id) {
-                            $member = new InstituteMember(array($object->getId(), $institut_id));
-                            $member['inst_perms'] = $object['perms'];
-                            $member->store();
-                        }
-                    }
-                }
-                if ($this['tabledata']['simplematching']["fleximport_expiration_date"]['column'] || in_array("fleximport_expiration_date", $this->fieldsToBeDynamicallyMapped())) {
-                    if ($data['fleximport_expiration_date']) {
-                        UserConfig::get($object->getId())->store("EXPIRATION_DATE", $data['fleximport_expiration_date']);
-                    } else {
-                        UserConfig::get($object->getId())->delete("EXPIRATION_DATE");
-                    }
-                }
                 if (($output['found'] === false) && ($data['fleximport_welcome_message'] !== "none")) {
                     $user_language = getUserLanguagePath($object->getId());
                     setTempLanguage(false, $user_language);
@@ -639,8 +623,6 @@ class FleximportTable extends SimpleORMap {
                     $fields[] = $datafield['name'];
                 }
                 $fields[] = "fleximport_username_prefix";
-                $fields[] = "fleximport_user_inst";
-                $fields[] = "fleximport_expiration_date";
                 $fields[] = "fleximport_welcome_message";
                 break;
         }
@@ -772,37 +754,10 @@ class FleximportTable extends SimpleORMap {
                     $data['username'] = $data['fleximport_username_prefix'] . $data['username'];
                 }
             }
-            if ($this['tabledata']['simplematching']["fleximport_user_inst"]['column']) {
-                $data['fleximport_user_inst'] = (array) preg_split(
-                    "/\s*,\s*/",
-                    $data['fleximport_user_inst'],
-                    null,
-                    PREG_SPLIT_NO_EMPTY
-                );
-                $institut_ids = array();
-                foreach ($data['fleximport_user_inst'] as $inst_name) {
-                    $statement = DBManager::get()->prepare("
-                        SELECT Institut_id
-                        FROM Institute
-                        WHERE Name = ?
-                    ");
-                    $statement->execute(array($inst_name));
-                    $institut_id = $statement->fetch(PDO::FETCH_COLUMN, 0);
-                    if ($institut_id) {
-                        $institut_ids[] = $institut_id;
-                    }
-                }
-                $data['fleximport_user_inst'] = $institut_ids;
-            }
             if ($this['tabledata']['simplematching']["fleximport_userdomains"]['column'] && !in_array("fleximport_userdomains", $this->fieldsToBeDynamicallyMapped())) {
                 $statement = DBManager::get()->prepare("SELECT userdomain_id FROM userdomains WHERE name IN (:domains) OR userdomain_id IN (:domains)");
                 $statement->execute(array('domains' => $data['fleximport_userdomains']));
                 $data['fleximport_userdomains'] = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
-            }
-            if ($this['tabledata']['simplematching']["fleximport_expiration_date"]['column'] && !in_array("fleximport_expiration_date", $this->fieldsToBeDynamicallyMapped())) {
-                if (!is_numeric($data['fleximport_expiration_date'])) {
-                    $data['fleximport_expiration_date'] = strtotime($data['fleximport_expiration_date']);
-                }
             }
         }
 

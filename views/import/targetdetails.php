@@ -84,7 +84,9 @@
                         $changed = false;
                         if ($currentValue !== false) {
                             if (is_array($currentValue)) {
-                                $changed = count(array_diff($currentValue, $data[$field])) + count(array_diff($data[$field], $currentValue)) > 0;
+                                $changed = count(array_diff($data[$field], $currentValue))
+                                    + ($table['tabledata']['simplematching'][$field]['sync'] ? count(array_diff($currentValue, $data[$field])) : 0)
+                                    > 0;
                             } else {
                                 $changed = $data[$field] != $currentValue;
                             }
