@@ -466,13 +466,14 @@ class FleximportTable extends SimpleORMap {
             $for = $dynamic->forClassFields();
             foreach ((array) $for[$classname] as $fieldname => $placeholder) {
                 if (isset($data[$fieldname])) {
-                    $dynamic->applyValue($object, $data[$fieldname], $line);
+                    $dynamic->applyValue($object, $data[$fieldname], $line, (bool) $this['tabledata']['simplematching'][$fieldname]['sync']);
                 }
             }
         }
 
         switch ($classname) {
             case "Course":
+                //Even if no fleximport_studyarea is mapped, we need something in the seminar_inst table:
                 $insert = DBManager::get()->prepare("
                     INSERT IGNORE INTO seminar_inst
                     SET seminar_id = :seminar_id,
@@ -683,19 +684,21 @@ class FleximportTable extends SimpleORMap {
 
         //Trennen der Werte der Felder, die multiple Werte enthalten sollen wie fleximport_dozenten
         foreach ($fields as $field) {
-            foreach ($dynamics as $dynamic) {
-                $for = $dynamic->forClassFields();
-                if (isset($for[$this['import_type']][$field]) && $dynamic->isMultiple()) {
-                    $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
-                    $value = $data[$mapfrom] ?: $line[$mapfrom];
-                    $delimiter = $this['tabledata']['simplematching'][$field]['delimiter'] ?: ";";
-                    $value = (array) preg_split(
-                        "/\s*".$delimiter."\s*/",
-                        $value,
-                        null,
-                        PREG_SPLIT_NO_EMPTY
-                    );
-                    $data[$field] = $value;
+            if ($this['tabledata']['simplematching'][$field]['column']) {
+                foreach ($dynamics as $dynamic) {
+                    $for = $dynamic->forClassFields();
+                    if (isset($for[$this['import_type']][$field]) && $dynamic->isMultiple()) {
+                        $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
+                        $value = $data[$mapfrom] ?: $line[$mapfrom];
+                        $delimiter = $this['tabledata']['simplematching'][$field]['delimiter'] ?: ";";
+                        $value = (array)preg_split(
+                            "/\s*" . $delimiter . "\s*/",
+                            $value,
+                            null,
+                            PREG_SPLIT_NO_EMPTY
+                        );
+                        $data[$field] = $value;
+                    }
                 }
             }
         }

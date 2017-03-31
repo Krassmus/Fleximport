@@ -14,7 +14,7 @@ class FleximportCourseLockedDynamic implements FleximportDynamic {
         return false;
     }
 
-    public function applyValue($object, $value, $line)
+    public function applyValue($object, $value, $line, $sync)
     {
         //Lock or unlock course
         if ($value) {
@@ -30,7 +30,7 @@ class FleximportCourseLockedDynamic implements FleximportDynamic {
         }
     }
 
-    public function currentValue($object, $field)
+    public function currentValue($object, $field, $sync)
     {
         $courseset = CourseSet::getSetForCourse($object->getId());
         return ($courseset && ($courseset->getId() === CourseSet::getGlobalLockedAdmissionSetId())) ? 1 : 0;

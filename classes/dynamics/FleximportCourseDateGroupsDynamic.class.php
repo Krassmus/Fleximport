@@ -14,14 +14,16 @@ class FleximportCourseDateGroupsDynamic implements FleximportDynamic {
         return true;
     }
 
-    public function applyValue($object, $value, $line)
+    public function applyValue($object, $value, $line, $sync)
     {
-        $statement = DBManager::get()->prepare("
-            DELETE FROM termin_related_groups
-            WHERE termin_id = ?
-        ");
-        $statement->execute(array($object->getId()));
-        $statement = DBManager::get()->prepare("
+        if ($sync) {
+            $delete = DBManager::get()->prepare("
+                DELETE FROM termin_related_groups
+                WHERE termin_id = ?
+            ");
+            $delete->execute(array($object->getId()));
+        }
+        $insert = DBManager::get()->prepare("
             INSERT IGNORE INTO termin_related_groups
             SET termin_id = :termin_id,
                 statusgruppe_id = :statusgruppe_id
@@ -32,7 +34,7 @@ class FleximportCourseDateGroupsDynamic implements FleximportDynamic {
                 'name' => $groupname
             ));
             if ($statusgruppe) {
-                $statement->execute(array(
+                $insert->execute(array(
                     'termin_id' => $object->getId(),
                     'statusgruppe_id' => $statusgruppe->getId()
                 ));
@@ -40,7 +42,7 @@ class FleximportCourseDateGroupsDynamic implements FleximportDynamic {
         }
     }
 
-    public function currentValue($object, $field)
+    public function currentValue($object, $field, $sync)
     {
         $statement = DBManager::get()->prepare("
             SELECT statusgruppe_id 

@@ -14,15 +14,21 @@ class FleximportCourseDozentenDynamic implements FleximportDynamic {
         return true;
     }
 
-    public function applyValue($object, $value, $line)
+    public function applyValue($object, $value, $line, $sync)
     {
+        $old_dozenten = $this->currentValue($object, "fleximport_dozenten", $sync);
+        $seminar = new Seminar($object->getId());
         foreach ((array) $value as $dozent_id) {
-            $seminar = new Seminar($object->getId());
             $seminar->addMember($dozent_id, 'dozent');
+        }
+        if ($sync) {
+            foreach (array_diff($old_dozenten, $value) as $dozent_id) {
+                $seminar->deleteMember($dozent_id);
+            }
         }
     }
 
-    public function currentValue($object, $field)
+    public function currentValue($object, $field, $sync)
     {
         $select = DBManager::get()->prepare("
             SELECT user_id

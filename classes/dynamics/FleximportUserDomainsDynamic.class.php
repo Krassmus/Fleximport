@@ -14,12 +14,14 @@ class FleximportUserDomainsDynamic implements FleximportDynamic {
         return true;
     }
 
-    public function applyValue($object, $value, $line)
+    public function applyValue($object, $value, $line, $sync)
     {
         $olddomains = UserDomain::getUserDomainsForUser($object->getId());
-        foreach ($olddomains as $olddomain) {
-            if (!in_array($olddomain->getID(), (array) $value)) {
-                $olddomain->removeUser($object->getId());
+        if ($sync) {
+            foreach ($olddomains as $olddomain) {
+                if (!in_array($olddomain->getID(), (array)$value)) {
+                    $olddomain->removeUser($object->getId());
+                }
             }
         }
         foreach ($value as $userdomain) {
@@ -57,7 +59,7 @@ class FleximportUserDomainsDynamic implements FleximportDynamic {
         }
     }
 
-    public function currentValue($object, $field)
+    public function currentValue($object, $field, $sync)
     {
         $domain_ids = array();
         foreach (UserDomain::getUserDomainsForUser($object->getId()) as $domain) {

@@ -14,7 +14,7 @@ class FleximportCourseDomainsDynamic implements FleximportDynamic {
         return true;
     }
 
-    public function applyValue($object, $value, $line)
+    public function applyValue($object, $value, $line, $sync)
     {
         $statement = DBManager::get()->prepare("
             SELECT userdomain_id
@@ -27,13 +27,15 @@ class FleximportCourseDomainsDynamic implements FleximportDynamic {
             $domain = new UserDomain($to_add);
             $domain->addSeminar($object->getId());
         }
-        foreach (array_diff($olddomains, $value) as $to_remove) {
-            $domain = new UserDomain($to_remove);
-            $domain->removeSeminar($object->getId());
+        if ($sync) {
+            foreach (array_diff($olddomains, $value) as $to_remove) {
+                $domain = new UserDomain($to_remove);
+                $domain->removeSeminar($object->getId());
+            }
         }
     }
 
-    public function currentValue($object, $field)
+    public function currentValue($object, $field, $sync)
     {
         $domain_ids = array();
         foreach (UserDomain::getUserDomainsForSeminar($object->getId()) as $domain) {

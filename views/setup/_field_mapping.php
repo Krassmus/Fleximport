@@ -15,7 +15,7 @@
         <? else : ?>
             <select name="tabledata[simplematching][<?= htmlReady($field) ?>][column]"
                     id="simplematching_<?= htmlReady($field) ?>"
-                    onChange="jQuery('#simplematching_<?= htmlReady($field) ?>_static').toggle(this.value === 'static value'); jQuery('#simplematching_<?= htmlReady($field) ?>_mapfrom').toggle(this.value.indexOf('fleximport_mapper__') === 0); jQuery('#simplematching_<?= htmlReady($field) ?>_format').toggle(this.value !== ''); jQuery('#simplematching_<?= htmlReady($field) ?>_delimiter').toggle(this.value !== '');"
+                    onChange="jQuery('#simplematching_<?= htmlReady($field) ?>_static').toggle(this.value === 'static value'); jQuery('#simplematching_<?= htmlReady($field) ?>_mapfrom').toggle(this.value.indexOf('fleximport_mapper__') === 0); jQuery('#simplematching_<?= htmlReady($field) ?>_format').toggle(this.value !== ''); jQuery('#simplematching_<?= htmlReady($field) ?>_delimiter').css('display', !this.value ? 'none' : 'flex');"
                     title="<?= htmlReady($placeholder) ?>">
                 <option value="" title="<?= _("Wert wird nicht gemapped") ?>"></option>
                 <option value="static value"<?= $table['tabledata']['simplematching'][$field]['column'] === "static value" ? " selected" : "" ?>>[<?= _("Fester Eintrag") ?>]</option>
@@ -99,19 +99,30 @@
             <? endif ?>
 
             <? if ($delimiter) : ?>
-                <div id="simplematching_<?= htmlReady($field) ?>_delimiter" style="<?= $table['tabledata']['simplematching'][$field]['column'] ? "" : ' display: none;' ?>">
-                    <label style="display: inline;">
-                        <?= _("Trennzeichen") ?>
-                        <input type="text"
-                               name="tabledata[simplematching][<?= htmlReady($field) ?>][delimiter]"
-                               value="<?= htmlReady($table['tabledata']['simplematching'][$field]['delimiter'] ?: ";") ?>"
-                               placeholder="<?= _("Bspw. ; , |") ?>"
-                               style="width: 65px; display: inline; vertical-align: baseline">
-                    </label>
-                    <? $title = _("Dieses Feld kann mehrere Einträge haben. Sie können diese Einträge mit einem Zeichen trennen. Zum Beispiel ein Semikolon oder ein | Zeichen oder ein ganzes Wort. Auch reguläre Ausdrücke sind hier möglich.") ?>
-                    <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                        ? Icon::create("info-circle", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => $title, 'onclick' => "alert('".addslashes($title)."');", 'style' => "cursor: pointer"))
-                        : Assets::img("icons/20/grey/info-circle", array('class' => "text-bottom", 'title' => $title, 'onclick' => "alert('".addslashes($title)."');", 'style' => "cursor: pointer")) ?>
+                <div id="simplematching_<?= htmlReady($field) ?>_delimiter" style="<?= $table['tabledata']['simplematching'][$field]['column'] ? "display: flex;" : ' display: none;' ?>">
+                    <div style="width: 50%;">
+                        <label style="display: inline;">
+                            <?= _("Trennzeichen") ?>
+                            <input type="text"
+                                   name="tabledata[simplematching][<?= htmlReady($field) ?>][delimiter]"
+                                   value="<?= htmlReady($table['tabledata']['simplematching'][$field]['delimiter'] ?: ";") ?>"
+                                   placeholder="<?= _("Bspw. ; , |") ?>"
+                                   style="width: 65px; display: inline; vertical-align: baseline">
+                        </label>
+                        <? $title = _("Dieses Feld kann mehrere Einträge haben. Sie können diese Einträge mit einem Zeichen trennen. Zum Beispiel ein Semikolon oder ein | Zeichen oder ein ganzes Wort. Auch reguläre Ausdrücke sind hier möglich.") ?>
+                        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                            ? Icon::create("info-circle", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => $title, 'onclick' => "alert('".addslashes($title)."');", 'style' => "cursor: pointer"))
+                            : Assets::img("icons/20/grey/info-circle", array('class' => "text-bottom", 'title' => $title, 'onclick' => "alert('".addslashes($title)."');", 'style' => "cursor: pointer")) ?>
+                    </div>
+                    <div>
+                        <label>
+                            <input type="checkbox"
+                                   name="tabledata[simplematching][<?= htmlReady($field) ?>][sync]"
+                                   <?= $table['tabledata']['simplematching'][$field]['sync'] ? "checked" : "" ?>
+                                   value="1">
+                            <?= _("Synchronisieren") ?>
+                        </label>
+                    </div>
                 </div>
             <? endif ?>
 

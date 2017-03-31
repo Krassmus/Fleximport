@@ -14,7 +14,7 @@ class FleximportCourseStudyareaDynamic implements FleximportDynamic {
         return true;
     }
 
-    public function applyValue($object, $value, $line)
+    public function applyValue($object, $value, $line, $sync)
     {
         $select = DBManager::get()->prepare("
             SELECT sem_tree_id
@@ -25,11 +25,13 @@ class FleximportCourseStudyareaDynamic implements FleximportDynamic {
                 OR sem_tree_id = :name
                 OR Institute.Name = :name OR TRIM(Institute.Name) = :name
         ");
-        $delete = DBManager::get()->prepare("
-            DELETE FROM seminar_sem_tree
-            WHERE seminar_id = ?
-        ");
-        $delete->execute(array($object->getId()));
+        if ($sync) {
+            $delete = DBManager::get()->prepare("
+                DELETE FROM seminar_sem_tree
+                WHERE seminar_id = ?
+            ");
+            $delete->execute(array($object->getId()));
+        }
         $insert = DBManager::get()->prepare("
             INSERT IGNORE INTO seminar_sem_tree
             SET seminar_id = :course_id,
@@ -47,7 +49,7 @@ class FleximportCourseStudyareaDynamic implements FleximportDynamic {
         }
     }
 
-    public function currentValue($object, $field)
+    public function currentValue($object, $field, $sync)
     {
         $select = DBManager::get()->prepare("
             SELECT sem_tree_id
