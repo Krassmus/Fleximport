@@ -137,7 +137,7 @@ class fleximport_semiro_course_import extends FleximportPlugin {
         }
 
 
-
+        /*
         $teilnehmergruppe = $line['teilnehmergruppe'];
         $import_type = "semiro_participant_import_".$object->getId()."_".md5($teilnehmergruppe);
         $imported_items = array();
@@ -275,7 +275,8 @@ class fleximport_semiro_course_import extends FleximportPlugin {
                 }
                 $item->delete();
             }
-        }
+        }*/
+
     }
 }
 

@@ -818,6 +818,17 @@ class FleximportTable extends SimpleORMap {
                 if (is_a($checker, "FleximportChecker")) {
                     $output['errors'] .= $checker->check($data, $object, $relevantfields);
                 }
+            } else {
+                $sorm_metadata = $object->getTableMetadata();
+                $fields = $sorm_metadata['fields'];
+                foreach ($fields as $field) {
+                    if (($field['null'] === "NO")
+                            && !$field['default']
+                            && ($object[$field['name']] === null)
+                            && (count($sorm_metadata['pk']) !== 1 || !in_array($field['name'], $sorm_metadata['pk']))) {
+                        $output['errors'] .= "Feld ".$field['name']." nicht gesetzt. ";
+                    }
+                }
             }
         }
 

@@ -66,7 +66,7 @@ class fleximport_pan_userimport extends FleximportPlugin {
     public function getDescription()
     {
         return "Es werden alle neuen Alumni in der Veranstaltung ALUMNI in die entsprechende Statusgruppe eingetragen. " .
-            "Falls die Studenten nicht einverstanden sind, als Alumni weiter geführt zu werden, werden die Nutzer gelöscht, " .
+            "Falls die Studenten in die Domäne 'alumni' neu eingetragen werden sollen, aber nicht einverstanden sind, als Alumni weiter geführt zu werden, werden die Nutzer gelöscht, " .
             "anstatt in die Alumni-Domäne übertragen zu werden.";
     }
 }

@@ -33,6 +33,11 @@
                         ? Icon::create("date", "info")->asImg(20, array('class' => "text-bottom"))
                         : Assets::img("icons/20/black/date", array('class' => "text-bottom"));
                     break;
+                case "Statusgruppen":
+                    echo version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                        ? Icon::create("group3", "info")->asImg(20, array('class' => "text-bottom"))
+                        : Assets::img("icons/20/black/group3", array('class' => "text-bottom"));
+                    break;
                 case "Course":
                     echo version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
                         ? Icon::create("seminar", "info")->asImg(20, array('class' => "text-bottom"))
