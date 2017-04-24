@@ -73,6 +73,28 @@
                 </td>
             </tr>
         <? endif ?>
+        <? if ($table['import_type'] === "CourseMember") : ?>
+            <? $dynamically_mapped = in_array("fleximport_welcome_message", $table->fieldsToBeDynamicallyMapped()) ?>
+            <tr style="<?= $dynamically_mapped ? "opacity: 0.5;" : "" ?>" class="<?= $dynamically_mapped ? "dynamically_mapped" : "" ?>">
+                <td>
+                    fleximport_welcome_message
+                    <div style="font-size: 0.8em;"><?= _("Nachricht, die an neue Nutzer der Veranstaltung versendet wird.") ?></div>
+                </td>
+                <td>
+                    <? if ($dynamically_mapped) : ?>
+                        <?= _("Wird von einem Plugin dynamisch gemapped") ?>
+                    <? else : ?>
+                        <select name="tabledata[simplematching][fleximport_welcome_message][column]">
+                            <option value=""><?= _("Keine Nachricht versenden") ?></option>
+                            <option value="standard"<?= ($table['tabledata']['simplematching']['fleximport_welcome_message']['column'] === "standard") ? " selected" : "" ?>><?= _("Standardnachricht an Nutzer") ?></option>
+                            <? foreach (FleximportConfig::all() as $config => $value) : ?>
+                                <option value="<?= htmlReady($config) ?>"<?= $config === $table['tabledata']['simplematching']['fleximport_welcome_message']['column'] ? " selected" : "" ?>><?= htmlReady($config) ?></option>
+                            <? endforeach ?>
+                        </select>
+                    <? endif ?>
+                </td>
+            </tr>
+        <? endif ?>
         </tbody>
     </table>
 

@@ -61,4 +61,9 @@ class fleximport_semiro_participant_import extends FleximportPlugin {
         }
         $this->table->createTable($fields, $seminar_data);
     }
+
+    public function getDescription()
+    {
+        return "Zieht sich die Daten aus Semiro. Ist eine reine Hilfstabelle und sollte nicht selbst importiert werden.";
+    }
 }

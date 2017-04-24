@@ -484,6 +484,33 @@ class FleximportTable extends SimpleORMap {
                     'institut_id' => $object['institut_id']
                 ));
                 break;
+            case "CourseMember":
+                if (($output['found'] === false) && $data['fleximport_welcome_message']) {
+                    $user_language = getUserLanguagePath($object['user_id']);
+                    setTempLanguage(false, $user_language);
+                    if ($data['fleximport_welcome_message'] && FleximportConfig::get($data['fleximport_welcome_message'])) {
+                        $message = FleximportConfig::get($data['fleximport_welcome_message']);
+                        $message = FleximportConfig::template($message, $data, $line);
+                    } else {
+                        $message = sprintf(_('Sie wurden als TeilnehmerIn in die Veranstaltung **%s** eingetragen.'), $object->course->name);
+                    }
+                    if ($message) {
+                        $messaging = new messaging();
+                        $messaging->insert_message(
+                            $message,
+                            get_username($object['user_id']),
+                            '____%system%____',
+                            FALSE,
+                            FALSE,
+                            '1',
+                            FALSE,
+                            sprintf('%s %s', _('Systemnachricht:'), _('Eintragung in Veranstaltung')),
+                            TRUE
+                        );
+                    }
+                    restoreLanguage();
+                }
+                break;
             case "User":
                 if (($output['found'] === false) && ($data['fleximport_welcome_message'] !== "none")) {
                     $user_language = getUserLanguagePath($object->getId());
