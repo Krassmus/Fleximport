@@ -13,7 +13,7 @@ class FleximportSeminar_idMapper implements FleximportMapper {
     public function possibleFormats() {
         $formats = array(
             "number" => "Veranstaltungsnummer",
-            "name" => "Name"
+            "name" => "Veranstaltungsname"
         );
         $datafields = DataField::findBySQL("object_type = 'sem' ORDER BY name ASC");
         foreach ($datafields as $datafield) {
