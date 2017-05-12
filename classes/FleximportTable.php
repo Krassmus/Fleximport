@@ -128,11 +128,17 @@ class FleximportTable extends SimpleORMap {
 
     public function fetchCount()
     {
-        $statement = DBManager::get()->prepare("
-            SELECT COUNT(*) FROM `".addslashes($this['name'])."`
-        ");
-        $statement->execute();
-        return $statement->fetch(PDO::FETCH_COLUMN);
+        try {
+            $statement = DBManager::get()->prepare("
+                SELECT COUNT(*) FROM `" . addslashes($this['name']) . "`
+            ");
+            $statement->execute();
+            $count = $statement->fetch(PDO::FETCH_COLUMN);
+            return $count;
+        } catch(Exception $e) {
+            PageLayout::postMessage(MessageBox::error(sprintf(_("Kann %s '%s' nicht abrufen in Datenbank."), $this['source'] !== "sqlview" ? "Tabelle": "View", $this['name'])));
+            return 0;
+        }
     }
 
     public function fetchLines()
