@@ -491,11 +491,12 @@ class FleximportTable extends SimpleORMap {
                 ));
                 break;
             case "CourseMember":
-                if (($output['found'] === false) && $data['fleximport_welcome_message']) {
+                if (($output['found'] === false) && $this['tabledata']['simplematching']['fleximport_welcome_message']['column']) {
                     $user_language = getUserLanguagePath($object['user_id']);
+                    $column = $this['tabledata']['simplematching']['fleximport_welcome_message']['column'];
                     setTempLanguage(false, $user_language);
-                    if ($data['fleximport_welcome_message'] && FleximportConfig::get($data['fleximport_welcome_message'])) {
-                        $message = FleximportConfig::get($data['fleximport_welcome_message']);
+                    if ($column && FleximportConfig::get($column)) {
+                        $message = FleximportConfig::get($column);
                         $message = FleximportConfig::template($message, $data, $line);
                     } else {
                         $message = sprintf(_('Sie wurden als TeilnehmerIn in die Veranstaltung **%s** eingetragen.'), $object->course->name);
@@ -585,11 +586,14 @@ class FleximportTable extends SimpleORMap {
             $fieldname = $datafield['name'];
 
             if (isset($data[$fieldname])) {
-                $entry = new DatafieldEntryModel(array(
-                    $datafield->getId(),
-                    $object->getId(),
-                    ""
-                ));
+                $id = array($datafield->getId());
+                foreach (array_reverse((array) $object->getId()) as $id_part) {
+                    $id[] = $id_part;
+                }
+                if (count($id) < 3) {
+                    $id[] = "";
+                }
+                $entry = new DatafieldEntryModel($id);
                 $entry['content'] = $data[$fieldname];
                 $entry->store();
             }
@@ -656,6 +660,12 @@ class FleximportTable extends SimpleORMap {
                     $fields[] = $datafield['name'];
                 }
                 $fields[] = "fleximport_username_prefix";
+                $fields[] = "fleximport_welcome_message";
+                break;
+            case "CourseMember":
+                foreach (DataField::findBySQL("object_type = 'usersemdata'") as $datafield) {
+                    $fields[] = $datafield['name'];
+                }
                 $fields[] = "fleximport_welcome_message";
                 break;
         }
@@ -729,13 +739,15 @@ class FleximportTable extends SimpleORMap {
                         $value = $data[$field] ?: ($data[$mapfrom] ?: $line[$mapfrom]);
                         if (is_array($value)) {
                             foreach ($value as $k => $v) {
-                                $value[$k] = $mapper->map(
-                                    $format,
-                                    $v
-                                );
+                                if ($v) {
+                                    $value[$k] = $mapper->map(
+                                        $format,
+                                        $v
+                                    );
+                                }
                             }
                             $data[$field] = $value;
-                        } else {
+                        } elseif($value) {
                             $data[$field] = $mapper->map(
                                 $format,
                                 $value

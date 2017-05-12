@@ -76,6 +76,46 @@
                 </td>
             </tr>
         <? endforeach ?>
+        <? foreach ($datafields as $datafield) : ?>
+            <? $overwrite = isset($data[$datafield['name']]) && ($data[$datafield['name']] !== false) ?>
+            <tr<?= $overwrite ? "" : ' style="opacity: 0.5;"' ?>>
+                <? if (!$object->isNew()) : ?>
+                    <td>
+                        <?
+                        $id = array($datafield->getId());
+                        foreach (array_reverse((array) $object->getId()) as $id_part) {
+                            $id[] = $id_part;
+                        }
+                        if (count($id) < 3) {
+                            $id[] = "";
+                        }
+                        $entry = new DatafieldEntryModel($id);
+                        $oldvalue = $entry->content;
+                        ?>
+                        <? if ($overwrite && ($oldvalue != $data[$datafield['name']])) : ?>
+                            <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                                ? Icon::create("arr_2right", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld.")))
+                                : Assets::img("icons/20/grey/arr_2right", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
+                        <? endif ?>
+                    </td>
+                <? endif ?>
+                <td style="font-family: MONOSPACE;">
+                    <?= htmlReady($datafield['name']) ?>
+                </td>
+                <? if (!$object->isNew()) : ?>
+                    <td><?= htmlReady($oldvalue) ?></td>
+                <? endif ?>
+                <td>
+                    <? if (!$overwrite) : ?>
+                        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                            ? Icon::create("decline", "inactive")->asImg(16, array('title' => _("Wert wird nicht überschrieben.")))
+                            : Assets::img("icons/16/grey/decline", array('title' => _("Wert wird nicht überschrieben."))) ?>
+                    <? else : ?>
+                        <?= htmlReady($data[$datafield['name']]) ?>
+                    <? endif ?>
+                </td>
+            </tr>
+        <? endforeach ?>
         <? foreach ((array) $additional_fields as $field => $currentValue) : ?>
             <tr>
                 <td>
