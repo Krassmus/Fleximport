@@ -10,6 +10,11 @@
     </label>
 
     <label>
+        <?= _("Tabellen wieviele Minuten zwischenspeichern?") ?>
+        <input name="data[cache_tables]" type="number" min="0" value="<?= htmlReady($process['cache_tables'] ?: 0) ?>">
+    </label>
+
+    <label>
         <input type="checkbox" value="1" name="data[triggered_by_cronjob]"<?= $process['triggered_by_cronjob'] ? " checked" : "" ?>>
         <?= _("Durch Cronjob starten") ?>
     </label>

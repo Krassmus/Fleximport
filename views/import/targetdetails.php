@@ -118,6 +118,7 @@
         <? endforeach ?>
         <? foreach ((array) $additional_fields as $field => $currentValue) : ?>
             <tr>
+                <? if (!$object->isNew()) : ?>
                 <td>
                     <? if (!$object->isNew()) : ?>
                         <?
@@ -138,6 +139,7 @@
                         <? endif?>
                     <? endif ?>
                 </td>
+                <? endif ?>
                 <td style="font-family: MONOSPACE;">
                     <?= htmlReady($field) ?>
                 </td>

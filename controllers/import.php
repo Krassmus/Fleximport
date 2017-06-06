@@ -21,8 +21,13 @@ class ImportController extends PluginController {
     {
         $this->process = FleximportProcess::find($process_id);
         if ($this->process) {
-            foreach ($this->process->tables as $table) {
-                $table->fetchData();
+            if ($this->process['cache_tables']
+                    && (time() - $this->process['last_data_import'] > $this->process['cache_tables'])) {
+                foreach ($this->process->tables as $table) {
+                    $table->fetchData();
+                }
+                $this->process['last_data_import'] = time();
+                $this->process->store();
             }
             Navigation::activateItem("/fleximport/process_".$process_id);
             $this->tables = $this->process->tables;
@@ -121,6 +126,21 @@ class ImportController extends PluginController {
                 $this->datafields = DataField::findBySQL("object_type = 'usersemdata'");
                 break;
         }
+    }
+
+    public function deletables_action($table_id)
+    {
+        $this->table = FleximportTable::find($table_id);
+        $this->class = $this->table['import_type'];
+        $item_ids = array();
+        foreach ($this->table->fetchLines() as $line) {
+            $report = $this->table->checkLine($line);
+            if ($report['pk'] && !$report['errors']) {
+                $item_ids[] = is_array($report['pk']) ? implode("-", $report['pk']) : $report['pk'];
+            }
+        }
+        $this->deletables = $this->table->findDeletableItems($item_ids);
+        PageLayout::setTitle(_("Zu löschende Datensätze"));
     }
 
 }

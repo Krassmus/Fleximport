@@ -713,10 +713,14 @@ class FleximportTable extends SimpleORMap {
                 foreach ($dynamics as $dynamic) {
                     $for = $dynamic->forClassFields();
                     if (isset($for[$this['import_type']][$field]) && $dynamic->isMultiple()) {
-                        $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
-                        $value = $data[$mapfrom] ?: $line[$mapfrom];
+                        if (!$data[$field]) {
+                            $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
+                            $value = $data[$mapfrom] ?: $line[$mapfrom];
+                        } else {
+                            $value = $data[$field];
+                        }
                         $delimiter = $this['tabledata']['simplematching'][$field]['delimiter'] ?: ";";
-                        $value = (array)preg_split(
+                        $value = (array) preg_split(
                             "/\s*" . $delimiter . "\s*/",
                             $value,
                             null,

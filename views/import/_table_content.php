@@ -105,14 +105,14 @@
     <? $item_ids = array() ?>
     <? if ($table['display_lines'] !== "ondemand") : ?>
         <? foreach ($table->fetchLines() as $line) : ?>
-            <? if (($displayed_lines >= (int) $limit) && ($limit !== false)) {
-                break;
-            } ?>
-            <? $report = $table->checkLine($line) ?>
-            <? if ($report['pk']) {
+            <? $report = $table->checkLine($line);
+            if ($report['pk'] && !$report['errors']) {
                 $item_ids[] = is_array($report['pk']) ? implode("-", $report['pk']) : $report['pk'];
-            } ?>
-            <? if (($count < (int) $limit || $report['errors']) || $limit === false) : ?>
+            }
+            if (($displayed_lines >= (int) $limit) && ($limit !== false)) {
+                break;
+            }
+            if (($count < (int) $limit || $report['errors']) || $limit === false) : ?>
                 <tr>
                     <td>
                         <? if ($table['import_type']) : ?>
@@ -163,7 +163,14 @@
         <tfoot>
             <tr>
                 <td colspan="100">
-                    <?= sprintf("Synchronisation: %s Datensätze werden bei diesem Import gelöscht.", $table->countDeletableItems($item_ids)) ?>
+                    <? $deletable_items = $table->countDeletableItems($item_ids) ?>
+                    <? if ($deletable_items > 0) : ?>
+                        <a href="<?= PluginEngine::getLink($plugin, array(), "import/deletables/".$table->getId()) ?>" data-dialog>
+                    <? endif ?>
+                    <?= sprintf("Synchronisation: %s Datensätze werden bei diesem Import gelöscht.", $deletable_items) ?>
+                    <? if ($deletable_items > 0) : ?>
+                        </a>
+                    <? endif ?>
                 </td>
             </tr>
         </tfoot>
