@@ -34,8 +34,14 @@
                         case "CourseMember":
                             $name = User::find($item['user_id']->getFullName())." - ".Course::find($item['seminar_id']->name);
                             break;
+                        case "CourseDate":
+                            $name = Course::find($item['range_id']->name).": ".$item->getFullname();
+                            break;
+                        case "StatusgruppeUser":
+                            $name = $item->group->name.": ".$item->user->getFullname();
+                            break;
                         default:
-                            $name = $item['name'] ?: $item['title'];
+                            $name = $item->isField("name") ? $item['name'] : ($item->isField("title") ? $item['title'] : null);
                     } ?>
                     <?= htmlReady($name ?: _("unbekannt")) ?>
                 </td>
@@ -50,6 +56,19 @@
                                 break;
                             case "CourseMember":
                                 $link = URLHelper::getLink("dispatch.php/course/members", array('cid' => $item['seminar_id']));
+                                break;
+                            case "CourseDate":
+                                $link = URLHelper::getLink("dispatch.php/course/dates", array('cid' => $item['range_id']));
+                                break;
+                            case "Statusgruppen":
+                                $link = version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                                    ? URLHelper::getLink("dispatch.php/course/statusgroups", array('cid' => $item['range_id']))
+                                    : URLHelper::getLink("statusgruppen.php", array('cid' => $item['range_id']));
+                                break;
+                            case "Statusgruppen":
+                                $link = version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                                    ? URLHelper::getLink("dispatch.php/course/statusgroups", array('cid' => $item['range_id']))
+                                    : URLHelper::getLink("statusgruppen.php", array('cid' => $item['range_id']));
                                 break;
                         } ?>
                         <a href="<?= $link ?>" target="_blank">

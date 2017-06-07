@@ -21,8 +21,8 @@ class ImportController extends PluginController {
     {
         $this->process = FleximportProcess::find($process_id);
         if ($this->process) {
-            if ($this->process['cache_tables']
-                    && (time() - $this->process['last_data_import'] > $this->process['cache_tables'])) {
+            if (!$this->process['cache_tables']
+                    || (time() - $this->process['last_data_import'] * 60 > $this->process['cache_tables'])) {
                 foreach ($this->process->tables as $table) {
                     $table->fetchData();
                 }
