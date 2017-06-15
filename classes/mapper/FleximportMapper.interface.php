@@ -6,6 +6,6 @@ interface FleximportMapper {
 
     public function possibleFieldnames();
 
-    public function map($format, $value);
+    public function map($format, $value, $data);
 
 }

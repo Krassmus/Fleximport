@@ -66,7 +66,7 @@ class fleximport_semiro_course_groups extends FleximportPlugin {
     public function fieldsToBeMapped()
     {
         return array(
-            "statusgruppe_id"
+            //"statusgruppe_id"
         );
     }
 

@@ -732,7 +732,7 @@ class FleximportTable extends SimpleORMap {
             }
         }
 
-        foreach ($fields as $field) {
+        foreach (array_reverse($fields) as $field) {
             //Mappen der Werte mit FleximportMappern:
             if (strpos($this['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") === 0) {
                 list($prefix, $mapperclass, $format) = explode("__", $this['tabledata']['simplematching'][$field]['column']);
@@ -746,7 +746,8 @@ class FleximportTable extends SimpleORMap {
                                 if ($v) {
                                     $value[$k] = $mapper->map(
                                         $format,
-                                        $v
+                                        $v,
+                                        $data
                                     );
                                 }
                             }
@@ -754,7 +755,8 @@ class FleximportTable extends SimpleORMap {
                         } elseif($value) {
                             $data[$field] = $mapper->map(
                                 $format,
-                                $value
+                                $value,
+                                $data
                             );
                         }
                     }
