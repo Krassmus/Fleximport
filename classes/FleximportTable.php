@@ -874,7 +874,8 @@ class FleximportTable extends SimpleORMap {
                     if (($field['null'] === "NO")
                             && !$field['default']
                             && ($object[$field['name']] === null)
-                            && (count($sorm_metadata['pk']) !== 1 || !in_array($field['name'], $sorm_metadata['pk']))) {
+                            && (count($sorm_metadata['pk']) !== 1 || !in_array($field['name'], $sorm_metadata['pk']))
+                            && !in_array($field['name'], array("mkdate", "chdate"))) {
                         $output['errors'] .= "Feld ".$field['name']." nicht gesetzt. ";
                     }
                 }
