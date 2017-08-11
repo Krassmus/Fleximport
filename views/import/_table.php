@@ -50,7 +50,7 @@
                     break;
                 case "":
                     echo version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                        ? Icon::create("person", "remove-circle")->asImg(20, array('class' => "text-bottom"))
+                        ? Icon::create("remove-circle", "info")->asImg(20, array('class' => "text-bottom"))
                         : Assets::img("icons/20/black/remove-circle", array('class' => "text-bottom"));
                     break;
                 default:
