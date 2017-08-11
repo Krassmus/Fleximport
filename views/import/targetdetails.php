@@ -48,7 +48,7 @@
     </thead>
     <tbody>
         <? foreach ($table->getTargetFields() as $field) : ?>
-            <? $overwrite = isset($data[$field]) && ($data[$field] !== false) && !in_array($field, (array) $table['tabledata']['ignoreonupdate']) ?>
+            <? $overwrite = isset($data[$field]) && ($data[$field] !== false) && (!in_array($field, (array) $table['tabledata']['ignoreonupdate']) || $object->isNew()) ?>
             <tr<?= $overwrite ? "" : ' style="opacity: 0.5;"' ?>>
                 <? if (!$object->isNew()) : ?>
                 <td>
