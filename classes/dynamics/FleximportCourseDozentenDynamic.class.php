@@ -19,7 +19,9 @@ class FleximportCourseDozentenDynamic implements FleximportDynamic {
         $old_dozenten = $this->currentValue($object, "fleximport_dozenten", $sync);
         $seminar = new Seminar($object->getId());
         foreach ((array) $value as $dozent_id) {
-            $seminar->addMember($dozent_id, 'dozent');
+            if ($dozent_id) {
+                $seminar->addMember($dozent_id, 'dozent');
+            }
         }
         if ($sync) {
             foreach (array_diff($old_dozenten, $value) as $dozent_id) {

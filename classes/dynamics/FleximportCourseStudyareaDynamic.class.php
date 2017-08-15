@@ -37,14 +37,17 @@ class FleximportCourseStudyareaDynamic implements FleximportDynamic {
             SET seminar_id = :course_id,
                 sem_tree_id = :sem_tree_id
         ");
-        foreach ($value as $key => $name) {
-            $select->execute(array('name' => $name));
 
-            foreach ($select->fetchAll(PDO::FETCH_COLUMN, 0) as $sem_tree_id) {
-                $insert->execute(array(
-                    'course_id' => $object->getId(),
-                    'sem_tree_id' => $sem_tree_id
-                ));
+        foreach ($value as $key => $name) {
+            if ($name) {
+                $select->execute(array('name' => $name));
+
+                foreach ($select->fetchAll(PDO::FETCH_COLUMN, 0) as $sem_tree_id) {
+                    $insert->execute(array(
+                        'course_id' => $object->getId(),
+                        'sem_tree_id' => $sem_tree_id
+                    ));
+                }
             }
         }
     }
