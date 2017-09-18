@@ -696,6 +696,19 @@ class FleximportTable extends SimpleORMap {
                             $config = substr($this['tabledata']['simplematching'][$field]['column'], strlen("fleximportconfig_"));
                             $template = FleximportConfig::get($config);
                             $data[$field] = FleximportConfig::template($template, $data, $line);
+                        } elseif(strpos($this['tabledata']['simplematching'][$field]['column'], "fleximportkeyvalue_") === 0) {
+                            $config = substr($this['tabledata']['simplematching'][$field]['column'], strlen("fleximportkeyvalue_"));
+                            $map = parse_ini_string(FleximportConfig::get($config));
+                            $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
+                            $value = $data[$field] ?: ($data[$mapfrom] ?: $line[$mapfrom]);
+                            if (isset($map[$value])) {
+                                $value = FleximportConfig::template($map[$value], $data, $line);
+                            } elseif(isset($map["default"])) {
+                                $value = FleximportConfig::template($map["default"], $data, $line);
+                            } else {
+                                $value = "";
+                            }
+                            $data[$field] = $value;
                         } else {
                             //use a matched column
                             $data[$field] = $line[$this['tabledata']['simplematching'][$field]['column']];

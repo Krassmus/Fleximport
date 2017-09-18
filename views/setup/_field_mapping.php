@@ -15,7 +15,7 @@
         <? else : ?>
             <select name="tabledata[simplematching][<?= htmlReady($field) ?>][column]"
                     id="simplematching_<?= htmlReady($field) ?>"
-                    onChange="jQuery('#simplematching_<?= htmlReady($field) ?>_static').toggle(this.value === 'static value'); jQuery('#simplematching_<?= htmlReady($field) ?>_mapfrom').toggle(this.value.indexOf('fleximport_mapper__') === 0); jQuery('#simplematching_<?= htmlReady($field) ?>_format').toggle(this.value !== ''); jQuery('#simplematching_<?= htmlReady($field) ?>_delimiter').css('display', !this.value ? 'none' : 'flex');"
+                    onChange="jQuery('#simplematching_<?= htmlReady($field) ?>_static').toggle(this.value === 'static value'); jQuery('#simplematching_<?= htmlReady($field) ?>_mapfrom').toggle(this.value.indexOf('fleximport_mapper__') === 0 || this.value.indexOf('fleximportkeyvalue_') === 0); jQuery('#simplematching_<?= htmlReady($field) ?>_format').toggle(this.value !== ''); jQuery('#simplematching_<?= htmlReady($field) ?>_delimiter').css('display', !this.value ? 'none' : 'flex');"
                     title="<?= htmlReady($placeholder) ?>">
                 <option value="" title="<?= _("Wert wird nicht gemapped") ?>"></option>
                 <option value="static value"<?= $table['tabledata']['simplematching'][$field]['column'] === "static value" ? " selected" : "" ?>>[<?= _("Fester Eintrag") ?>]</option>
@@ -66,6 +66,16 @@
                     </optgroup>
                 <? endif ?>
 
+                <? if (count($configs)) : ?>
+                    <optgroup label="<?= _("Key-Value-Mapper") ?>">
+                        <? foreach ($configs as $configname => $value) : ?>
+                            <option value="fleximportkeyvalue_<?= htmlReady($configname) ?>"<?= "fleximportkeyvalue_".$configname === $table['tabledata']['simplematching'][$field]['column'] ? " selected" : ""?>>
+                                <?= _("Key-Value: ").htmlReady($configname) ?>
+                            </option>
+                        <? endforeach ?>
+                    </optgroup>
+                <? endif ?>
+
                 <? if (in_array($table['import_type'], (array) array("Course", "CourseMember"))) : ?>
                     <? if ($field === "seminar_id") : ?>
                         <optgroup label="<?= _("Weitere") ?>">
@@ -86,7 +96,7 @@
             <? if (count($mapperclasses)) : ?>
                 <select id="simplematching_<?= htmlReady($field) ?>_mapfrom"
                         name="tabledata[simplematching][<?= htmlReady($field) ?>][mapfrom]"
-                        style="<?= strpos($table['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") === 0 ? "" : "display: none;" ?>">
+                        style="<?= (strpos($table['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") === 0) || (strpos($table['tabledata']['simplematching'][$field]['column'], "fleximportkeyvalue_") === 0) ? "" : "display: none;" ?>">
                     <option value=""><?= _("Aus Spalte ...") ?></option>
                     <? foreach ($table->getTableHeader() as $header) : ?>
                         <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>

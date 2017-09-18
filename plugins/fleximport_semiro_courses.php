@@ -2,8 +2,6 @@
 
 class fleximport_semiro_courses extends FleximportPlugin {
 
-
-
     public function fieldsToBeMapped()
     {
         return array(
