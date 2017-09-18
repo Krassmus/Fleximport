@@ -722,7 +722,7 @@ class FleximportTable extends SimpleORMap {
 
         //Trennen der Werte der Felder, die multiple Werte enthalten sollen wie fleximport_dozenten
         foreach ($fields as $field) {
-            if ($this['tabledata']['simplematching'][$field]['column']) {
+            if ($this['tabledata']['simplematching'][$field]['column'] && (!$plugin || !in_array($field, $plugin->fieldsToBeMapped()))) {
                 foreach ($dynamics as $dynamic) {
                     $for = $dynamic->forClassFields();
                     if (isset($for[$this['import_type']][$field]) && $dynamic->isMultiple()) {
