@@ -160,6 +160,9 @@
 
     <div style="text-align: center" data-dialog-button>
         <?= \Studip\Button::create(_("Speichern")) ?>
+        <? if ($table['synchronization'] && FleximportMappedItem::countBySQL("table_id = ?", array($table->getId())) > 0) : ?>
+            <?= \Studip\Button::create(_("Sync-Info Löschen"), 'delete_mapped_items', array('onclick' => "return window.confirm('"._("Wirklich die Informationen über bereits importierte Einträge löschen?")."');")) ?>
+        <? endif ?>
     </div>
 
 </form>
