@@ -2,7 +2,7 @@
 <tr style="<?= $dynamically_mapped ? "opacity: 0.5;" : "" ?>" class="<?= $dynamically_mapped ? "dynamically_mapped" : "" ?>">
     <td>
         <? if (!$dynamically_mapped) : ?>
-        <label for="simplematching_<?= htmlReady($field) ?>">
+        <label for="simplematching_<?= md5($field) ?>">
             <? endif ?>
             <?= htmlReady($field) ?>
             <? if (!$dynamically_mapped) : ?>
@@ -14,8 +14,8 @@
             <?= _("Wird vom Plugin dynamisch gemapped") ?>
         <? else : ?>
             <select name="tabledata[simplematching][<?= htmlReady($field) ?>][column]"
-                    id="simplematching_<?= htmlReady($field) ?>"
-                    onChange="jQuery('#simplematching_<?= htmlReady($field) ?>_static').toggle(this.value === 'static value'); jQuery('#simplematching_<?= htmlReady($field) ?>_mapfrom').toggle(this.value.indexOf('fleximport_mapper__') === 0 || this.value.indexOf('fleximportkeyvalue_') === 0); jQuery('#simplematching_<?= htmlReady($field) ?>_format').toggle(this.value !== ''); jQuery('#simplematching_<?= htmlReady($field) ?>_delimiter').css('display', !this.value ? 'none' : 'flex');"
+                    id="simplematching_<?= md5($field) ?>"
+                    onChange="STUDIP.Fleximport.changeMappingOfField.call(this, '<?= md5($field) ?>');"
                     title="<?= htmlReady($placeholder) ?>">
                 <option value="" title="<?= _("Wert wird nicht gemapped") ?>"></option>
                 <option value="static value"<?= $table['tabledata']['simplematching'][$field]['column'] === "static value" ? " selected" : "" ?>>[<?= _("Fester Eintrag") ?>]</option>
@@ -86,7 +86,7 @@
                     <? endif ?>
                 <? endif ?>
             </select>
-            <div id="simplematching_<?= htmlReady($field) ?>_static" style="<?= $table['tabledata']['simplematching'][$field]['column'] !== "static value" ? "display: none;" : "" ?>">
+            <div id="simplematching_<?= md5($field) ?>_static" style="<?= $table['tabledata']['simplematching'][$field]['column'] !== "static value" ? "display: none;" : "" ?>">
                 <input type="text"
                        name="tabledata[simplematching][<?= htmlReady($field) ?>][static]"
                        value="<?= htmlReady($table['tabledata']['simplematching'][$field]['static']) ?>"
@@ -94,7 +94,7 @@
             </div>
 
             <? if (count($mapperclasses)) : ?>
-                <select id="simplematching_<?= htmlReady($field) ?>_mapfrom"
+                <select id="simplematching_<?= md5($field) ?>_mapfrom"
                         name="tabledata[simplematching][<?= htmlReady($field) ?>][mapfrom]"
                         style="<?= (strpos($table['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") === 0) || (strpos($table['tabledata']['simplematching'][$field]['column'], "fleximportkeyvalue_") === 0) ? "" : "display: none;" ?>">
                     <option value=""><?= _("Aus Spalte ...") ?></option>
@@ -109,7 +109,7 @@
             <? endif ?>
 
             <? if ($delimiter) : ?>
-                <div id="simplematching_<?= htmlReady($field) ?>_delimiter" style="<?= $table['tabledata']['simplematching'][$field]['column'] ? "display: flex;" : ' display: none;' ?>">
+                <div id="simplematching_<?= md5($field) ?>_delimiter" style="<?= $table['tabledata']['simplematching'][$field]['column'] ? "display: flex;" : ' display: none;' ?>">
                     <div style="width: 50%;">
                         <label style="display: inline;">
                             <?= _("Trennzeichen") ?>
@@ -137,7 +137,7 @@
             <? endif ?>
 
             <? if (($table['import_type'] === "Course") && ($field === "status")) : ?>
-                <div class="format" id="simplematching_<?= htmlReady($field) ?>_format">
+                <div class="format" id="simplematching_<?= md5($field) ?>_format">
                     <select name="tabledata[simplematching][<?= htmlReady($field) ?>][format]">
                         <option value=""><?= _("Format: sem_type_id") ?></option>
                         <option value="name"<?= $table['tabledata']['simplematching'][$field]['format'] === "name" ? " selected" : "" ?>><?= _("Format: Veranstaltungstyp-Name") ?></option>
@@ -145,7 +145,7 @@
                 </div>
             <? endif ?>
             <? if (($table['import_type'] === "User") && ($field === "username")) : ?>
-                <div class="format" id="simplematching_<?= htmlReady($field) ?>_format">
+                <div class="format" id="simplematching_<?= md5($field) ?>_format">
                     <select name="tabledata[simplematching][<?= htmlReady($field) ?>][format]">
                         <option value="cleartext"><?= _("Format: Reiner Text") ?></option>
                         <option value="email_first_part"<?= $table['tabledata']['simplematching'][$field]['format'] === "email_first_part" ? " selected" : "" ?>><?= _("Format: Erster Teil der Email") ?></option>
