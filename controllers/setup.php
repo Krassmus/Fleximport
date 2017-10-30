@@ -57,6 +57,10 @@ class SetupController extends PluginController {
                 $this->table->store();
             }
 
+            if (Request::submitted("delete_mapped_items")) {
+                FleximportMappedItem::deleteBySQL("table_id = ?", array($this->table->getId()));
+            }
+
             if (Request::isAjax()) {
                 $output = array(
                     'func' => "STUDIP.Fleximport.updateTable",

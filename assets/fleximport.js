@@ -37,6 +37,14 @@ STUDIP.Fleximport = {
                 });
             }
         });
+    },
+    "changeMappingOfField": function (field) {
+        jQuery('#simplematching_' + field + '_static').toggle(this.value === 'static value');
+        jQuery('#simplematching_' + field + '_mapfrom').toggle(
+            (this.value.indexOf('fleximport_mapper__') === 0) || (this.value.indexOf('fleximportkeyvalue_') === 0)
+        );
+        jQuery('#simplematching_' + field + '_format').toggle(this.value !== '');
+        jQuery('#simplematching_' + field + '_delimiter').css('display', !this.value ? 'none' : 'flex');
     }
 };
 

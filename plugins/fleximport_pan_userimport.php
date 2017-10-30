@@ -15,16 +15,17 @@ class fleximport_pan_userimport extends FleximportPlugin {
     {
         $old_domains = array_map(function ($domain) { return $domain->getID(); }, $this->old_domains);
         $new_domains = UserDomain::getUserDomainsForUser($object->getId());
-        foreach ($new_domains as $domain_id) {
+        foreach ($new_domains as $domain) {
+            $domain_id = $domain->getId();
             if (!in_array($domain_id, $old_domains)) {
                 if ($domain_id === "alumni") {
                     if (count($new_domains) == 1) {
                         $statement = DBManager::get()->prepare("
                             SELECT seminar_user.Seminar_id 
                             FROM seminar_user
-                                LEFT JOIN seminar_userdomain ON (seminar_user.Seminar_id = seminar_userdomain.Seminar_id)
+                                LEFT JOIN seminar_userdomains ON (seminar_user.Seminar_id = seminar_userdomains.seminar_id)
                             WHERE seminar_user.user_id = :user_id
-                                AND seminar_user.Seminar_id NOT IN (SELECT seminar_id FROM seminar_userdomain WHERE userdomain_id = 'alumni')
+                                AND seminar_user.Seminar_id NOT IN (SELECT seminar_id FROM seminar_userdomains WHERE userdomain_id = 'alumni')
                         ");
                         $statement->execute(array(
                             'user_id' => $object->getId()
@@ -35,23 +36,31 @@ class fleximport_pan_userimport extends FleximportPlugin {
                         }
                     }
                     $datafield = DataField::findOneBySQL("name = 'Ich will weiterhin als Alumni in Stud.IP geführt werden' AND object_type = 'user'");
-                    $user_wants_to_stay = DatafieldEntry::findOneBySQL("datafield_id = ? AND range_id = ?", array($datafield->getId(), $object->getId()));
+                    $user_wants_to_stay = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND range_id = ?", array($datafield->getId(), $object->getId()));
                     if ($user_wants_to_stay && $user_wants_to_stay['content']) {
                         //In Veranstaltung ALUMNI die Statusgruppe anlegen:
                         $datafield = DataField::findOneBySQL("name = 'Alumni' AND object_type = 'user'");
-                        $entry = DatafieldEntry::findOneBySQL("datafield_id = ? AND range_id = ?", array($datafield->getId(), $object->getId()));
-                        $course = Course::findOneByName("ALUMNI");
-                        $gruppenname = $entry ? $entry['content'] : null;
-                        if ($course && $gruppenname) {
-                            $statusgruppe = Statusgruppen::findOneBySQL("name = ? range_id = ?", array($gruppenname, $course->getId()));
-                            if (!$statusgruppe) {
-                                $statusgruppe = new Statusgruppen();
-                                $statusgruppe['name'] = $gruppenname;
-                                $statusgruppe['range_id'] = $course->getId();
-                                $statusgruppe->store();
-                            }
-                            if (!$statusgruppe->isMember($object->getId())) {
-                                $statusgruppe->addUser($object->getId());
+                        if ($datafield) {
+                            $entry = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND range_id = ?", array(
+                                $datafield->getId(),
+                                $object->getId()
+                            ));
+                            $course = Course::findOneByName("ALUMNI");
+                            $gruppenname = $entry ? $entry['content'] : null;
+                            if ($course && $gruppenname) {
+                                $statusgruppe = Statusgruppen::findOneBySQL("name = ? range_id = ?", array(
+                                    $gruppenname,
+                                    $course->getId()
+                                ));
+                                if (!$statusgruppe) {
+                                    $statusgruppe = new Statusgruppen();
+                                    $statusgruppe['name'] = $gruppenname;
+                                    $statusgruppe['range_id'] = $course->getId();
+                                    $statusgruppe->store();
+                                }
+                                if (!$statusgruppe->isMember($object->getId())) {
+                                    $statusgruppe->addUser($object->getId());
+                                }
                             }
                         }
                     } else {

@@ -134,6 +134,30 @@
         <input type="text" name="table[webhook_urls]" value="<?= htmlReady($table['webhook_urls']) ?>" placeholder="https://...">
     </label>
 
+    <label>
+        <input type="checkbox" name="table[pushupdate]" value="1"<?= $table['pushupdate'] ? " checked" : "" ?> onChange="jQuery('#pushupdate_url').toggle('fade');">
+        <?= _("Push-Update ist erlaubt") ?>
+    </label>
+
+    <? URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']) ?>
+    <div id="pushupdate_url"<?= $table['pushupdate'] ? "" : ' style="display: none;"' ?>>
+        <label>
+            <?= _("Insert/Update") ?>
+            <input type="text"
+                   readonly
+                   value="<?= PluginEngine::getLink($plugin, array(), "webhoockendpoints/pushupdate/".$table->getId()) ?>"
+                   >
+        </label>
+        <label>
+            <?= _("Delete") ?>
+            <input type="text"
+                   readonly
+                   value="<?= PluginEngine::getLink($plugin, array(), "webhoockendpoints/pushdelete/".$table->getId()) ?>"
+                   >
+        </label>
+    </div>
+    <? URLHelper::setBaseURL("/") ?>
+
     <? if ($table->isInDatabase()) : ?>
         <div>
             <?= _("Nur folgende Spalten anzeigen") ?>
@@ -160,6 +184,9 @@
 
     <div style="text-align: center" data-dialog-button>
         <?= \Studip\Button::create(_("Speichern")) ?>
+        <? if ($table['synchronization'] && FleximportMappedItem::countBySQL("table_id = ?", array($table->getId())) > 0) : ?>
+            <?= \Studip\Button::create(_("Sync-Info Löschen"), 'delete_mapped_items', array('onclick' => "return window.confirm('"._("Wirklich die Informationen über bereits importierte Einträge löschen?")."');")) ?>
+        <? endif ?>
     </div>
 
 </form>
