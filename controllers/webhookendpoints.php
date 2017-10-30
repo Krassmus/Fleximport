@@ -45,8 +45,21 @@ class WebhookendpointsController extends PluginController {
                 default:
                     //CSV to data:
                     $type = "csv";
+                    if ($table['tabledata']['source_encoding'] === "utf8") {
+                        $body = studip_utf8decode($body);
+                    }
+                    $body = $table->CSV2Array($body);
+                    $headline = array_shift($body);
+                    foreach ($body as $bodyline) {
+                        $line = array();
+                        foreach ($headline as $index => $field) {
+                            $line[$field] = $bodyline[$index];
+                        }
+                        $datalines[] = $line;
+                    }
                     break;
             }
+            //now we have the data and do the dirty work:
             foreach ($datalines as $line) {
                 if ($cmd === "update") {
                     $table->importLine($line);
