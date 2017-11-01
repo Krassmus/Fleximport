@@ -49,6 +49,19 @@ abstract class FleximportPlugin {
     }
 
     /**
+     * Transforms the body of the webhook push data to an array of associative arrays
+     * @param string $body: the body of the push data. Can be json or csv or xml.
+     * @param string $mime_type: the content-type of the request. Might be indicating what data the body contains.
+     * @return string|array of arrays: each of the returned arrays must be an associative array that fits to the table
+     *      and its mapping like array('user_id' => "1456464", 'email' => "fuhse@data-quest.de"). If you don't want to
+     *      use that method simply return the body variable.
+     */
+    function fetchPushData($body, $mime_type = null)
+    {
+        return $body;
+    }
+
+    /**
      * Indicates which fields will be mapped. Returns an array of string fieldnames. These are the
      * fieldnames of the target table like seminare - not of the source-table, where you get your data from.
      * Note that this list can also contain some dynamic fielnames like fleximport_dozenten .

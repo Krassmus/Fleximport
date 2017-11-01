@@ -30,34 +30,42 @@ class WebhookendpointsController extends PluginController {
         $table = FleximportTable::find($table_id);
         if (Request::isPost() && $table && $table['pushupdate']) {
             $body = file_get_contents('php://input');
-            //internal logging
-            switch ($_SERVER['HTTP_CONTENT_TYPE']) {
-                case "text/json":
-                case "application/json":
-                    $body = studip_utf8decode(json_decode($body));
-                    if (is_array($body) && !$this->isAssoc($body)) {
-                        $datalines = $body;
-                    } else {
-                        $datalines = array($body);
-                    }
-                    break;
-                case "text/csv":
-                default:
-                    //CSV to data:
-                    $type = "csv";
-                    if ($table['tabledata']['source_encoding'] === "utf8") {
-                        $body = studip_utf8decode($body);
-                    }
-                    $body = $table->CSV2Array($body);
-                    $headline = array_shift($body);
-                    foreach ($body as $bodyline) {
-                        $line = array();
-                        foreach ($headline as $index => $field) {
-                            $line[$field] = $bodyline[$index];
+            if ($table->getPlugin()) {
+                $body = $table->getPlugin()->fetchPushData($body, $_SERVER['HTTP_CONTENT_TYPE']);
+            }
+            if (!is_array($body)) {
+                //internal logging
+                switch ($_SERVER['HTTP_CONTENT_TYPE']) {
+                    case "text/json":
+                    case "application/json":
+                        $body = studip_utf8decode(json_decode($body));
+                        if (is_array($body) && !$this->isAssoc($body)) {
+                            $datalines = $body;
+                        } else {
+                            $datalines = array($body);
                         }
-                        $datalines[] = $line;
-                    }
-                    break;
+                        break;
+                    case "text/csv":
+                    default:
+                        //CSV to data:
+                        $type = "csv";
+                        if ($table['tabledata']['source_encoding'] === "utf8") {
+                            $body = studip_utf8decode($body);
+                        }
+                        $body = $table->CSV2Array($body);
+                        $headline = array_shift($body);
+                        foreach ($body as $bodyline) {
+                            $line = array();
+                            foreach ($headline as $index => $field) {
+                                $line[$field] = $bodyline[$index];
+                            }
+                            $datalines[] = $line;
+                        }
+                        break;
+                }
+            } else {
+                //plugin did that processing:
+                $datalines = $body;
             }
             //now we have the data and do the dirty work:
             foreach ($datalines as $line) {
