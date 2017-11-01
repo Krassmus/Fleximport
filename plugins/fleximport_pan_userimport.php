@@ -37,7 +37,6 @@ class fleximport_pan_userimport extends FleximportPlugin {
                     }
                     $datafield = DataField::findOneBySQL("name = 'Ich will weiterhin als Alumni in Stud.IP geführt werden' AND object_type = 'user'");
                     $user_wants_to_stay = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND range_id = ?", array($datafield->getId(), $object->getId()));
-
                     if ($user_wants_to_stay && $user_wants_to_stay['content']) {
                         //In Veranstaltung ALUMNI die Statusgruppe anlegen:
                         $datafield = DataField::findOneBySQL("name = 'Alumni' AND object_type = 'user'");
