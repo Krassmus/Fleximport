@@ -97,7 +97,12 @@ class FleximportTable extends SimpleORMap {
                 $this->getPlugin()->fetchData();
             }
         } catch (Exception $e) {
-            PageLayout::postMessage(MessageBox::error(sprintf(_("Konnte Tabelle '%s' nicht mit Daten befüllen."), $this['name'])));
+            PageLayout::postMessage(
+                MessageBox::error(
+                    sprintf(_("Konnte Tabelle '%s' nicht mit Daten befüllen."), $this['name']),
+                    array($e->getMessage())
+                )
+            );
         }
     }
 
