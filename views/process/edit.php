@@ -38,7 +38,7 @@
     <div data-dialog-button>
         <?= \Studip\Button::create(_("Speichern")) ?>
         <? if (!$process->isNew()) : ?>
-            <?= \Studip\Button::create(_("Löschen"), "delete_process", array('onclick' => "return window.confirm('"._("Wirklich löschen?")."');")) ?>
+            <?= \Studip\Button::create(_("LÃ¶schen"), "delete_process", array('onclick' => "return window.confirm('"._("Wirklich lÃ¶schen?")."');")) ?>
         <? endif ?>
     </div>
 </form>

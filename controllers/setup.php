@@ -18,7 +18,7 @@ class SetupController extends PluginController {
 
     public function table_action($table_id = null)
     {
-        PageLayout::setTitle($table_id ? _("Tabelleneinstellung bearbeiten") : _("Tabelle hinzufügen"));
+        PageLayout::setTitle($table_id ? _("Tabelleneinstellung bearbeiten") : _("Tabelle hinzufÃ¼gen"));
         $this->table = new FleximportTable($table_id);
         if ($this->table->isNew() && Request::option("process_id")) {
             $this->table['process_id'] = Request::option("process_id");
@@ -71,7 +71,7 @@ class SetupController extends PluginController {
                         'close' => $failed ? 0 : 1
                     )
                 );
-                $this->response->add_header("X-Dialog-Execute", json_encode(studip_utf8encode($output)));
+                $this->response->add_header("X-Dialog-Execute", json_encode($output));
             } else {
                 PageLayout::postMessage(MessageBox::success(_("Daten wurden gespeichert.")));
             }
@@ -87,7 +87,7 @@ class SetupController extends PluginController {
         if (Request::isAjax()) {
             $this->render_nothing();
         } else {
-            PageLayout::postMessage(MessageBox::success(_("Tabelle gelöscht.")));
+            PageLayout::postMessage(MessageBox::success(_("Tabelle gelÃ¶scht.")));
             $this->redirect("import/overview/" . $process_id);
         }
     }
@@ -121,7 +121,7 @@ class SetupController extends PluginController {
                     'html' => $this->render_template_as_string("import/_table.php")
                 )
             );
-            $this->response->add_header("X-Dialog-Execute", json_encode(studip_utf8encode($output)));
+            $this->response->add_header("X-Dialog-Execute", json_encode($output));
         }
         $this->mapperclasses = array();
         foreach (get_declared_classes() as $class) {

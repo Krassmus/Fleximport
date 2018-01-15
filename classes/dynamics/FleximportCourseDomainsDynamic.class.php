@@ -5,7 +5,7 @@ class FleximportCourseDomainsDynamic implements FleximportDynamic {
     public function forClassFields()
     {
         return array(
-            'Course' => array("fleximport_course_userdomains" => _("IDs oder Namen der Nutzerdom‰nen"))
+            'Course' => array("fleximport_course_userdomains" => _("IDs oder Namen der Nutzerdom√§nen"))
         );
     }
 

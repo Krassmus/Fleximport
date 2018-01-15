@@ -155,8 +155,8 @@ class fleximport_nsi_kurse extends FleximportPlugin
             return $statement->fetchAll(PDO::FETCH_COLUMN, 0);
         } elseif($field === "leistungsnachweis") {
             if ($line['pruefung_schr'] || $line['pruefung_mdl']) {
-                return "Schriftliche Prüfungen: ".$line['pruefung_schr']."\n" .
-                "Mündliche Prüfungen: ".$line['pruefung_mdl'];
+                return "Schriftliche PrÃ¼fungen: ".$line['pruefung_schr']."\n" .
+                "MÃ¼ndliche PrÃ¼fungen: ".$line['pruefung_mdl'];
             } else {
                 return "";
             }

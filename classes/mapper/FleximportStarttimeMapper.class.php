@@ -15,7 +15,7 @@ class FleximportStarttimeMapper implements FleximportMapper {
             "name" => "Semestername",
             "timestamp" => "Semester-Zeitpunkt",
             "current" => "Aktuelles Semester",
-            "next" => "Nächstes Semester"
+            "next" => "NÃ¤chstes Semester"
         );
         return $formats;
     }

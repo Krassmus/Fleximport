@@ -39,7 +39,7 @@ class FleximportCourseChecker implements FleximportChecker {
                 }
             }
             if (!$data['institut_id'] || !Institute::find($data['institut_id'])) {
-                $errors .= "Keine gültige Heimateinrichtung. ";
+                $errors .= "Keine gÃ¼ltige Heimateinrichtung. ";
             }
             if (!Semester::findByTimestamp($data['start_time'])) {
                 $errors .= "Semester wurde nicht gefunden. ";

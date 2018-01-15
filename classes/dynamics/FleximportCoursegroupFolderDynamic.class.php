@@ -21,7 +21,7 @@ class FleximportCoursegroupFolderDynamic implements FleximportDynamic {
             if (!$object->hasFolder()) {
                 create_folder(
                     (_("Dateiordner der Gruppe:") . ' ' . $object['name']),
-                    (_("Ablage für Ordner und Dokumente dieser Gruppe")),
+                    (_("Ablage fÃ¼r Ordner und Dokumente dieser Gruppe")),
                     $object->getId(),
                     15,
                     $object['range_id']

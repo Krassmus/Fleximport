@@ -46,16 +46,16 @@ class fleximport_semiro_course_groups extends FleximportPlugin {
         $fields = array();
 
         $doc = new DOMDocument();
-        $doc->loadXML(studip_utf8decode($result->return));
+        $doc->loadXML($result->return);
         $seminar_data = array();
         foreach ($doc->getElementsByTagName("seminar") as $seminar) {
             $seminar_data_row = array();
             foreach ($seminar->childNodes as $attribute) {
                 if ($attribute->tagName) {
-                    if (!in_array(studip_utf8decode(trim($attribute->tagName)), $fields)) {
-                        $fields[] = studip_utf8decode(trim($attribute->tagName));
+                    if (!in_array(trim($attribute->tagName), $fields)) {
+                        $fields[] = trim($attribute->tagName);
                     }
-                    $seminar_data_row[] = studip_utf8decode(trim($attribute->nodeValue));
+                    $seminar_data_row[] = trim($attribute->nodeValue);
                 }
             }
             $seminar_data[] = $seminar_data_row;

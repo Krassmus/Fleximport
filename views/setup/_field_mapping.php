@@ -119,10 +119,8 @@
                                    placeholder="<?= _("Bspw. ; , |") ?>"
                                    style="width: 65px; display: inline; vertical-align: baseline">
                         </label>
-                        <? $title = _("Dieses Feld kann mehrere Einträge haben. Sie können diese Einträge mit einem Zeichen trennen. Zum Beispiel ein Semikolon oder ein | Zeichen oder ein ganzes Wort. Auch reguläre Ausdrücke sind hier möglich.") ?>
-                        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                            ? Icon::create("info-circle", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => $title, 'onclick' => "alert('".addslashes($title)."');", 'style' => "cursor: pointer"))
-                            : Assets::img("icons/20/grey/info-circle", array('class' => "text-bottom", 'title' => $title, 'onclick' => "alert('".addslashes($title)."');", 'style' => "cursor: pointer")) ?>
+                        <? $title = _("Dieses Feld kann mehrere EintrÃ¤ge haben. Sie kÃ¶nnen diese EintrÃ¤ge mit einem Zeichen trennen. Zum Beispiel ein Semikolon oder ein | Zeichen oder ein ganzes Wort. Auch regulÃ¤re AusdrÃ¼cke sind hier mÃ¶glich.") ?>
+                        <?= Icon::create("info-circle", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => $title, 'onclick' => "alert('".addslashes($title)."');", 'style' => "cursor: pointer")) ?>
                     </div>
                     <div>
                         <label>

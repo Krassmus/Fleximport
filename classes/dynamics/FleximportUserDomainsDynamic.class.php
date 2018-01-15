@@ -5,7 +5,7 @@ class FleximportUserDomainsDynamic implements FleximportDynamic {
     public function forClassFields()
     {
         return array(
-            'User' => array("fleximport_userdomains" => _("IDs oder Namen der Nutzerdom‰nen"))
+            'User' => array("fleximport_userdomains" => _("IDs oder Namen der Nutzerdom√§nen"))
         );
     }
 

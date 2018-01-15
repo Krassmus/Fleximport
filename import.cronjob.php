@@ -15,7 +15,7 @@ class FleximportJob extends CronJob
      */
     public static function getDescription()
     {
-        return _('Führt einmal den Fleximport aus. Dazu werden alle eingestellten Tabellen nacheinander importiert. Bei externen Datenquellen werden vorher natürlich die Daten gezogen.');
+        return _('FÃ¼hrt einmal den Fleximport aus. Dazu werden alle eingestellten Tabellen nacheinander importiert. Bei externen Datenquellen werden vorher natÃ¼rlich die Daten gezogen.');
     }
 
     /**

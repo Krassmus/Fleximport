@@ -18,9 +18,7 @@
             $text = _("Zum Objekt");
     } ?>
     <a href="<?= URLHelper::getURL($url) ?>">
-        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-            ? Icon::create("link-intern", "clickable")->asImg(16, array('class' => "text-bottom"))
-            : Assets::img("icons/16/blue/link-intern", array('class' => "text-bottom")) ?>
+        <?= Icon::create("link-intern", "clickable")->asImg(16, array('class' => "text-bottom")) ?>
         <?= htmlReady($text) ?>
     </a>
 </div>
@@ -31,7 +29,7 @@
         <? if (!$object->isNew()) : ?>
             <?= _("Datenvergleich") ?>
         <? else : ?>
-            <?= _("Datenübersicht") ?>
+            <?= _("DatenÃ¼bersicht") ?>
         <? endif ?>
     </caption>
     <thead>
@@ -53,9 +51,7 @@
                 <? if (!$object->isNew()) : ?>
                 <td>
                     <? if ($overwrite && ($object[$field] != $data[$field])) : ?>
-                        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                            ? Icon::create("arr_2right", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld.")))
-                            : Assets::img("icons/20/grey/arr_2right", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
+                        <?= Icon::create("arr_2right", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt VerÃ¤nderungen in diesem Feld."))) ?>
                     <? endif ?>
                 </td>
                 <? endif ?>
@@ -67,9 +63,7 @@
                 <? endif ?>
                 <td>
                     <? if (!$overwrite) : ?>
-                        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                            ? Icon::create("decline", "inactive")->asImg(16, array('title' => _("Wert wird nicht überschrieben.")))
-                            : Assets::img("icons/16/grey/decline", array('title' => _("Wert wird nicht überschrieben."))) ?>
+                        <?= Icon::create("decline", "inactive")->asImg(16, array('title' => _("Wert wird nicht Ã¼berschrieben."))) ?>
                     <? else : ?>
                         <?= htmlReady($data[$field]) ?>
                     <? endif ?>
@@ -93,9 +87,7 @@
                         $oldvalue = $entry->content;
                         ?>
                         <? if ($overwrite && ($oldvalue != $data[$datafield['name']])) : ?>
-                            <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                                ? Icon::create("arr_2right", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld.")))
-                                : Assets::img("icons/20/grey/arr_2right", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
+                            <?= Icon::create("arr_2right", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt VerÃ¤nderungen in diesem Feld."))) ?>
                         <? endif ?>
                     </td>
                 <? endif ?>
@@ -107,9 +99,7 @@
                 <? endif ?>
                 <td>
                     <? if (!$overwrite) : ?>
-                        <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                            ? Icon::create("decline", "inactive")->asImg(16, array('title' => _("Wert wird nicht überschrieben.")))
-                            : Assets::img("icons/16/grey/decline", array('title' => _("Wert wird nicht überschrieben."))) ?>
+                        <?= Icon::create("decline", "inactive")->asImg(16, array('title' => _("Wert wird nicht Ã¼berschrieben."))) ?>
                     <? else : ?>
                         <?= htmlReady($data[$datafield['name']]) ?>
                     <? endif ?>
@@ -133,9 +123,7 @@
                             }
                         } ?>
                         <? if ($changed) : ?>
-                            <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                                ? Icon::create("arr_2right", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld.")))
-                                : Assets::img("icons/20/grey/arr_2right", array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
+                            <?= Icon::create("arr_2right", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt VerÃ¤nderungen in diesem Feld."))) ?>
                         <? endif?>
                     <? endif ?>
                 </td>

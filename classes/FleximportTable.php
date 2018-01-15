@@ -16,22 +16,11 @@ class FleximportTable extends SimpleORMap {
     static protected function configure($config = array())
     {
         $config['db_table'] = 'fleximport_tables';
-        if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.2", ">=")) {
-            $config['registered_callbacks']['before_store'][]     = 'cbSerializeData';
-            $config['registered_callbacks']['after_store'][]      = 'cbUnserializeData';
-            $config['registered_callbacks']['after_delete'][]      = 'cbDeleteTable';
-            $config['registered_callbacks']['after_initialize'][] = 'cbUnserializeData';
-        }
+        $config['registered_callbacks']['before_store'][]     = 'cbSerializeData';
+        $config['registered_callbacks']['after_store'][]      = 'cbUnserializeData';
+        $config['registered_callbacks']['after_delete'][]      = 'cbDeleteTable';
+        $config['registered_callbacks']['after_initialize'][] = 'cbUnserializeData';
         parent::configure($config);
-    }
-
-    function __construct($id = null)
-    {
-        if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.2", "<")) {
-            $this->registerCallback('before_store', 'cbSerializeData');
-            $this->registerCallback('after_store after_initialize', 'cbUnserializeData');
-        }
-        parent::__construct($id);
     }
 
     function cbDeleteTable()
@@ -42,22 +31,18 @@ class FleximportTable extends SimpleORMap {
 
     function cbSerializeData()
     {
-        $this->content['tabledata'] = json_encode(studip_utf8encode($this->content['tabledata']));
-        //$this->content_db['tabledata'] = json_encode(studip_utf8encode($this->content_db['tabledata']));
+        $this->content['tabledata'] = json_encode($this->content['tabledata']);
         return true;
     }
 
     function cbUnserializeData()
     {
-        $this->content['tabledata'] = (array) studip_utf8decode(json_decode($this->content['tabledata'], true));
-        //$this->content_db['tabledata'] = (array) studip_utf8decode(json_decode($this->content_db['tabledata'], true));
+        $this->content['tabledata'] = (array) json_decode($this->content['tabledata'], true);
         return true;
     }
 
     public function isInDatabase()
     {
-        //$this->fetchData();
-
         $statement = DBManager::get()->prepare("
             SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
             WHERE TABLE_NAME = :table
@@ -99,7 +84,7 @@ class FleximportTable extends SimpleORMap {
         } catch (Exception $e) {
             PageLayout::postMessage(
                 MessageBox::error(
-                    sprintf(_("Konnte Tabelle '%s' nicht mit Daten befüllen."), $this['name']),
+                    sprintf(_("Konnte Tabelle '%s' nicht mit Daten befÃ¼llen."), $this['name']),
                     array($e->getMessage())
                 )
             );
@@ -241,18 +226,18 @@ class FleximportTable extends SimpleORMap {
     }
 
     static public function reduceDiakritikaFromIso88591($text) {
-        $text = str_replace(array("ä","Ä","ö","Ö","ü","Ü","ß"), array('ae','Ae','oe','Oe','ue','Ue','ss'), $text);
-        $text = str_replace(array('À','Á','Â','Ã','Å','Æ'), 'A' , $text);
-        $text = str_replace(array('à','á','â','ã','å','æ'), 'a' , $text);
-        $text = str_replace(array('È','É','Ê','Ë'), 'E' , $text);
-        $text = str_replace(array('è','é','ê','ë'), 'e' , $text);
-        $text = str_replace(array('Ì','Í','Î','Ï'), 'I' , $text);
-        $text = str_replace(array('ì','í','î','ï'), 'i' , $text);
-        $text = str_replace(array('Ò','Ó','Õ','Ô','Ø'), 'O' , $text);
-        $text = str_replace(array('ò','ó','ô','õ','ø'), 'o' , $text);
-        $text = str_replace(array('Ù','Ú','Û'), 'U' , $text);
-        $text = str_replace(array('ù','ú','û'), 'u' , $text);
-        $text = str_replace(array('Ç','ç','Ð','Ñ','Ý','ñ','ý','ÿ'), array('C','c','D','N','Y','n','y','y') , $text);
+        $text = str_replace(array("Ã¤","Ã„","Ã¶","Ã–","Ã¼","Ãœ","ÃŸ"), array('ae','Ae','oe','Oe','ue','Ue','ss'), $text);
+        $text = str_replace(array('Ã€','Ã','Ã‚','Ãƒ','Ã…','Ã†'), 'A' , $text);
+        $text = str_replace(array('Ã ','Ã¡','Ã¢','Ã£','Ã¥','Ã¦'), 'a' , $text);
+        $text = str_replace(array('Ãˆ','Ã‰','ÃŠ','Ã‹'), 'E' , $text);
+        $text = str_replace(array('Ã¨','Ã©','Ãª','Ã«'), 'e' , $text);
+        $text = str_replace(array('ÃŒ','Ã','ÃŽ','Ã'), 'I' , $text);
+        $text = str_replace(array('Ã¬','Ã­','Ã®','Ã¯'), 'i' , $text);
+        $text = str_replace(array('Ã’','Ã“','Ã•','Ã”','Ã˜'), 'O' , $text);
+        $text = str_replace(array('Ã²','Ã³','Ã´','Ãµ','Ã¸'), 'o' , $text);
+        $text = str_replace(array('Ã™','Ãš','Ã›'), 'U' , $text);
+        $text = str_replace(array('Ã¹','Ãº','Ã»'), 'u' , $text);
+        $text = str_replace(array('Ã‡','Ã§','Ã','Ã‘','Ã','Ã±','Ã½','Ã¿'), array('C','c','D','N','Y','n','y','y') , $text);
         return $text;
     }
 
@@ -276,16 +261,16 @@ class FleximportTable extends SimpleORMap {
 
     public function getCSVDataFromFile($file_path, $delim = ';', $encl = '"', $optional = 1) {
         $contents = file_get_contents($file_path);
-        if ($this['tabledata']['source_encoding'] === "utf8") {
-            $contents = studip_utf8decode($contents);
+        if ($this['tabledata']['source_encoding'] !== "utf8") {
+            $contents = mb_convert_encoding($contents, "UTF-8", "Windows-1252");
         }
         return $this->CSV2Array($contents, $delim, $encl, $optional);
     }
 
     public function getCSVDataFromURL($file_path, $delim = ';', $encl = '"', $optional = 1) {
         $contents = file_get_contents($file_path);
-        if ($this['tabledata']['source_encoding'] === "utf8") {
-            $contents = studip_utf8decode($contents);
+        if ($this['tabledata']['source_encoding'] !== "utf8") {
+            $contents = mb_convert_encoding($contents, "UTF-8", "Windows-1252");
         }
         return $this->CSV2Array($contents, $delim, $encl, $optional);
     }
@@ -334,7 +319,7 @@ class FleximportTable extends SimpleORMap {
             }
         }
         if ($GLOBALS['FLEXIMPORT_IS_CRONJOB']) {
-            echo sprintf(_("%s von %s Datensätze der Tabelle %s erfolgreich importiert."), $count_successful, $count, $this['name'])." \n";
+            echo sprintf(_("%s von %s DatensÃ¤tze der Tabelle %s erfolgreich importiert."), $count_successful, $count, $this['name'])." \n";
         }
         if ($this['synchronization']) {
             $import_type = $this['import_type'];
@@ -624,7 +609,7 @@ class FleximportTable extends SimpleORMap {
                     'seminar_id' => $object->getId(),
                     'user_id' => $GLOBALS['user']->id,
                     'name' => _("Allgemeiner Dateiordner"),
-                    'description' => _("Ablage für allgemeine Ordner und Dokumente der Veranstaltung")
+                    'description' => _("Ablage fÃ¼r allgemeine Ordner und Dokumente der Veranstaltung")
                 ));
             }
         }
@@ -992,7 +977,7 @@ class FleximportTable extends SimpleORMap {
         if ($data['Checksum']) {
             return $data['Checksum'];
         } else {
-            //wir haben vermutlich einen View und müssen den Hash selbst berechnen
+            //wir haben vermutlich einen View und mÃ¼ssen den Hash selbst berechnen
 
             $statement = DBManager::get()->prepare("SELECT CRC32(SUM(CRC32(CONCAT_WS(`".implode("`,`", $this->getTableHeader())."`)))) AS hash FROM `".addslashes($this['name'])."`;");
             $statement->execute();

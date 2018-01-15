@@ -56,9 +56,9 @@ class ImportController extends PluginController {
                 }
                 $duration = time() - $starttime;
                 if ($duration >= 60) {
-                    PageLayout::postMessage(MessageBox::success(sprintf(_("Import wurde durchgeführt und dauerte %s Minuten"), floor($duration / 60)), $protocol));
+                    PageLayout::postMessage(MessageBox::success(sprintf(_("Import wurde durchgefÃ¼hrt und dauerte %s Minuten"), floor($duration / 60)), $protocol));
                 } else {
-                    PageLayout::postMessage(MessageBox::success(_("Import wurde durchgeführt"), $protocol));
+                    PageLayout::postMessage(MessageBox::success(_("Import wurde durchgefÃ¼hrt"), $protocol));
                 }
 
             } elseif ($_FILES['tableupload']) {
@@ -66,8 +66,8 @@ class ImportController extends PluginController {
                     if ($tmp_name) {
                         $table = new FleximportTable($table_id);
                         $output = $this->plugin->getCSVDataFromFile($tmp_name);
-                        if ($table['tabledata']['source_encoding'] === "utf8") {
-                            $output = studip_utf8decode($output);
+                        if ($table['tabledata']['source_encoding'] !== "utf8") {
+                            $output = mb_convert_encoding($output, "UTF-8", "Windows-1252");
                         }
                         $headline = array_shift($output);
                         $table->createTable($headline, $output);
@@ -140,7 +140,7 @@ class ImportController extends PluginController {
             }
         }
         $this->deletables = $this->table->findDeletableItems($item_ids);
-        PageLayout::setTitle(_("Zu löschende Datensätze"));
+        PageLayout::setTitle(_("Zu lÃ¶schende DatensÃ¤tze"));
     }
 
 }

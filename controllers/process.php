@@ -20,7 +20,7 @@ class ProcessController extends PluginController {
         if (Request::isPost()) {
             if (Request::submitted("delete_process")) {
                 $this->process->delete();
-                PageLayout::postMessage(MessageBox::success(_("Prozess wurde gelöscht.")));
+                PageLayout::postMessage(MessageBox::success(_("Prozess wurde gelÃ¶scht.")));
                 $processes = FleximportProcess::findBySQL("1=1 ORDER BY name ASC");
                 $this->redirect("import/overview" . (count($processes) ? "/".$processes[0]['process_id'] : ""));
             } else {

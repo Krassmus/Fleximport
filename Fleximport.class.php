@@ -1,17 +1,5 @@
 <?php
 
-if (file_exists('lib/models/DataField.class.php')) {
-    require_once 'lib/models/DataField.class.php';
-}
-if (file_exists('lib/models/Datafield.class.php')) {
-    require_once 'lib/models/Datafield.class.php';
-}
-if (class_exists("Datafield") && !class_exists("DataField")) {
-    class DataField extends Datafield {}
-}
-if (file_exists('lib/models/DatafieldEntryModel.class.php')) {
-    require_once 'lib/models/DatafieldEntryModel.class.php';
-}
 require_once __DIR__."/classes/FleximportTable.php";
 require_once __DIR__."/classes/FleximportConfig.php";
 require_once __DIR__."/classes/FleximportProcess.php";
@@ -45,9 +33,7 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
 
     static public function getCSSFormClass()
     {
-        return version_compare("3.4", $GLOBALS['SOFTWARE_VERSION'], ">")
-            ? "studip_form"
-            : "default";
+        return "default";
     }
 
     static public function CSV2Array($content, $delim = ';', $encl = '"', $optional = 1) {
@@ -98,15 +84,11 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
             if (FleximportConfig::get("DISPLAY_AT_HEADER")) {
                 if (is_numeric(FleximportConfig::get("DISPLAY_AT_HEADER"))) {
                     Navigation::getItem('/fleximport')->setImage(
-                        version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                            ? Icon::create("install", "navigation")
-                            : Assets::image_path("icons/lightblue/install.svg")
+                        Icon::create("install", "navigation")
                     );
                 } else {
                     Navigation::getItem('/fleximport')->setImage(
-                        version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                            ? Icon::create(FleximportConfig::get("DISPLAY_AT_HEADER"), "navigation")
-                            : FleximportConfig::get("DISPLAY_AT_HEADER")
+                        Icon::create(FleximportConfig::get("DISPLAY_AT_HEADER"), "navigation")
                     );
                 }
             }

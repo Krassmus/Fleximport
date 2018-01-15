@@ -37,7 +37,7 @@
 
     <? if ($table->isNew() || !$table->getPlugin() || !$table->getPlugin()->customImportEnabled()) : ?>
         <label>
-            <?= _("Import über") ?>
+            <?= _("Import Ã¼ber") ?>
             <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink'); jQuery('#sqlview_info').toggle(this.value == 'sqlview'); jQuery('#csv_studipfile_info').toggle(this.value == 'csv_studipfile'); jQuery('#csv_encoding').toggle(['csv_studipfile','csv_upload','csv_weblink'].indexOf(this.value) !== -1);">
                 <option value="csv_upload"<?= $table['source'] === "csv_upload" || $table->isNew() ? " selected" : "" ?>><?= _("CSV-Upload") ?></option>
                 <option value="csv_studipfile"<?= $table['source'] === "csv_studipfile" ? " selected" : "" ?>><?= _("CSV-Datei in Stud.IP") ?></option>
@@ -126,11 +126,11 @@
 
     <label>
         <input type="checkbox" name="table[synchronization]" value="1"<?= $table['synchronization'] ? " checked" : "" ?>>
-        <?= _("Synchronisierung (Importierte Objekte werden beim Update gelöscht, wenn sie beim neuen Import nicht mit mehr auftauchen)") ?>
+        <?= _("Synchronisierung (Importierte Objekte werden beim Update gelÃ¶scht, wenn sie beim neuen Import nicht mit mehr auftauchen)") ?>
     </label>
 
     <label data-change_hash="<?= htmlReady($table->isInDatabase() ? $table->calculateChangeHash() : "") ?>">
-        <?= _("Bei Änderungen an den Tabellendaten einen Webhook an folgende URL verschicken (mehrere durch Leerzeichen trennen)") ?>
+        <?= _("Bei Ã„nderungen an den Tabellendaten einen Webhook an folgende URL verschicken (mehrere durch Leerzeichen trennen)") ?>
         <input type="text" name="table[webhook_urls]" value="<?= htmlReady($table['webhook_urls']) ?>" placeholder="https://...">
     </label>
 
@@ -185,7 +185,7 @@
     <div style="text-align: center" data-dialog-button>
         <?= \Studip\Button::create(_("Speichern")) ?>
         <? if ($table['synchronization'] && FleximportMappedItem::countBySQL("table_id = ?", array($table->getId())) > 0) : ?>
-            <?= \Studip\Button::create(_("Sync-Info Löschen"), 'delete_mapped_items', array('onclick' => "return window.confirm('"._("Wirklich die Informationen über bereits importierte Einträge löschen?")."');")) ?>
+            <?= \Studip\Button::create(_("Sync-Info LÃ¶schen"), 'delete_mapped_items', array('onclick' => "return window.confirm('"._("Wirklich die Informationen Ã¼ber bereits importierte EintrÃ¤ge lÃ¶schen?")."');")) ?>
         <? endif ?>
     </div>
 

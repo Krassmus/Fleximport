@@ -21,9 +21,7 @@
                     : $itemdata['item_id'];
                 $item = new $class($pk) ?>
                 <td>
-                    <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                        ? Icon::create("trash", "info")->asImg(20, array('class' => "text-bottom", 'title' => _("Wird gelöscht.")))
-                        : Assets::img("icons/20/black/trash", array('class' => "text-bottom", 'title' => _("Wird gelöscht."))) ?>
+                    <?= Icon::create("trash", "info")->asImg(20, array('class' => "text-bottom", 'title' => _("Wird gelÃ¶scht."))) ?>
                 </td>
                 <td><?= htmlReady($itemdata['item_id']) ?></td>
                 <td>
@@ -61,20 +59,14 @@
                                 $link = URLHelper::getLink("dispatch.php/course/dates", array('cid' => $item['range_id']));
                                 break;
                             case "Statusgruppen":
-                                $link = version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                                    ? URLHelper::getLink("dispatch.php/course/statusgroups", array('cid' => $item['range_id']))
-                                    : URLHelper::getLink("statusgruppen.php", array('cid' => $item['range_id']));
+                                $link = URLHelper::getLink("dispatch.php/course/statusgroups", array('cid' => $item['range_id']));
                                 break;
                             case "Statusgruppen":
-                                $link = version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                                    ? URLHelper::getLink("dispatch.php/course/statusgroups", array('cid' => $item['range_id']))
-                                    : URLHelper::getLink("statusgruppen.php", array('cid' => $item['range_id']));
+                                $link = URLHelper::getLink("dispatch.php/course/statusgroups", array('cid' => $item['range_id']));
                                 break;
                         } ?>
                         <a href="<?= $link ?>" target="_blank">
-                            <?= version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                                ? Icon::create("arr_2right", "clickable")->asImg(20, array('class' => "text-bottom", 'title' => _("Zum Objekt.")))
-                                : Assets::img("icons/20/blue/arr_2right", array('class' => "text-bottom", 'title' => _("Zum Objekt."))) ?>
+                            <?= Icon::create("arr_2right", "clickable")->asImg(20, array('class' => "text-bottom", 'title' => _("Zum Objekt."))) ?>
                         </a>
                     </td>
                 <? endif ?>

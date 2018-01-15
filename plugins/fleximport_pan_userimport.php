@@ -35,7 +35,7 @@ class fleximport_pan_userimport extends FleximportPlugin {
                             $seminar->deleteMember($object->getId());
                         }
                     }
-                    $datafield = DataField::findOneBySQL("name = 'Ich will weiterhin als Alumni in Stud.IP geführt werden' AND object_type = 'user'");
+                    $datafield = DataField::findOneBySQL("name = 'Ich will weiterhin als Alumni in Stud.IP gefÃ¼hrt werden' AND object_type = 'user'");
                     $user_wants_to_stay = DatafieldEntryModel::findOneBySQL("datafield_id = ? AND range_id = ?", array($datafield->getId(), $object->getId()));
                     if ($user_wants_to_stay && $user_wants_to_stay['content']) {
                         //In Veranstaltung ALUMNI die Statusgruppe anlegen:
@@ -75,8 +75,8 @@ class fleximport_pan_userimport extends FleximportPlugin {
     public function getDescription()
     {
         return "Es werden alle neuen Alumni in der Veranstaltung ALUMNI in die entsprechende Statusgruppe eingetragen. " .
-            "Falls die Studenten in die Domäne 'alumni' neu eingetragen werden sollen, aber nicht einverstanden sind, als Alumni weiter geführt zu werden, werden die Nutzer gelöscht, " .
-            "anstatt in die Alumni-Domäne übertragen zu werden.";
+            "Falls die Studenten in die DomÃ¤ne 'alumni' neu eingetragen werden sollen, aber nicht einverstanden sind, als Alumni weiter gefÃ¼hrt zu werden, werden die Nutzer gelÃ¶scht, " .
+            "anstatt in die Alumni-DomÃ¤ne Ã¼bertragen zu werden.";
     }
 }
 

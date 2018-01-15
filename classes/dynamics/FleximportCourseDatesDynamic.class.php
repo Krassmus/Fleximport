@@ -5,7 +5,7 @@ class FleximportCourseDatesDynamic implements FleximportDynamic {
     public function forClassFields()
     {
         return array(
-            'Course' => array("fleximport_course_dates" => _("Regelmäßige Termine"))
+            'Course' => array("fleximport_course_dates" => _("RegelmÃ¤ÃŸige Termine"))
         );
     }
 
@@ -75,7 +75,7 @@ class FleximportCourseDatesDynamic implements FleximportDynamic {
                     $cycle['weekday'] = $weekdays[$day];
                     $cycle['week_offset'] = 0;
                     $cycle['end_offset'] = floor(($semester->ende - $semester->beginn) / (7*24*60*60)) - 2;
-                    $cycle['cycle'] = 0; //wöchentlich
+                    $cycle['cycle'] = 0; //wÃ¶chentlich
                     $cycle->store();
                     $cycle_id = $cycle->getId();*/
 
@@ -119,7 +119,7 @@ class FleximportCourseDatesDynamic implements FleximportDynamic {
                     $cycle->end_hour = $matches[4];
                     $cycle->end_minute = $matches[5];
                     $cycle['weekday'] = $weekdays[$day];
-                    $cycle['cycle'] = 0; //wöchentlich
+                    $cycle['cycle'] = 0; //wÃ¶chentlich
                     $cycle['week_offset'] = 0;
                     $cycle['end_offset'] = floor(($semester->ende - $semester->beginn) / (7*24*60*60)) - 2;
                     $cycle->store();*/

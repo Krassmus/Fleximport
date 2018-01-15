@@ -100,7 +100,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                         $cycle['weekday'] = $weekdays[$day];
                         $cycle['week_offset'] = 0;
                         $cycle['end_offset'] = floor(($semester->ende - $semester->beginn) / (7*24*60*60)) - 2;
-                        $cycle['cycle'] = 0; //wöchentlich
+                        $cycle['cycle'] = 0; //wÃ¶chentlich
                         $cycle->store();
                         $cycle_id = $cycle->getId();*/
 
@@ -144,7 +144,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                         $cycle->end_hour = $matches[4];
                         $cycle->end_minute = $matches[5];
                         $cycle['weekday'] = $weekdays[$day];
-                        $cycle['cycle'] = 0; //wöchentlich
+                        $cycle['cycle'] = 0; //wÃ¶chentlich
                         $cycle['week_offset'] = 0;
                         $cycle['end_offset'] = floor(($semester->ende - $semester->beginn) / (7*24*60*60)) - 2;
                         $cycle->store();*/
@@ -216,7 +216,7 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
     }
 
     public function getDescription() {
-        return "Mapped Dozenten nach dem Nachnamen. Mehrere Dozenten bitte per Komma trennen. Das Feld 'zeit' wird verwendet, um regelmäßige Termine zu erzeugen. Beim Update werden die regelmäßigen Termine auch geupdated (also eventuell auch gelöscht).";
+        return "Mapped Dozenten nach dem Nachnamen. Mehrere Dozenten bitte per Komma trennen. Das Feld 'zeit' wird verwendet, um regelmÃ¤ÃŸige Termine zu erzeugen. Beim Update werden die regelmÃ¤ÃŸigen Termine auch geupdated (also eventuell auch gelÃ¶scht).";
     }
 }
 

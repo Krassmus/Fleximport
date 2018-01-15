@@ -38,7 +38,7 @@ class WebhookendpointsController extends PluginController {
                 switch ($_SERVER['HTTP_CONTENT_TYPE']) {
                     case "text/json":
                     case "application/json":
-                        $body = studip_utf8decode(json_decode($body));
+                        $body = json_decode($body);
                         if (is_array($body) && !$this->isAssoc($body)) {
                             $datalines = $body;
                         } else {
@@ -49,8 +49,8 @@ class WebhookendpointsController extends PluginController {
                     default:
                         //CSV to data:
                         $type = "csv";
-                        if ($table['tabledata']['source_encoding'] === "utf8") {
-                            $body = studip_utf8decode($body);
+                        if ($table['tabledata']['source_encoding'] !== "utf8") {
+                            $body = mb_convert_encoding($body, "UTF-8", "Windows-1252");
                         }
                         $body = $table->CSV2Array($body);
                         $headline = array_shift($body);

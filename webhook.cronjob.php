@@ -15,7 +15,7 @@ class FleximportWebhookJob extends CronJob
      */
     public static function getDescription()
     {
-        return _('Sendet alle eingetragenen Webhooks, falls es Änderungen an den Tabellen gegeben hat.');
+        return _('Sendet alle eingetragenen Webhooks, falls es Ã„nderungen an den Tabellen gegeben hat.');
     }
 
     /**
@@ -70,7 +70,7 @@ class FleximportWebhookJob extends CronJob
                         'server_id' => $GLOBALS['STUDIP_INSTALLATION_ID'],
                         'server_url' => $GLOBALS['ABSOLUTE_URI_STUDIP']
                     );
-                    $payload = json_encode(studip_utf8encode($payload));
+                    $payload = json_encode($payload);
                     foreach ($urls as $url) {
                         //Send webhook now:
                         $header = array();

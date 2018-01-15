@@ -22,26 +22,20 @@ $actions = new ActionsWidget();
 $actions->addLink(
     _("Prozess erstellen"),
     PluginEngine::getURL($plugin, array(), "process/edit"),
-    version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-        ? Icon::create("archive2", "clickable")
-        : Assets::image_path("icons/blue/add/archive2"),
+    Icon::create("archive2", "clickable"),
     array('data-dialog' => 1)
 );
 if ($process) {
     $actions->addLink(
         _("Prozess bearbeiten"),
         PluginEngine::getURL($plugin, array(), "process/edit/".$process->getId()),
-        version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-            ? Icon::create("edit", "clickable")
-            : Assets::image_path("icons/blue/edit"),
+        Icon::create("edit", "clickable"),
         array('data-dialog' => 1)
     );
     $actions->addLink(
-        _("Tabelle hinzufügen"),
+        _("Tabelle hinzufÃ¼gen"),
         PluginEngine::getURL($plugin, array('process_id' => $process->getId()), "setup/table"),
-        version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-            ? Icon::create("add", "clickable")
-            : Assets::image_path("icons/blue/add"),
+        Icon::create("add", "clickable"),
         array('data-dialog' => 1)
     );
 }

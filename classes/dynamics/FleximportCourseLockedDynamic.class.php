@@ -5,7 +5,7 @@ class FleximportCourseLockedDynamic implements FleximportDynamic {
     public function forClassFields()
     {
         return array(
-            'Course' => array("fleximport_locked" => _("1 für gesperrt"))
+            'Course' => array("fleximport_locked" => _("1 fÃ¼r gesperrt"))
         );
     }
 

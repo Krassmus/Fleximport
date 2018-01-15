@@ -2,11 +2,11 @@
 
 /**
  * Interface FleximportPlugin
- * Alle Dateien in diesem Verzeichnis werden automatisch eingebunden. Sie sind gewissermaßen Subplugins zu
- * dem Fleximport-Plugin und ermöglichen besondere lokale Spezialitäten, die wir durch die Einstellmöglichkeiten
- * über die GUI des Plugins nicht ermöglichen könnten. Der Klassiker ist da sicher das dynamische Anlegen und
- * Einhängen in den Studienbereichsbaum. Aber es wäre zum Beispiel auch möglich, DoIt Aufgaben gleich mit über
- * die Veranstaltungstabelle anzulegen oder die Veranstaltungsbeschreibung über ein Template zu ermöglichen.
+ * Alle Dateien in diesem Verzeichnis werden automatisch eingebunden. Sie sind gewissermaÃŸen Subplugins zu
+ * dem Fleximport-Plugin und ermÃ¶glichen besondere lokale SpezialitÃ¤ten, die wir durch die EinstellmÃ¶glichkeiten
+ * Ã¼ber die GUI des Plugins nicht ermÃ¶glichen kÃ¶nnten. Der Klassiker ist da sicher das dynamische Anlegen und
+ * EinhÃ¤ngen in den Studienbereichsbaum. Aber es wÃ¤re zum Beispiel auch mÃ¶glich, DoIt Aufgaben gleich mit Ã¼ber
+ * die Veranstaltungstabelle anzulegen oder die Veranstaltungsbeschreibung Ã¼ber ein Template zu ermÃ¶glichen.
  */
 
 abstract class FleximportPlugin {

@@ -48,7 +48,7 @@
             <?= $this->render_partial("setup/_field_mapping.php", array(
                 'field' => "fleximport_username_prefix",
                 'table' => $table,
-                'placeholder' => _("Präfix für den Nutzernamen"),
+                'placeholder' => _("PrÃ¤fix fÃ¼r den Nutzernamen"),
                 'mapperclasses' => $mapperclasses
             )) ?>
 
