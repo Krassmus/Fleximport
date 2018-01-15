@@ -46,7 +46,7 @@ class fleximport_semiro_course_groups extends FleximportPlugin {
         $fields = array();
 
         $doc = new DOMDocument();
-        $doc->loadXML($result->return);
+        $doc->loadXML(mb_convert_encoding($result->return, "Windows-1252", "UTF-8"));
         $seminar_data = array();
         foreach ($doc->getElementsByTagName("seminar") as $seminar) {
             $seminar_data_row = array();

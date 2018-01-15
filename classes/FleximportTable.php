@@ -73,9 +73,16 @@ class FleximportTable extends SimpleORMap {
                     $this->fetchDataFromWeblink();
                     return;
                 } elseif($this['source'] === "csv_studipfile") {
-                    $output = $this->getCSVDataFromFile(get_upload_file_path($this['tabledata']['weblink']['file_id']), ";");
-                    $headline = array_shift($output);
-                    $this->createTable($headline, $output);
+                    $file = FileRef::find($this['tabledata']['weblink']['file_id']);
+                    if ($file) {
+                        $output = $this->getCSVDataFromFile($file->file->getPath(), ";");
+                        $headline = array_shift($output);
+                        $this->createTable($headline, $output);
+                    } else {
+                        PageLayout::postError(
+                            _("Angegebene Datei konnte nicht im System gefunden werden.")
+                        );
+                    }
                     return;
                 }
             } else {
