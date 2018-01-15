@@ -74,7 +74,7 @@ class FleximportTable extends SimpleORMap {
                     return;
                 } elseif($this['source'] === "csv_studipfile") {
                     $file = FileRef::find($this['tabledata']['weblink']['file_id']);
-                    if ($file) {
+                    if ($file && $file->file) {
                         $output = $this->getCSVDataFromFile($file->file->getPath(), ";");
                         $headline = array_shift($output);
                         $this->createTable($headline, $output);
