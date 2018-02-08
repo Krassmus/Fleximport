@@ -7,7 +7,7 @@ class FixMappedItems extends Migration {
     {
         DBManager::get()->exec("
 	        ALTER TABLE `fleximport_mapped_items`
-	        CHANGE `import_type` `table_id` VARCHAR(200) NOT NULL DEFAULT '0'
+	        CHANGE `import_type` `table_id` VARCHAR(150) NOT NULL DEFAULT '0'
         ");
         SimpleORMap::expireTableScheme();
     }
@@ -16,7 +16,7 @@ class FixMappedItems extends Migration {
     {
         DBManager::get()->exec("
 	        ALTER TABLE `fleximport_mapped_items`
-	        CHANGE `table_id` `import_type` VARCHAR(200) NOT NULL DEFAULT '0'
+	        CHANGE `table_id` `import_type` VARCHAR(150) NOT NULL DEFAULT '0'
 	    ");
         SimpleORMap::expireTableScheme();
     }
