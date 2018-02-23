@@ -67,7 +67,7 @@ class ImportController extends PluginController {
                         $table = new FleximportTable($table_id);
                         $output = $this->plugin->getCSVDataFromFile($tmp_name);
                         if ($table['tabledata']['source_encoding'] !== "utf8") {
-                            $output = mb_convert_encoding($output, "UTF-8", "Windows-1252");
+                            $output = $this->mb_convert_encoding_rec($output, "UTF-8", "Windows-1252");
                         }
                         $headline = array_shift($output);
                         $table->createTable($headline, $output);
@@ -78,6 +78,20 @@ class ImportController extends PluginController {
 
         }
         $this->redirect("import/overview/".$process_id);
+    }
+
+    protected function mb_convert_encoding_rec($input, $to_enc, $from_enc)
+    {
+        if (is_string($input)) {
+            return mb_convert_encoding($input, $to_enc, $from_enc);
+        } elseif(is_array($input)) {
+            $new = array();
+            foreach ($input as $key => $value) {
+                $new[mb_convert_encoding($key, $to_enc, $from_enc)] = $this->mb_convert_encoding_rec($value, $to_enc, $from_enc);
+            }
+            return $new;
+        }
+        return mb_convert_encoding((string) $input, $to_enc, $from_enc);
     }
 
     public function showtable_action($table_id)

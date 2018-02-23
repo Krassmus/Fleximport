@@ -56,8 +56,13 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
     }
 
     static public function getCSVDataFromFile($file_path, $delim = ';', $encl = '"', $optional = 1) {
-        $bom = pack('H*','EFBBBF'); //remove BOM is there is one
-        return self::CSV2Array(preg_replace("/^$bom/", '', file_get_contents($file_path)), $delim, $encl, $optional);
+        $bom = pack('H*','EFBBBF'); //remove BOM if there is one
+        return self::CSV2Array(
+            preg_replace("/^$bom/", '', file_get_contents($file_path)),
+            $delim,
+            $encl,
+            $optional
+        );
     }
 
     public function __construct() {

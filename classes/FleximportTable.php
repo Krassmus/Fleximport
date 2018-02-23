@@ -382,6 +382,15 @@ class FleximportTable extends SimpleORMap {
         );
     }
 
+    public function clearIndicators() {
+        return FleximportMappedItem::deleteBySQL(
+            "table_id = :table_id",
+            array(
+                'table_id' => $this->getId()
+            )
+        );
+    }
+
     /**
      * Returns the line for the given id as an associative array.
      * @param integer $id
