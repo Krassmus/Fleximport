@@ -140,4 +140,11 @@ class SetupController extends PluginController {
         }
     }
 
+    public function clear_indicators_action($table_id) {
+        $this->table = new FleximportTable($table_id);
+        $this->table->clearIndicators();
+        PageLayout::postSuccess(sprintf(_("Synchronisationsdaten von Tabelle %s wurden gelöscht."), $this->table->name));
+        $this->redirect("import/overview/".$this->table->process_id);
+    }
+
 }

@@ -382,6 +382,15 @@ class FleximportTable extends SimpleORMap {
         );
     }
 
+    public function clearIndicators() {
+        return FleximportMappedItem::deleteBySQL(
+            "table_id = :table_id",
+            array(
+                'table_id' => $this->getId()
+            )
+        );
+    }
+
     /**
      * Returns the line for the given id as an associative array.
      * @param integer $id
@@ -593,31 +602,6 @@ class FleximportTable extends SimpleORMap {
                 $entry = new DatafieldEntryModel($id);
                 $entry['content'] = $data[$fieldname];
                 $entry->store();
-            }
-        }
-
-        if ($classname === "Course") {
-            $folder_exist = DBManager::get()->prepare("
-                SELECT 1 FROM folder WHERE range_id = ?
-            ");
-            $folder_exist->execute(array($object->getId()));
-            if (!$folder_exist->fetch()) {
-                $insert_folder = DBManager::get()->prepare("
-                    INSERT IGNORE INTO folder
-                    SET folder_id = MD5(CONCAT(:seminar_id, 'allgemeine_dateien')),
-                    range_id = :seminar_id,
-                    user_id = :user_id,
-                    name = :name,
-                    description = :description,
-                    mkdate = UNIX_TIMESTAMP(),
-                    chdate = UNIX_TIMESTAMP()
-                ");
-                $insert_folder->execute(array(
-                    'seminar_id' => $object->getId(),
-                    'user_id' => $GLOBALS['user']->id,
-                    'name' => _("Allgemeiner Dateiordner"),
-                    'description' => _("Ablage für allgemeine Ordner und Dokumente der Veranstaltung")
-                ));
             }
         }
 

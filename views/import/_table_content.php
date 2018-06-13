@@ -131,6 +131,17 @@
         <tfoot>
             <tr>
                 <td colspan="100">
+                    <? $all_deletables = $table->countDeletableItems() ?>
+                    <? if ($all_deletables > 0) : ?>
+                    <div style="float: right;">
+                        <a href="<?= PluginEngine::getLink($plugin, array(), "setup/clear_indicators/".$table->getId()) ?>"
+                           title="<?= sprintf(_("Synchronisationsdaten mit %s Datensätzen verwerfen"), $all_deletables) ?>"
+                           onClick="return window.confirm('<?= _("Wirklich die Synchronisationsdaten verwerfen?") ?>');">
+                            <?= Icon::create("category+remove", "clickable")->asImg(20) ?>
+                        </a>
+                    </div>
+                    <? endif ?>
+
                     <? $deletable_items = $table->countDeletableItems($item_ids) ?>
                     <? if ($deletable_items > 0) : ?>
                         <a href="<?= PluginEngine::getLink($plugin, array(), "import/deletables/".$table->getId()) ?>" data-dialog>

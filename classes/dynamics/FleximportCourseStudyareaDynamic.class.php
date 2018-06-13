@@ -5,7 +5,7 @@ class FleximportCourseStudyareaDynamic implements FleximportDynamic {
     public function forClassFields()
     {
         return array(
-            'Course' => array("fleximport_studyarea" => _("sem_tree_ids oder Namen der Studienbereiche"))
+            'Course' => array("fleximport_studyarea" => _("sem_tree_ids"))
         );
     }
 

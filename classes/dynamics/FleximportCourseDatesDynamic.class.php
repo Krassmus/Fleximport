@@ -16,12 +16,12 @@ class FleximportCourseDatesDynamic implements FleximportDynamic {
 
     public function applyValue($object, $value, $line, $sync)
     {
-        if (!$value) {
-            $value = array($object['institut_id']);
-        } else if(!in_array($object['institut_id'], $value)) {
-            $value[] = $object['institut_id'];
+        //Example: 2018-05-23 14:15 - 2018-05-23 16:00
+        //Example: Di 10:00 - 12:00
+        //Or combinations of those formats
+        if (!trim($value)) {
+            return;
         }
-        $old_institutes = $this->currentValue($object, "fleximport_related_institutes", $sync);
 
         $weekdays = array(
             'so' => 0,
@@ -59,7 +59,7 @@ class FleximportCourseDatesDynamic implements FleximportDynamic {
                 ));
                 $found = false;
                 foreach ($statement->fetchAll(PDO::FETCH_COLUMN) as $cycle_id) {
-                    if (FleximportMappedItem::findbyItemId($cycle_id, $import_type_metadates)) {
+                    if (FleximportMappedItem::findbyItemId($cycle_id, "fleximport_course_dates_".$object->getId())) {
                         $found = $cycle_id;
                         break;
                     }
@@ -92,7 +92,7 @@ class FleximportCourseDatesDynamic implements FleximportDynamic {
                     ));
 
                     $mapped = new FleximportMappedItem();
-                    $mapped['table_id'] = $import_type_metadates;
+                    $mapped['table_id'] = "fleximport_course_dates_".$object->getId();
                     $mapped['item_id'] = $cycle_id;
                     $mapped->store();
 
@@ -129,7 +129,7 @@ class FleximportCourseDatesDynamic implements FleximportDynamic {
             }
         } else {
             //$zeit = explode("-", $zeit);
-            preg_match("/(\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{1,2})\s*-\s(\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{1,2})/", $zeit, $matches);
+            preg_match("/(\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{1,2})\s*-\s(\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{1,2})/", $value, $matches);
             $begin = strtotime($matches[1]);
             $end = strtotime($matches[2]);
             $found = false;
@@ -140,7 +140,7 @@ class FleximportCourseDatesDynamic implements FleximportDynamic {
                 'end' => $end
             ));
             foreach ($dates as $date) {
-                if (FleximportMappedItem::findbyItemId($date->getId(), $import_type_dates)) {
+                if (FleximportMappedItem::findbyItemId($date->getId(), "fleximport_course_dates_".$object->getId())) {
                     $found = true;
                     $singledates[] = $date->getId();
                     break;
@@ -155,7 +155,7 @@ class FleximportCourseDatesDynamic implements FleximportDynamic {
                 $date->store();
 
                 $mapped = new FleximportMappedItem();
-                $mapped['table_id'] = $import_type_dates;
+                $mapped['table_id'] = "fleximport_course_dates_".$object->getId();
                 $mapped['item_id'] = $date->getId();
                 $mapped->store();
 

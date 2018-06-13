@@ -12,7 +12,7 @@ class FleximportStatusgruppe_idMapper implements FleximportMapper {
 
     public function possibleFormats() {
         return array(
-            "uniquename" => "Gruppenname in Veranstaltung"
+            "uniquename" => "Gruppenname in Kontext"
         );
     }
 
