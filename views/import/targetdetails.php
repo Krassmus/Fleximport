@@ -83,6 +83,9 @@
                         if (count($id) < 3) {
                             $id[] = "";
                         }
+                        if (StudipVersion::newerThan("4.1") && count($id) < 4) {
+                            $id[] = "";
+                        }
                         $entry = new DatafieldEntryModel($id);
                         $oldvalue = $entry->content;
                         ?>
