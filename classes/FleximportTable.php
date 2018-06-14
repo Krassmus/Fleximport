@@ -690,6 +690,8 @@ class FleximportTable extends SimpleORMap {
                                 $value = "";
                             }
                             $data[$field] = $value;
+                        } elseif($field == "fleximport_welcome_message" && FleximportConfig::get($this['tabledata']['simplematching'][$field]['column'])) {
+                            $data[$field] = $this['tabledata']['simplematching'][$field]['column'];
                         } else {
                             //use a matched column
                             $data[$field] = $line[$this['tabledata']['simplematching'][$field]['column']];
