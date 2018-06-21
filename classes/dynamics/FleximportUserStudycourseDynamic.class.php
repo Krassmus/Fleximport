@@ -41,7 +41,7 @@ class FleximportUserStudycourseDynamic implements FleximportDynamic {
             if ($studiengang && $abschluss) {
                 $studiengang = StudyCourse::find($studiengang) ?: StudyCourse::findOneBySQL("name = ?", array($studiengang));
                 $abschluss = Degree::find($abschluss) ?: Degree::findOneBySQL("name = ?", array($abschluss));
-                $userstudycourse = UserStudyCourse::findOneBySQL("user_id = :user_id AND studiengang_id = :fach_id AND abschluss_id = :abschluss_id", array(
+                $userstudycourse = UserStudyCourse::findOneBySQL("user_id = :user_id AND fach_id = :fach_id AND abschluss_id = :abschluss_id", array(
                     'user_id' => $object->getId(),
                     'fach_id' => $studiengang->getId(),
                     'abschluss_id' => $abschluss->getId()
@@ -49,7 +49,7 @@ class FleximportUserStudycourseDynamic implements FleximportDynamic {
                 if (!$userstudycourse) {
                     $userstudycourse = new UserStudyCourse();
                     $userstudycourse['user_id'] = $object->getId();
-                    $userstudycourse['studiengang_id'] = $studiengang->getId();
+                    $userstudycourse['fach_id'] = $studiengang->getId();
                     $userstudycourse['abschluss_id'] = $abschluss->getId();
                 }
                 $userstudycourse['semester'] = $fachsemester;
