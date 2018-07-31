@@ -164,6 +164,14 @@ class FleximportTable extends SimpleORMap {
                 $columns = $extern_db->query("
                     SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ".$extern_db->quote($this['tabledata']['server']['table'])."
                 ")->fetchAll(PDO::FETCH_COLUMN, 0);
+                foreach ($values as $i => $data) {
+                    foreach ($data as $k => $cell) {
+                        $values[$i][$k] = mb_convert_encoding($cell, 'UTF-8');
+                    }
+                }
+                foreach ($columns as $i => $name) {
+                    $columns[$i] = mb_convert_encoding($name, 'UTF-8');
+                }
                 break;
             default:
             case "mysql":
