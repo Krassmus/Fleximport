@@ -30,7 +30,7 @@ class fleximport_nsi_personendaten extends FleximportPlugin
     public function fieldsToBeMapped()
     {
         return array(
-            'user_id',
+            //'user_id',
             'username',
             'geschlecht'
         );

@@ -49,6 +49,13 @@ abstract class FleximportPlugin {
     }
 
     /**
+     * Executed directly after the
+     */
+    public function afterDataFetching()
+    {
+    }
+
+    /**
      * Transforms the body of the webhook push data to an array of associative arrays
      * @param string $body: the body of the push data. Can be json or csv or xml.
      * @param string $mime_type: the content-type of the request. Might be indicating what data the body contains.

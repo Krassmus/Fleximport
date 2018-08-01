@@ -116,6 +116,12 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
                 $table->fetchData();
             }
         }
+        foreach ($processes as $process) {
+            foreach ($process->tables as $table) {
+                //possibly clean up data to save time
+                $table->afterDataFetching();
+            }
+        }
         if ($GLOBALS['FLEXIMPORT_IS_CRONJOB']) {
             echo "Fetching data finished at ".date("c")."\n";
         }
