@@ -26,6 +26,9 @@ class ImportController extends PluginController {
                 foreach ($this->process->tables as $table) {
                     $table->fetchData();
                 }
+                foreach ($this->process->tables as $table) {
+                    $table->afterDataFetching();
+                }
                 $this->process['last_data_import'] = time();
                 $this->process->store();
             }

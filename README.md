@@ -62,7 +62,9 @@ Datenfelder spielen eine wichtige Rolle in Stud.IP. Sie können ganz normal gema
 
 ### Spezialfelder mappen
 
-Manche Felder sind nicht wirklich Felder der Zieltabelle. Ihre Feldnamen beginnen stets mit `fleximport_...`, damit man sie unterscheiden kann. Sie haben aber eine besondere Bedeutung. Zum Beispiel kann man damit die importierten Veranstaltungen gleich sperren. Wenn das so ist, wird Fleximport automatisch die Veranstaltung mit einem speziellen Anmeldeset, der gesperrten Anmeldung, verknüpfen. Da diese Verknüpfung kein einfacher Eintrag in der Tabelle `seminare` ist, sondern eine weitere Tabelle, wird das der Einfachheit halber über so ein Spezialmapping behandelt. Theoretisch könnte man auch einen zweiten Import nur für die Verknüpfungstabelle starten. Das wäre aber arg kompliziert für diesen häufigen Anwendungsfall. Die Spezialfelder machen die Importe daher sehr viel einfacher.
+Manche Felder sind nicht wirklich Felder der Zieltabelle. Ihre Feldnamen beginnen stets mit `fleximport_...`, damit man sie unterscheiden kann. Sie haben aber eine besondere Bedeutung. Zum Beispiel kann man damit die importierten Veranstaltungen gleich sperren. Wenn das so ist, wird Fleximport automatisch die Veranstaltung mit einem speziellen Anmeldeset, der gesperrten Anmeldung, verknüpfen. Da diese Verknüpfung kein einfacher Eintrag in der Tabelle `seminare` ist, sondern eine weitere Tabelle, wird das der Einfachheit halber über so ein Spezialmapping behandelt. Theoretisch könnte man auch einen zweiten Import nur für die Verknüpfungstabelle starten. Das wäre aber arg kompliziert für diesen häufigen Anwendungsfall. Die Spezialfelder machen die Importe daher sehr viel einfacher (*hüstel*).
+
+Manche dieser Spezialfelder ermöglichen den Eintrag mehrerer werde wie `fleximport_dozenten` als die Dozenten einer Veranstaltung. Fleximport fragt Sie, welches Trennzeichen innerhalb der Tabellenzelle die einzelnen Identifizierer dieser mehreren Datensätze verwendet werden soll. Sinnvolle Zeichen dafür sind das Semikolon `;`, das Komma `,`, die Pipe `|` oder das Leerzeichen.
 
 ## 4) Konfigurationen
 

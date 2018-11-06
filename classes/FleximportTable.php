@@ -98,6 +98,18 @@ class FleximportTable extends SimpleORMap {
         }
     }
 
+    /**
+     * This is a hook to do something after all tables of all processes have been imported.
+     * We often use that to delete useless data to save time.
+     */
+    public function afterDataFetching()
+    {
+        $plugin = $this->getPlugin();
+        if ($plugin) {
+            $plugin->afterDataFetching();
+        }
+    }
+
     public function getExportSecret()
     {
         return md5($this->getId().$GLOBALS['STUDIP_INSTALLATION_ID']);
@@ -151,6 +163,7 @@ class FleximportTable extends SimpleORMap {
     {
         switch ($this['tabledata']['server']['type']) {
             case "mssql":
+                setlocale (LC_TIME, 'de_DE'); //to prevent umlauts in datetime objects
                 $extern_db = new PDO(
                     "dblib:host=".$this['tabledata']['server']['adress'].":".$this['tabledata']['server']['port'].";dbname=".$this['tabledata']['server']['dbname']."",
                     $this['tabledata']['server']['user'],
@@ -164,6 +177,14 @@ class FleximportTable extends SimpleORMap {
                 $columns = $extern_db->query("
                     SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ".$extern_db->quote($this['tabledata']['server']['table'])."
                 ")->fetchAll(PDO::FETCH_COLUMN, 0);
+                foreach ($values as $i => $data) {
+                    foreach ($data as $k => $cell) {
+                        $values[$i][$k] = mb_convert_encoding($cell, 'UTF-8', 'Windows-1252');
+                    }
+                }
+                foreach ($columns as $i => $name) {
+                    $columns[$i] = mb_convert_encoding($name, 'UTF-8', 'Windows-1252');
+                }
                 break;
             default:
             case "mysql":
@@ -599,7 +620,7 @@ class FleximportTable extends SimpleORMap {
                 if (count($id) < 3) {
                     $id[] = "";
                 }
-                if (StudipVersion::newerThan("4.1") && count($id) < 4) {
+                if (StudipVersion::newerThan("4.0") && count($id) < 4) {
                     $id[] = "";
                 }
                 $entry = new DatafieldEntryModel($id);

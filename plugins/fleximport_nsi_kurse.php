@@ -74,12 +74,23 @@ class fleximport_nsi_kurse extends FleximportPlugin
                     return false;
                 } elseif (!$sem_tree_id) {
                     $sem_tree_id = md5(uniqid("hey hey WiKi"));
-                    $db->exec(
+                    $statement = DBManager::get()->prepare("
+                        INSERT IGNORE INTO sem_tree
+                        SET sem_tree_id = :sem_tree_id,
+                            parent_id = :parent_id,
+                            name = :name
+                    ");
+                    $statement->execute(array(
+                        'sem_tree_id' => $sem_tree_id,
+                        'parent_id' => $parent_id,
+                        'name' => $ebene
+                    ));
+                    /*$db->exec(
                         "INSERT INTO sem_tree " .
                         "SET sem_tree_id = ".$db->quote($sem_tree_id).", " .
                             "parent_id = ".$db->quote($parent_id).", " .
                             "name = ".$db->quote($ebene)." " .
-                    "");
+                    "");*/
                 }
                 $parent_id = $sem_tree_id;
             }
@@ -90,6 +101,24 @@ class fleximport_nsi_kurse extends FleximportPlugin
     
     
     //own code starts here
+
+    /**
+     * Clean up old semesters and their data
+     */
+    public function afterDataFetching()
+    {
+        //$old_semesters = array("2011/12", "2012/13", "2013/14", "2014/15", "2015/16", "2016/17");
+        $old_semesters = preg_split("/\s+/", FleximportConfig::get("NSI_OLD_SEMESTERS"), -1, PREG_SPLIT_NO_EMPTY);
+        if (count($old_semesters)) {
+            $statement = DBManager::get()->prepare("
+                DELETE FROM `fleximport_nsi_kurse`
+                WHERE `ausbildungsjahr` IN (:old_semesters)
+            ");
+            $statement->execute(array(
+                'old_semesters' => $old_semesters
+            ));
+        }
+    }
     
     public function fieldsToBeMapped()
     {
