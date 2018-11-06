@@ -39,7 +39,7 @@ class ExportController extends PluginController {
         }
         $delimiter = ";";
         $mask = '"';
-        $output_string = "";
+        $output_string = chr(239) . chr(187) . chr(191); //BOM
         foreach ($output as $key => $line) {
             if ($key > 0) {
                 $output_string .= "\n";
