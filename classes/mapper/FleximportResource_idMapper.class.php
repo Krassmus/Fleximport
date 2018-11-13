@@ -1,6 +1,6 @@
 <?php
 
-class FleximportInstitut_idMapper implements FleximportMapper {
+class FleximportResource_idMapper implements FleximportMapper {
 
     public function getName() {
         return "resource_id";
@@ -13,17 +13,17 @@ class FleximportInstitut_idMapper implements FleximportMapper {
     public function possibleFormats() {
         $formats = array(
             "name" => "Name der Ressource",
-            "description" => "Beschreibung"
+            "description" => "Beschreibung der Ressource"
         );
         $statement = DBManager::get()->prepare("
-            SELECT property_id, name
+            SELECT property_id, `name`
             FROM resources_properties
             ORDER BY name ASC
         ");
         $statement->execute();
 
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $property) {
-            $formats[$property['property_id']] = _("Eigenschaft")." '".$property['name']."'";
+            $formats[$property['property_id']] = _("Ressourceneigenschaft")." '".$property['name']."'";
         }
         return $formats;
     }
