@@ -9,11 +9,11 @@ class FleximportConfig {
     static public function template($text, $data, $rawline)
     {
         foreach ($data as $index => $value) {
-            $text = str_replace("{{".$index."}}", $value, $text);
+            $text = str_ireplace("{{".$index."}}", $value, $text);
         }
         foreach ($rawline as $index => $value) {
             if (!in_array($index, $data)) {
-                $text = str_replace("{{".$index."}}", $value, $text);
+                $text = str_ireplace("{{".$index."}}", $value, $text);
             }
         }
         $functions = array("md5", "urlencode");

@@ -58,8 +58,6 @@ class FleximportCourseDateAssignmentDynamic implements FleximportDynamic {
                 'end' => $object['end_time']
             ));
         }
-
-        return $statement->fetch(PDO::FETCH_COLUMN, 0);
     }
 
     public function currentValue($object, $field, $sync)
