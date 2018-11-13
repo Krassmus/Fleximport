@@ -625,7 +625,7 @@ class FleximportTable extends SimpleORMap {
                 }
                 $entry = new DatafieldEntryModel($id);
                 $entry['content'] = $data[$fieldname];
-                //$entry->store();
+                $entry->store();
             }
         }
 
