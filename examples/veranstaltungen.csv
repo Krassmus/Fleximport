@@ -1,2 +1,2 @@
-"Veranstaltungsnummer";"Name der Veranstaltung";"Dozenten";"Einrichtung"
-"11";"Test-Lehrveranstaltung aus LSF";"test_dozent";"Test Fakultät"
+"Veranstaltungsnummer";"Name der Veranstaltung";"Dozenten";"Einrichtung";"Ordner"
+"11";"Test-Lehrveranstaltung aus LSF";"test_dozent";"Test Fakultät";"Hauptorder; Hausaufgaben (HomeworkFolder); Materialien (MaterialFolder)"
