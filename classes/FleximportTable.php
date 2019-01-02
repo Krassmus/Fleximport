@@ -240,16 +240,25 @@ class FleximportTable extends SimpleORMap {
         $db->exec($create_sql);
 
         foreach ($entries as $line) {
-            $insert_sql = "INSERT INTO `".addslashes($this['name'])."` SET ";
-            foreach ($headers as $key => $field) {
-                if ($field) {
-                    $key < 1 || $insert_sql .= ", ";
-                    $value = trim($line[$key]);
-                    $field = strtolower(self::reduceDiakritikaFromIso88591($field));
-                    $insert_sql .= "`" . addslashes($field) . "` = " . $db->quote($value) . " ";
+            $insertable = false;
+            foreach ($headers as $key => $fieldname) {
+                if (trim($line[$key])) {
+                    $insertable = true;
+                    break;
                 }
             }
-            $db->exec($insert_sql);
+            if ($insertable) {
+                $insert_sql = "INSERT INTO `" . addslashes($this['name']) . "` SET ";
+                foreach ($headers as $key => $field) {
+                    if ($field) {
+                        $key < 1 || $insert_sql .= ", ";
+                        $value = trim($line[$key]);
+                        $field = strtolower(self::reduceDiakritikaFromIso88591($field));
+                        $insert_sql .= "`" . addslashes($field) . "` = " . $db->quote($value) . " ";
+                    }
+                }
+                $db->exec($insert_sql);
+            }
         }
     }
 
