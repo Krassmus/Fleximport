@@ -24,7 +24,16 @@ class FleximportDateMapper implements FleximportMapper {
                 return $value;
                 break;
             case "strtotime":
-                return strtotime($value);
+                $timestamp = strtotime($value);
+                if ($timestamp === false) {
+                    $value = str_ireplace(
+                        array("Mrz", "Mär", "Mai", "Okt", "Dez"),
+                        array("Mar", "Mar", "May", "Oct", "Dec"),
+                        $value
+                    );
+                    $timestamp = strtotime($value);
+                }
+                return $timestamp;
                 break;
         }
     }

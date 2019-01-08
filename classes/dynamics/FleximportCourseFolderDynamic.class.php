@@ -18,7 +18,7 @@ class FleximportCourseFolderDynamic implements FleximportDynamic {
     {
         $newfolders = array();
         foreach ($value as $f) {
-            $success = preg_match("/(.+)\w*\((.+)\)/", $f, $matches);
+            $success = preg_match("/(.+)\s*\((.+)\)/", $f, $matches);
             $foldertype = trim($matches[2]);
             if ($success
                     && class_exists($foldertype)
