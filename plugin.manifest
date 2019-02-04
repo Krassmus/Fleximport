@@ -4,4 +4,4 @@ version=1.4.8
 origin=data-quest
 description=Ein flexibles Grundplugin, um alles mögliche wie Veranstaltungen, Nutzer, Termine, Gruppen und Teilnehmerdaten zu importieren.
 studipMinVersion=4.0
-studipMaxVersion=4.1.99
+studipMaxVersion=4.2.99
