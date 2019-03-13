@@ -16,12 +16,16 @@ class FleximportConfig {
                 $text = str_ireplace("{{".$index."}}", $value, $text);
             }
         }
-        $functions = array("md5", "urlencode");
+        $functions = array("md5", "urlencode", "strip_whitespace");
         foreach ($functions as $function) {
             $text = preg_replace_callback(
                 "/".strtoupper($function)."\((.*)\)/",
                 function ($match) use ($function) {
-                    return $function($match[1]);
+                    if ($function === "strip_whitespace") {
+                        return preg_replace("/\s+/", "", $match[1]);
+                    } else {
+                        return $function($match[1]);
+                    }
                 },
                 $text
             );
