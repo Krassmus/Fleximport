@@ -867,7 +867,7 @@ class FleximportTable extends SimpleORMap {
             'errors' => ""
         );
 
-        if ($classname && $classname !== "fleximport_mysql_command") {
+        if ($classname && ($classname !== "fleximport_mysql_command")) {
             try {
                 if ($data === null) {
                     $data = $this->getMappedData($line);

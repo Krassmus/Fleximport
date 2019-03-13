@@ -64,16 +64,16 @@
 
 
     <thead>
-    <tr>
-        <th></th>
-        <th></th>
-        <? $tableHeader = $table->getTableHeader() ?>
-        <? foreach ($tableHeader as $column) : ?>
-            <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY" && (!$table['tabledata']['display_only_columns'] || in_array($column, $table['tabledata']['display_only_columns']))) : ?>
-                <th><?= htmlReady($column) ?></th>
-            <? endif ?>
-        <? endforeach ?>
-    </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            <? $tableHeader = $table->getTableHeader() ?>
+            <? foreach ($tableHeader as $column) : ?>
+                <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY" && (!$table['tabledata']['display_only_columns'] || in_array($column, $table['tabledata']['display_only_columns']))) : ?>
+                    <th><?= htmlReady($column) ?></th>
+                <? endif ?>
+            <? endforeach ?>
+        </tr>
     </thead>
     <tbody>
     <? $item_ids = array() ?>
@@ -89,7 +89,7 @@
             if (($count < (int) $limit || $report['errors']) || $limit === false) : ?>
                 <tr>
                     <td>
-                        <? if ($table['import_type']) : ?>
+                        <? if ($table['import_type'] && ($table['import_type'] !== "fleximport_mysql_command")) : ?>
                             <a href="<?= PluginEngine::getLink($plugin, array('table' => $table['name']), "import/targetdetails/".$line['IMPORT_TABLE_PRIMARY_KEY']) ?>" data-dialog>
                                 <? $icon = $report['found'] ? "accept" : "star" ?>
                                 <? if ($report['errors']) : ?>
@@ -98,6 +98,8 @@
                                     <?= Icon::create($icon, "clickable")->asImg(20, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden und wird geupdated") : _("Objekt wird neu angelegt werden. Zur Datenvorschau."))) ?>
                                 <? endif ?>
                             </a>
+                        <? elseif ($table['import_type'] === "fleximport_mysql_command") : ?>
+                            <?= Icon::create("question-circle", "info")->asImg(20, array('title' => _("Daten werden über MySQL-Anweisung eventuell importiert."))) ?>
                         <? endif ?>
                     </td>
                     <td>
