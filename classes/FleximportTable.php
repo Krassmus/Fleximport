@@ -72,6 +72,9 @@ class FleximportTable extends SimpleORMap {
                 } elseif ($this['source'] === "csv_weblink") {
                     $this->fetchDataFromWeblink();
                     return;
+                } elseif ($this['source'] === "csv_path") {
+                    $this->fetchDataFromPath();
+                    return;
                 } elseif($this['source'] === "csv_studipfile") {
                     $file = FileRef::find($this['tabledata']['weblink']['file_id']);
                     if ($file && $file->file) {
@@ -222,8 +225,18 @@ class FleximportTable extends SimpleORMap {
         $this->createTable($headline, $output);
     }
 
+    public function fetchDataFromPath()
+    {
+        $output = $this->getCSVDataFromFile($this['tabledata']['weblink']['path'], ";");
+        $headline = array_shift($output);
+        $this->createTable($headline, $output);
+    }
+
     public function createTable($headers, $entries = array())
     {
+        if (!$headers) {
+            return;
+        }
         $db = DBManager::get();
         $this->drop();
         $create_sql = "CREATE TABLE `".addslashes($this['name'])."` (";
@@ -238,6 +251,7 @@ class FleximportTable extends SimpleORMap {
         $create_sql .= ", PRIMARY KEY (`IMPORT_TABLE_PRIMARY_KEY`) ";
         $create_sql .= ") ENGINE=MyISAM";
         $db->exec($create_sql);
+
 
         foreach ($entries as $line) {
             $insertable = false;
@@ -297,7 +311,17 @@ class FleximportTable extends SimpleORMap {
     }
 
     public function getCSVDataFromFile($file_path, $delim = ';', $encl = '"', $optional = 1) {
+        if (!file_exists($file_path)) {
+            PageLayout::postError(_("Datei ist nicht vorhanden."));
+            return array();
+        }
+        if (!is_readable($file_path)) {
+            PageLayout::postError(_("Kann Daten nicht lesen."));
+            return array();
+        }
         $contents = file_get_contents($file_path);
+        $bom = pack('H*','EFBBBF');
+        $contents = preg_replace("/^$bom/", '', $contents);
         if ($this['tabledata']['source_encoding'] !== "utf8") {
             $contents = mb_convert_encoding($contents, "UTF-8", "Windows-1252");
         }
@@ -306,6 +330,8 @@ class FleximportTable extends SimpleORMap {
 
     public function getCSVDataFromURL($file_path, $delim = ';', $encl = '"', $optional = 1) {
         $contents = file_get_contents($file_path);
+        $bom = pack('H*','EFBBBF');
+        $contents = preg_replace("/^$bom/", '', $contents);
         if ($this['tabledata']['source_encoding'] !== "utf8") {
             $contents = mb_convert_encoding($contents, "UTF-8", "Windows-1252");
         }
