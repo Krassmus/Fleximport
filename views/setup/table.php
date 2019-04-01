@@ -38,10 +38,11 @@
     <? if ($table->isNew() || !$table->getPlugin() || !$table->getPlugin()->customImportEnabled()) : ?>
         <label>
             <?= _("Import über") ?>
-            <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink'); jQuery('#sqlview_info').toggle(this.value == 'sqlview'); jQuery('#csv_studipfile_info').toggle(this.value == 'csv_studipfile'); jQuery('#csv_encoding').toggle(['csv_studipfile','csv_upload','csv_weblink'].indexOf(this.value) !== -1);">
+            <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink'); jQuery('#path_info').toggle(this.value == 'csv_path'); jQuery('#sqlview_info').toggle(this.value == 'sqlview'); jQuery('#csv_studipfile_info').toggle(this.value == 'csv_studipfile'); jQuery('#csv_encoding').toggle(['csv_studipfile','csv_upload','csv_weblink','csv_path'].indexOf(this.value) !== -1);">
                 <option value="csv_upload"<?= $table['source'] === "csv_upload" || $table->isNew() ? " selected" : "" ?>><?= _("CSV-Upload") ?></option>
                 <option value="csv_studipfile"<?= $table['source'] === "csv_studipfile" ? " selected" : "" ?>><?= _("CSV-Datei in Stud.IP") ?></option>
                 <option value="csv_weblink"<?= $table['source'] === "csv_weblink" ? " selected" : "" ?>><?= _("CSV-Internetquelle") ?></option>
+                <option value="csv_path"<?= $table['source'] === "csv_path" ? " selected" : "" ?>><?= _("CSV-Pfad auf dem Server") ?></option>
                 <option value="database"<?= $table['source'] === "database" ? " selected" : "" ?>><?= _("Datenbank") ?></option>
                 <option value="extern"<?= $table['source'] === "extern" ? " selected" : "" ?>><?= _("Externes Tool") ?></option>
                 <option value="sqlview"<?= $table['source'] === "sqlview" ? " selected" : "" ?>><?= _("SQL-View") ?></option>
@@ -65,6 +66,11 @@
     <label id="weblink_info" style="<?= $table['source'] !== "csv_weblink" ? "display: none;" : "" ?>">
         <?= _("URL der CSV-Datei") ?>
         <input type="text" name="table[tabledata][weblink][url]" value="<?= htmlReady($table['tabledata']['weblink']['url']) ?>">
+    </label>
+
+    <label id="path_info" style="<?= $table['source'] !== "csv_path" ? "display: none;" : "" ?>">
+        <?= _("Pfad der CSV-Datei auf dem Server") ?>
+        <input type="text" name="table[tabledata][weblink][path]" value="<?= htmlReady($table['tabledata']['weblink']['path']) ?>">
     </label>
 
     <label id="sqlview_info" style="<?= $table['source'] !== "sqlview" ? "display: none;" : "" ?>">
