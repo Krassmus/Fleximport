@@ -50,7 +50,7 @@
         </label>
     <? endif ?>
 
-    <label id="csv_encoding" style="<?= !in_array($table['source'], array("csv_upload", "csv_studipfile", "csv_weblink")) ? "display: none;" : "" ?>">
+    <label id="csv_encoding" style="<?= !in_array($table['source'], array("csv_upload", "csv_studipfile", "csv_weblink", "csv_path")) ? "display: none;" : "" ?>">
         <?= _("Zeichensatz der Datei") ?>
         <select name="table[tabledata][source_encoding]">
             <option value="utf8"<?= $table['tabledata']['source_encoding'] === "utf8" ? " selected" : "" ?>>UTF-8</option>
