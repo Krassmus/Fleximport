@@ -26,10 +26,14 @@ class FleximportUserInstitutesDynamic implements FleximportDynamic {
         }
         if ($sync) {
             foreach (array_diff($old_institutes, $value) as $institut_id) {
-                $member = InstituteMember::deleteBySQL("institut_id = :institut_id AND user_id = :user_id", array(
-                    'institut_id' => $institut_id,
-                    'user_id' => $object->getId()
-                ));
+                try {
+                    InstituteMember::deleteBySQL("institut_id = :institut_id AND user_id = :user_id", array(
+                        'institut_id' => $institut_id,
+                        'user_id' => $object->getId()
+                    ));
+                } catch (Exception $e) {
+                    throw new Exception(sprintf(_("Konnte Nutzer %s nicht aus den Einrichtungen austragen: ", ($object->getFullName())).$e->getMessage()));
+                }
             }
         }
     }

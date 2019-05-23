@@ -19,7 +19,7 @@ class FleximportUserDomainsDynamic implements FleximportDynamic {
         $olddomains = UserDomain::getUserDomainsForUser($object->getId());
         if ($sync) {
             foreach ($olddomains as $olddomain) {
-                if (!in_array($olddomain->getID(), (array)$value)) {
+                if (!in_array($olddomain->getID(), (array) $value)) {
                     $olddomain->removeUser($object->getId());
                 }
             }
