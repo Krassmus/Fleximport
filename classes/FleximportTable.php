@@ -794,6 +794,7 @@ class FleximportTable extends SimpleORMap {
                 if (class_exists($mapperclass)) {
                     $mapper = new $mapperclass();
                     if (is_a($mapper, "FleximportMapper")) {
+
                         $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
                         $value = $data[$field] ?: ($data[$mapfrom] ?: $line[$mapfrom]);
                         if (is_array($value)) {
@@ -807,7 +808,7 @@ class FleximportTable extends SimpleORMap {
                                 }
                             }
                             $data[$field] = $value;
-                        } elseif($value) {
+                        } else {
                             $data[$field] = $mapper->map(
                                 $format,
                                 $value,
