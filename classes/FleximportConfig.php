@@ -6,8 +6,11 @@ class FleximportConfig {
 
     protected $variables = null;
 
-    static public function template($text, $data, $rawline)
+    static public function template($text, $data, $rawline, $singleinput = null)
     {
+        if ($singleinput) {
+            $text = str_ireplace("{{input}}", $singleinput, $text);
+        }
         foreach ($data as $index => $value) {
             $text = str_ireplace("{{".$index."}}", $value, $text);
         }

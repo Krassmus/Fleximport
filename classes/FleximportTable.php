@@ -740,7 +740,13 @@ class FleximportTable extends SimpleORMap {
                             $config = substr($this['tabledata']['simplematching'][$field]['column'], strlen("fleximportkeyvalue_"));
                             $map = parse_ini_string(FleximportConfig::get($config));
                             $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
-                            $value = $data[$field] ?: ($data[$mapfrom] ?: $line[$mapfrom]);
+                            if (strpos($mapfrom, "fleximportconfig_") === 0) {
+                                $config = substr($mapfrom, strlen("fleximportconfig_"));
+                                $template = FleximportConfig::get($config);
+                                $value = FleximportConfig::template($template, $data, $line);
+                            } else {
+                                $value = $data[$field] ?: ($data[$mapfrom] ?: $line[$mapfrom]);
+                            }
                             if (isset($map[$value])) {
                                 $value = FleximportConfig::template($map[$value], $data, $line);
                             } elseif(isset($map["default"])) {
@@ -781,6 +787,13 @@ class FleximportTable extends SimpleORMap {
                             null,
                             PREG_SPLIT_NO_EMPTY
                         );
+                        if ($this['tabledata']['simplematching'][$field]['dynamic_template']) {
+                            $configname = $this['tabledata']['simplematching'][$field]['dynamic_template'];
+                            foreach ($value as $i => $val) {
+                                $template = FleximportConfig::get($configname);
+                                $value[$i] = FleximportConfig::template($template, $data, $line, $val);
+                            }
+                        }
                         $data[$field] = $value;
                     }
                 }

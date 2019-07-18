@@ -110,7 +110,7 @@
 
             <? if ($delimiter) : ?>
                 <div id="simplematching_<?= md5($field) ?>_delimiter" style="<?= $table['tabledata']['simplematching'][$field]['column'] ? "display: flex;" : ' display: none;' ?>">
-                    <div style="width: 50%;">
+                    <div style="width: 33%;">
                         <label style="display: inline;">
                             <?= _("Trennzeichen") ?>
                             <input type="text"
@@ -122,7 +122,7 @@
                         <? $title = _("Dieses Feld kann mehrere Einträge haben. Sie können diese Einträge mit einem Zeichen trennen. Zum Beispiel ein Semikolon oder ein | Zeichen oder ein ganzes Wort. Auch reguläre Ausdrücke sind hier möglich.") ?>
                         <?= Icon::create("info-circle", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => $title, 'onclick' => "alert('".addslashes($title)."');", 'style' => "cursor: pointer")) ?>
                     </div>
-                    <div>
+                    <div style="width: 33%;">
                         <label>
                             <input type="checkbox"
                                    name="tabledata[simplematching][<?= htmlReady($field) ?>][sync]"
@@ -130,6 +130,16 @@
                                    value="1">
                             <?= _("Synchronisieren") ?>
                         </label>
+                    </div>
+                    <div style="width: 33%; padding-top: 7px;">
+                        <select name="tabledata[simplematching][<?= htmlReady($field) ?>][dynamic_template]">
+                            <option value=""><?= _("Mit Template ...") ?></option>
+                            <? foreach ($configs as $configname => $value) : ?>
+                                <option value="<?= htmlReady($configname) ?>"<?= $configname === $table['tabledata']['simplematching'][$field]['dynamic_template'] ? " selected" : ""?>>
+                                    <?= htmlReady($configname) ?>
+                                </option>
+                            <? endforeach ?>
+                        </select>
                     </div>
                 </div>
             <? endif ?>
