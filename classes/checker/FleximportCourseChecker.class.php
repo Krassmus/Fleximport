@@ -6,7 +6,7 @@ class FleximportCourseChecker implements FleximportChecker {
 
     public function check($data, $virtualobject, $relevantfields) {
         $errors = "";
-        if (!$data['seminar_id']) {
+        if ($virtualobject->isNew()) {
             if (!$data['fleximport_dozenten'] || !count($data['fleximport_dozenten'])) {
                 $errors .= "Dozent kann nicht gemapped werden. ";
             } else {

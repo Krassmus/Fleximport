@@ -6,7 +6,7 @@ class FleximportUserChecker implements FleximportChecker {
 
     public function check($data, $virtualobject, $relevantfields) {
         $errors = "";
-        if (!$data['user_id']) {
+        if ($virtualobject->isNew()) {
             if (!$data['username']) {
                 $errors .= "Kein Nutzername. ";
             } else {
