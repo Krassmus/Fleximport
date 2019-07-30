@@ -22,7 +22,7 @@ class FleximportConfig {
         $functions = array("md5", "urlencode", "strip_whitespace");
         foreach ($functions as $function) {
             $text = preg_replace_callback(
-                "/".strtoupper($function)."\((.*)\)/",
+                "/".strtoupper($function)."\(([^\)]*)\)/",
                 function ($match) use ($function) {
                     if ($function === "strip_whitespace") {
                         return preg_replace("/\s+/", "", $match[1]);
