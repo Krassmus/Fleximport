@@ -178,7 +178,29 @@
                     <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
                         <li>
                             <label>
-                                <input type="checkbox" name="table[tabledata][display_only_columns][]" value="<?= htmlReady($column) ?>" class="column_selector"<?= !$table['tabledata']['display_only_columns'] || in_array($column, $table['tabledata']['display_only_columns']) ? " checked" : "" ?>>
+                                <input type="checkbox"
+                                       name="table[tabledata][display_only_columns][]"
+                                       value="<?= htmlReady($column) ?>"
+                                       class="column_selector"<?= !$table['tabledata']['display_only_columns'] || in_array($column, $table['tabledata']['display_only_columns']) ? " checked" : "" ?>>
+                                <?= htmlReady($column) ?>
+                            </label>
+                        </li>
+                    <? endif ?>
+                <? endforeach ?>
+            </ul>
+        </div>
+
+        <div>
+            <?= _("Index auf folgende Spalten anwenden") ?>
+            <ul>
+                <? foreach ($table->getTableHeader() as $column) : ?>
+                    <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
+                        <li>
+                            <label>
+                                <input type="checkbox"
+                                       name="table[tabledata][add_index][]"
+                                       value="<?= htmlReady($column) ?>"
+                                       <?= in_array($column, (array) $table['tabledata']['add_index']) ? " checked" : "" ?>>
                                 <?= htmlReady($column) ?>
                             </label>
                         </li>

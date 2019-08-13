@@ -249,6 +249,11 @@ class FleximportTable extends SimpleORMap {
             }
         }
         $create_sql .= ", PRIMARY KEY (`IMPORT_TABLE_PRIMARY_KEY`) ";
+        foreach ((array) $this['tabledata']['add_index'] as $index_column) {
+            if (in_array($index_column, $headers)) {
+                $create_sql .= ", KEY `" . $index_column . "` (`" . $index_column . "`(64)) ";
+            }
+        }
         $create_sql .= ") ENGINE=MyISAM";
         $db->exec($create_sql);
 
