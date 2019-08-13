@@ -352,8 +352,14 @@ class FleximportTable extends SimpleORMap {
             return array();
         }
         if ($this['import_type'] === "fleximport_mysql_command") {
-            $statement = DBManager::get()->prepare($this['tabledata']['fleximport_mysql_command']);
-            $statement->execute();
+            $command = $this['tabledata']['fleximport_mysql_command'];
+            $command = preg_split("/\s;\s/", $command, -1, PREG_SPLIT_NO_EMPTY);
+            if ($command) {
+                foreach ($command as $cmd) {
+                    $statement = DBManager::get()->prepare($cmd);
+                    $statement->execute();
+                }
+            }
             return array();
         }
         $statement = DBManager::get()->prepare("
