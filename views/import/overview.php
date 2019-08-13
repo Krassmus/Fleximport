@@ -6,7 +6,6 @@
         <? foreach ($tables as $table) : ?>
             <?= $this->render_partial("import/_table.php", array('table' => $table)) ?>
         <? endforeach ?>
-
     </form>
 
     <div style="text-align: center;">

@@ -62,7 +62,6 @@
         </div>
     </caption>
 
-
     <thead>
         <tr>
             <th></th>
@@ -79,7 +78,8 @@
     <? $item_ids = array() ?>
     <? if ($table['display_lines'] !== "ondemand") : ?>
         <? foreach ($table->fetchLines() as $line) : ?>
-            <? $report = $table->checkLine($line);
+            <?
+            $report = $table->checkLine($line);
             if ($report['pk'] && !$report['errors']) {
                 $item_ids[] = is_array($report['pk']) ? implode("-", $report['pk']) : $report['pk'];
             }

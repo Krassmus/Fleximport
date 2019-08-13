@@ -906,8 +906,12 @@ class FleximportTable extends SimpleORMap {
             'pk' => null,
             'errors' => ""
         );
+        if ($classname && ($classname !== "fleximport_mysql_command") && !class_exists($classname)) {
+            $output['errors'] = sprintf(_("Klasse %s existiert nicht."), $classname);
+            return $output;
+        }
 
-        if ($classname && ($classname !== "fleximport_mysql_command")) {
+        if ($classname && ($classname !== "fleximport_mysql_command") && class_exists($classname)) {
             try {
                 if ($data === null) {
                     $data = $this->getMappedData($line);

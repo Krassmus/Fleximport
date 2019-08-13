@@ -1,5 +1,8 @@
 <? if ($table->isInDatabase()) : ?>
-    <div id="table_<?= $table->getId() ?>_container" class="tablecontainer" data-name="<?= htmlReady($table['name']) ?>" data-table_id="<?= $table->getId() ?>">
+    <div id="table_<?= $table->getId() ?>_container"
+         class="tablecontainer"
+         data-name="<?= htmlReady($table['name']) ?>"
+         data-table_id="<?= $table->getId() ?>">
         <?= $this->render_partial("import/_table_content.php", compact("table")) ?>
     </div>
 <? else : ?>
