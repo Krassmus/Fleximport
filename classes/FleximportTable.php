@@ -241,20 +241,21 @@ class FleximportTable extends SimpleORMap {
         $this->drop();
         $create_sql = "CREATE TABLE `".addslashes($this['name'])."` (";
         $create_sql .= "`IMPORT_TABLE_PRIMARY_KEY` BIGINT NOT NULL AUTO_INCREMENT ";
+        $headers = array_map(function ($h) { return strtolower(self::reduceDiakritikaFromIso88591($h)); }, $headers);
         foreach ($headers as $key => $fieldname) {
             if ($fieldname) {
-                $fieldname = strtolower(self::reduceDiakritikaFromIso88591($fieldname));
                 $create_sql .= ", ";
                 $create_sql .= "`" . addslashes($fieldname) . "` TEXT NOT NULL";
             }
         }
         $create_sql .= ", PRIMARY KEY (`IMPORT_TABLE_PRIMARY_KEY`) ";
+
         foreach ((array) $this['tabledata']['add_index'] as $index_column) {
             if (in_array($index_column, $headers)) {
                 $create_sql .= ", KEY `" . $index_column . "` (`" . $index_column . "`(64)) ";
             }
         }
-        $create_sql .= ") ENGINE=MyISAM";
+        $create_sql .= ") ";
         $db->exec($create_sql);
 
 
