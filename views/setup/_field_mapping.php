@@ -98,13 +98,24 @@
                         name="tabledata[simplematching][<?= htmlReady($field) ?>][mapfrom]"
                         style="<?= (strpos($table['tabledata']['simplematching'][$field]['column'], "fleximport_mapper__") === 0) || (strpos($table['tabledata']['simplematching'][$field]['column'], "fleximportkeyvalue_") === 0) ? "" : "display: none;" ?>">
                     <option value=""><?= _("Aus Spalte ...") ?></option>
-                    <? foreach ($table->getTableHeader() as $header) : ?>
-                        <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
-                            <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching'][$field]['mapfrom'] ? " selected" : "" ?>>
-                                <?= htmlReady($header) ?>
-                            </option>
-                        <? endif ?>
-                    <? endforeach ?>
+                    <optgroup label="<?= _("Feldwerte") ?>">
+                        <? foreach ($table->getTableHeader() as $header) : ?>
+                            <? if ($header !== "IMPORT_TABLE_PRIMARY_KEY") : ?>
+                                <option value="<?= htmlReady($header) ?>"<?= $header === $table['tabledata']['simplematching'][$field]['mapfrom'] ? " selected" : "" ?>>
+                                    <?= htmlReady($header) ?>
+                                </option>
+                            <? endif ?>
+                        <? endforeach ?>
+                    </optgroup>
+                    <? if (count($configs)) : ?>
+                        <optgroup label="<?= _("Templates") ?>">
+                            <? foreach ($configs as $configname => $value) : ?>
+                                <option value="fleximportconfig_<?= htmlReady($configname) ?>"<?= "fleximportconfig_".$configname === $table['tabledata']['simplematching'][$field]['mapfrom'] ? " selected" : ""?>>
+                                    <?= _("Konfiguration: ").htmlReady($configname) ?>
+                                </option>
+                            <? endforeach ?>
+                        </optgroup>
+                    <? endif ?>
                 </select>
             <? endif ?>
 

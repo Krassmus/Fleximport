@@ -788,7 +788,13 @@ class FleximportTable extends SimpleORMap {
                     if (isset($for[$this['import_type']][$field]) && $dynamic->isMultiple()) {
                         if (!$data[$field]) {
                             $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
-                            $value = $data[$mapfrom] ?: $line[$mapfrom];
+                            if (strpos($mapfrom, "fleximportconfig_") === 0) {
+                                $config = substr($mapfrom, strlen("fleximportconfig_"));
+                                $template = FleximportConfig::get($config);
+                                $value = FleximportConfig::template($template, $data, $line);
+                            } else {
+                                $value = $data[$mapfrom] ?: $line[$mapfrom];
+                            }
                         } else {
                             $value = $data[$field];
                         }
@@ -821,7 +827,13 @@ class FleximportTable extends SimpleORMap {
                     if (is_a($mapper, "FleximportMapper")) {
 
                         $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
-                        $value = $data[$field] ?: ($data[$mapfrom] ?: $line[$mapfrom]);
+                        if (strpos($mapfrom, "fleximportconfig_") === 0) {
+                            $config = substr($mapfrom, strlen("fleximportconfig_"));
+                            $template = FleximportConfig::get($config);
+                            $value = FleximportConfig::template($template, $data, $line);
+                        } else {
+                            $value = $data[$field] ?: ($data[$mapfrom] ?: $line[$mapfrom]);
+                        }
                         if (is_array($value)) {
                             foreach ($value as $k => $v) {
                                 if ($v) {
