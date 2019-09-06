@@ -19,10 +19,10 @@ class ExportController extends PluginController {
             throw new AccessDeniedException();
         }
         $this->table->fetchData();
-        $this->render_csv();
+        $this->render_table_as_csv();
     }
 
-    protected function render_csv()
+    protected function render_table_as_csv()
     {
         $output = array();
         $header = $this->table->getTableHeader();

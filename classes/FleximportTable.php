@@ -504,6 +504,10 @@ class FleximportTable extends SimpleORMap {
         } else {
             $output['found'] = false;
         }
+        //Password for users
+        if ($classname === "User" && !isset($data['password'])) {
+            $data['password'] = UserManagement::generate_password(8);
+        }
         foreach ($data as $fieldname => $value) {
             if (($value !== false) && in_array($fieldname, $this->getTargetFields())) {
                 $object[$fieldname] = $value;
@@ -512,6 +516,8 @@ class FleximportTable extends SimpleORMap {
                 }
             }
         }
+
+
         if (method_exists($object, "getFullName")) {
             $error['name'] = $output['name'] = $object->getFullName();
         } elseif ($object->isField("name")) {
@@ -619,6 +625,7 @@ class FleximportTable extends SimpleORMap {
                         $message = $mailbody;
                     }
                     if ($message) {
+                        die($message);
                         $mail = new StudipMail();
                         $mail->addRecipient($object['email'], $object->getFullName());
                         $mail->setSubject($subject);
