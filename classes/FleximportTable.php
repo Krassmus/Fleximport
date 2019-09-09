@@ -625,7 +625,6 @@ class FleximportTable extends SimpleORMap {
                         $message = $mailbody;
                     }
                     if ($message) {
-                        die($message);
                         $mail = new StudipMail();
                         $mail->addRecipient($object['email'], $object->getFullName());
                         $mail->setSubject($subject);
