@@ -48,7 +48,7 @@ class fleximport_pan_userimport extends FleximportPlugin {
                             $course = Course::findOneByName("ALUMNI");
                             $gruppenname = $entry ? $entry['content'] : null;
                             if ($course && $gruppenname) {
-                                $statusgruppe = Statusgruppen::findOneBySQL("name = ? range_id = ?", array(
+                                $statusgruppe = Statusgruppen::findOneBySQL("name = ? AND range_id = ?", array(
                                     $gruppenname,
                                     $course->getId()
                                 ));
