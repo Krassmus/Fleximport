@@ -11,6 +11,7 @@
             <tr>
                 <th><?= _("Spalte der Zieltabelle") ?></th>
                 <th><?= _("Spalte der Datentabelle") ?></th>
+                <th><?= _("Ignorieren bei Update") ?></th>
             </tr>
         </thead>
         <tbody>
@@ -71,6 +72,7 @@
                         </select>
                     <? endif ?>
                 </td>
+                <td></td>
             </tr>
         <? endif ?>
         <? if ($table['import_type'] === "CourseMember") : ?>
@@ -93,24 +95,11 @@
                         </select>
                     <? endif ?>
                 </td>
+                <td></td>
             </tr>
         <? endif ?>
         </tbody>
     </table>
-
-    <h2><?= _("Folgende Felder bei Updates ignorieren") ?></h2>
-    <ul>
-        <? foreach ($table->getTargetFields() as $fieldname) : ?>
-            <li>
-                <label>
-                    <input type="checkbox" name="tabledata[ignoreonupdate][]"
-                           value="<?= htmlReady($fieldname) ?>"<?= in_array($fieldname, (array) $table['tabledata']['ignoreonupdate']) ? " checked" : "" ?>>
-                    <?= htmlReady($fieldname) ?>
-                </label>
-            </li>
-        <? endforeach ?>
-    </ul>
-
 
 
     <div style="text-align: center;" data-dialog-button>

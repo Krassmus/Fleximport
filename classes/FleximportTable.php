@@ -504,10 +504,6 @@ class FleximportTable extends SimpleORMap {
         } else {
             $output['found'] = false;
         }
-        //Password for users
-        if ($classname === "User" && !isset($data['password'])) {
-            $data['password'] = UserManagement::generate_password(8);
-        }
         foreach ($data as $fieldname => $value) {
             if (($value !== false) && in_array($fieldname, $this->getTargetFields())) {
                 $object[$fieldname] = $value;
@@ -911,12 +907,6 @@ class FleximportTable extends SimpleORMap {
             }
         }
 
-        if (($this['import_type'] === "User") && !$data['user_id']) {
-            if (!$data['user_id'] && ($data['auth_plugin'] === "standard") && !$data['password']) {
-                $usermanager = new UserManagement();
-                $data['password'] = $usermanager->generate_password(6);
-            }
-        }
         return $data;
     }
 

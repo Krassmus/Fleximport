@@ -173,3 +173,7 @@
             <? endif ?>
         <? endif ?>
     </td>
+    <td>
+        <input type="checkbox" name="tabledata[ignoreonupdate][]" title="<?= _("Ignorieren bei Update der Daten?") ?>"
+               value="<?= htmlReady($field) ?>"<?= in_array($field, (array) $table['tabledata']['ignoreonupdate']) ? " checked" : "" ?>>
+    </td>
