@@ -57,3 +57,13 @@
         jQuery(".importconfigs textarea").elastic();
     });
 </script>
+<?
+$actions = new ActionsWidget();
+$actions->addLink(
+    _("Prozess erstellen"),
+    PluginEngine::getURL($plugin, array(), "process/edit"),
+    Icon::create("archive2", "clickable"),
+    array('data-dialog' => 1)
+);
+
+Sidebar::Get()->addWidget($actions);

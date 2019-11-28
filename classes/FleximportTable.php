@@ -595,11 +595,11 @@ class FleximportTable extends SimpleORMap {
                 }
                 break;
             case "User":
-                if (($output['found'] === false) && ($data['fleximport_welcome_message'] !== "none")) {
+                if (($output['found'] === false) && ($this['tabledata']['simplematching']['fleximport_welcome_message']['column'] !== "none")) {
                     $user_language = getUserLanguagePath($object->getId());
                     setTempLanguage(false, $user_language);
-                    if ($data['fleximport_welcome_message'] && FleximportConfig::get($data['fleximport_welcome_message'])) {
-                        $message = FleximportConfig::get($data['fleximport_welcome_message']);
+                    if ($this['tabledata']['simplematching']['fleximport_welcome_message']['column'] && FleximportConfig::get($this['tabledata']['simplematching']['fleximport_welcome_message']['column'])) {
+                        $message = FleximportConfig::get($this['tabledata']['simplematching']['fleximport_welcome_message']['column']);
                         $message = FleximportConfig::template($message, $data, $line);
                         if (strpos($message, "\n") === false) {
                             $subject = dgettext($user_language, "Anmeldung Stud.IP-System");
