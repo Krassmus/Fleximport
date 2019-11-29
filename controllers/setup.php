@@ -99,6 +99,9 @@ class SetupController extends PluginController {
         Navigation::activateItem("/fleximport/process_".$this->table['process_id']);
         if (Request::isPost()) {
             $tabledata = Request::getArray("tabledata");
+            if (!$tabledata['ignoreonupdate']) {
+                $tabledata['ignoreonupdate'] = array();
+            }
             $tabledata = array_merge($this->table['tabledata'], $tabledata);
             $this->table['tabledata'] = $tabledata;
             $this->table->store();
