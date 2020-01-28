@@ -19,7 +19,10 @@ class FleximportConfig {
                 $text = str_ireplace("{{".$index."}}", $value, $text);
             }
         }
-        $functions = array("md5", "urlencode", "strip_whitespace");
+        $functions = array(
+            "md5", "urlencode", "strip_whitespace", "strtolower",
+            "strtoupper", "mb_strtoupper", "mb_strtolower"
+        );
         foreach ($functions as $function) {
             $text = preg_replace_callback(
                 "/".strtoupper($function)."\(([^\)]*)\)/",
