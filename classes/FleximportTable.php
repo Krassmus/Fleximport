@@ -507,9 +507,6 @@ class FleximportTable extends SimpleORMap {
         foreach ($data as $fieldname => $value) {
             if (($value !== false) && in_array($fieldname, $this->getTargetFields())) {
                 $object[$fieldname] = $value;
-                if ($classname === "User" && $fieldname === "password") {
-                    $object[$fieldname] = UserManagement::getPwdHasher()->HashPassword($value);
-                }
             }
         }
 

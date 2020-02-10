@@ -20,8 +20,8 @@ class FleximportConfig {
             }
         }
         $functions = array(
-            "md5", "urlencode", "strip_whitespace", "strtolower",
-            "strtoupper", "mb_strtoupper", "mb_strtolower"
+            "md5", "urlencode", "strip_whitespace", "mb_strtolower",
+            "mb_strtoupper", "strtoupper", "strtolower"
         );
         foreach ($functions as $function) {
             $text = preg_replace_callback(
