@@ -613,9 +613,10 @@ class FleximportTable extends SimpleORMap {
                             'auth_user_md5.Nachname' => $object['nachname'],
                             'auth_user_md5.Email' => $object['email']
                         );
-                        $password = $data['password']; //this is the not hashed password in cleartext
+                        $password = $data['password_plaintext']; //this is the not hashed password in cleartext
                         include("locale/$user_language/LC_MAILS/create_mail.inc.php");
                         $message = $mailbody;
+                        var_dump($message); die();
                     }
                     if ($message) {
                         $mail = new StudipMail();
@@ -833,6 +834,7 @@ class FleximportTable extends SimpleORMap {
                         } else {
                             $value = $data[$field] ?: ($data[$mapfrom] ?: $line[$mapfrom]);
                         }
+                        //Anwenden der Mapper:
                         if (is_array($value)) {
                             foreach ($value as $k => $v) {
                                 if ($v) {
@@ -897,11 +899,18 @@ class FleximportTable extends SimpleORMap {
                     $data['username'] = $data['fleximport_username_prefix'] . $data['username'];
                 }
             }
+            //Passwort hashen und das Klartextpasswort in Variable speichern für die zu versendende Passwortmail:
+            if ($this['tabledata']['simplematching']['password']['column']
+                && $this['tabledata']['simplematching']['password']['hash']) {
+                $data['password_plaintext'] = $data['password'];
+                $data['password'] = UserManagement::getPwdHasher()->HashPassword($data['password']);
+            }
             if ($this['tabledata']['simplematching']["fleximport_userdomains"]['column'] && !in_array("fleximport_userdomains", $this->fieldsToBeDynamicallyMapped())) {
                 $statement = DBManager::get()->prepare("SELECT userdomain_id FROM userdomains WHERE name IN (:domains) OR userdomain_id IN (:domains)");
                 $statement->execute(array('domains' => $data['fleximport_userdomains']));
                 $data['fleximport_userdomains'] = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
             }
+
         }
 
         return $data;

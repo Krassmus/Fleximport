@@ -171,6 +171,20 @@
                     </select>
                 </div>
             <? endif ?>
+
+            <? if (($table['import_type'] === "User") && ($field === "password")) : ?>
+                <div class="format" id="simplematching_<?= md5($field) ?>_format">
+                    <input type="hidden"
+                           name="tabledata[simplematching][<?= htmlReady($field) ?>][hash]"
+                           value="0">
+                    <label>
+                        <input type="checkbox"
+                               name="tabledata[simplematching][<?= htmlReady($field) ?>][hash]"
+                               value="1"<?= $table['tabledata']['simplematching'][$field]['hash'] ? " checked" : "" ?>>
+                        <?= _("Passwort mit BCrypt hashen") ?>
+                    </label>
+                </div>
+            <? endif ?>
         <? endif ?>
     </td>
     <td>

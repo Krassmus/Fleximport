@@ -12,8 +12,7 @@ class FleximportPasswordMapper implements FleximportMapper {
 
     public function possibleFormats() {
         $formats = array(
-            'generate' => "Passwortgenerator zufällig",
-            'bcrypt' => "Passwort hashen"
+            'generate' => "Passwortgenerator zufällig"
         );
         return $formats;
     }
@@ -22,9 +21,6 @@ class FleximportPasswordMapper implements FleximportMapper {
         switch ($format) {
             case "generate":
                 return UserManagement::generate_password(8);
-                break;
-            case "bcrypt":
-                return UserManagement::getPwdHasher()->HashPassword($value);
                 break;
         }
     }
