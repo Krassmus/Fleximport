@@ -892,9 +892,6 @@ class FleximportTable extends SimpleORMap {
 
         if (($this['import_type'] === "User")) {
             if ($this['tabledata']['simplematching']["username"]['column']) {
-                if ($this['tabledata']['simplematching']["username"]['format'] === "email_first_part") {
-                    list($data['username']) = explode("@", $data['username']);
-                }
                 if ($this['tabledata']['simplematching']["fleximport_username_prefix"]['column']) {
                     $data['username'] = $data['fleximport_username_prefix'] . $data['username'];
                 }

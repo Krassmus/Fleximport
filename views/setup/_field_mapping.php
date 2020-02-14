@@ -163,14 +163,6 @@
                     </select>
                 </div>
             <? endif ?>
-            <? if (($table['import_type'] === "User") && ($field === "username")) : ?>
-                <div class="format" id="simplematching_<?= md5($field) ?>_format">
-                    <select name="tabledata[simplematching][<?= htmlReady($field) ?>][format]">
-                        <option value="cleartext"><?= _("Format: Reiner Text") ?></option>
-                        <option value="email_first_part"<?= $table['tabledata']['simplematching'][$field]['format'] === "email_first_part" ? " selected" : "" ?>><?= _("Format: Erster Teil der Email") ?></option>
-                    </select>
-                </div>
-            <? endif ?>
 
             <? if (($table['import_type'] === "User") && ($field === "password")) : ?>
                 <div class="format" id="simplematching_<?= md5($field) ?>_format">
