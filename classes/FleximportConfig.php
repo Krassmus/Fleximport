@@ -21,7 +21,7 @@ class FleximportConfig {
         }
         $functions = array(
             "md5", "urlencode", "strip_whitespace", "mb_strtolower",
-            "mb_strtoupper", "strtoupper", "strtolower"
+            "mb_strtoupper", "strtoupper", "strtolower", "reduce_diakritika"
         );
         foreach ($functions as $function) {
             $text = preg_replace_callback(
@@ -29,6 +29,8 @@ class FleximportConfig {
                 function ($match) use ($function) {
                     if ($function === "strip_whitespace") {
                         return preg_replace("/\s+/", "", $match[1]);
+                    } elseif ($function === "reduce_diakritika") {
+                        return FleximportTable::reduceDiakritikaFromIso88591($match[1]);
                     } else {
                         return $function($match[1]);
                     }
