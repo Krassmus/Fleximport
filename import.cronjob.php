@@ -36,7 +36,14 @@ class FleximportJob extends CronJob
      */
     public static function getParameters()
     {
-        return array();
+        return [
+            'charge' => [
+                'type'        => 'string',
+                'default'     => "",
+                'status'      => 'optional',
+                'description' => _('Welche Charge an Prozessen sollen nur bearbeitet werden (leerlassen für alle)'),
+            ]
+        ];
     }
 
     /**
@@ -53,6 +60,6 @@ class FleximportJob extends CronJob
     public function execute($last_result, $parameters = array())
     {
         $plugin = new Fleximport();
-        $plugin->triggerImport();
+        $plugin->triggerImport($parameters['charge']);
     }
 }

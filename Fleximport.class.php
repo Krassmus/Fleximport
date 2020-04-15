@@ -104,9 +104,9 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
         return FleximportConfig::get("FLEXIMPORT_NAME") ?: _("Fleximport");
     }
 
-    public function triggerImport()
+    public function triggerImport($charge = "")
     {
-        $processes = FleximportProcess::findBySQL("triggered_by_cronjob = '1' ORDER BY name ASC");
+        $processes = FleximportProcess::findBySQL("charge = ? AND triggered_by_cronjob = '1' ORDER BY name ASC", [$charge]);
         if ($GLOBALS['FLEXIMPORT_IS_CRONJOB']) {
             echo "Starting Import at ".date("c")."\n\n";
         }

@@ -17,7 +17,7 @@ $GLOBALS['FLEXIMPORT_IS_CRONJOB'] = true;
 echo sprintf(_("Um %s fängt ein neuer Durchlauf des Importscripts an."), date("H:i:s")._(" Uhr am ").date("j.n.Y"))."\n";
 
 $plugin = new Fleximport();
-$plugin->triggerImport();
+$plugin->triggerImport("cli");
 
 echo sprintf(_("Um %s hört der Durchlauf des Importscripts auf."), date("H:i:s")._(" Uhr am ").date("j.n.Y"))."\n";
 

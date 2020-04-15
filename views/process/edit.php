@@ -15,12 +15,30 @@
     </label>
 
     <label>
-        <input type="checkbox" value="1" name="data[triggered_by_cronjob]"<?= $process['triggered_by_cronjob'] ? " checked" : "" ?>>
+        <input type="checkbox"
+               value="1"
+               onChange="$('#edit_charge').toggle('fade');"
+               name="data[triggered_by_cronjob]"<?= $process['triggered_by_cronjob'] ? " checked" : "" ?>>
         <?= _("Durch Cronjob starten") ?>
     </label>
 
+    <label id="edit_charge"<?= $process['triggered_by_cronjob'] ? "" : ' style="display: none;"' ?>>
+        <?= _("Charge der Cronjob-Prozesse") ?>
+        <select name="data[charge]">
+            <option value=""></option>
+            <option value="cli"<?= $process['charge'] == "cli" ? " selected": "" ?> title="<?= _("Relevant für das Skript import.cli.php, das im Ordner des Plugins liegt.") ?>">cli</option>
+            <? foreach ($charges as $charge) : ?>
+                <option value="<?= htmlReady($charge) ?>"<?= $process['charge'] == $charge ? " selected": "" ?>>
+                    <?= htmlReady($charge) ?>
+                </option>
+            <? endforeach ?>
+        </select>
+    </label>
+
     <label>
-        <input type="checkbox" value="1" name="data[webhookable]"<?= $process['webhookable'] ? " checked" : "" ?> onChange="jQuery('#process_webhook_url').toggle(this.checked);">
+        <input type="checkbox"
+               value="1"
+               name="data[webhookable]"<?= $process['webhookable'] ? " checked" : "" ?> onChange="jQuery('#process_webhook_url').toggle(this.checked);">
         <?= _("Durch Webhook starten") ?>
     </label>
 

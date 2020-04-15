@@ -33,5 +33,13 @@ class ProcessController extends PluginController {
                 $this->redirect("import/overview/" . $this->process->getId());
             }
         }
+        $schedules = CronjobSchedule::findBySQL("INNER JOIN cronjobs_tasks USING (task_id) WHERE cronjobs_tasks.`class` = 'FleximportJob'");
+        $this->charges = [];
+        foreach ($schedules as $schedule) {
+            if ($schedule->parameters['charge']) {
+                $this->charges[] = $schedule->parameters['charge'];
+            }
+        }
+        $this->charges = array_unique($this->charges);
     }
 }

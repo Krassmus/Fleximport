@@ -40,7 +40,7 @@ Manche Felder (in der Regel sind das Spezialfelder, siehe unten) kann man ganz n
 
 ### Mapping mit Templates
 
-Manchmal muss man Beschreibungsfelder mappen, in denen mehrere Angaben stehen. So zum Beispiel für eine Veranstaltung "Findet am xxx zum ersten Mal statt und am yyy zum letzten Mal". 
+Manchmal muss man Beschreibungsfelder mappen, in denen mehrere Angaben stehen. So zum Beispiel für eine Veranstaltung "Findet am xxx zum ersten Mal statt und am yyy zum letzten Mal".
 
 Um das zu bauen, kann man in Fleximport im Reiter Konfiguration eine Konfigurationsvariable anlegen, die später als Template fungiert. Innerhalb des Templates kann man Platzhalter einsetzen, die etwa so aussehen: ``{{Spalte aus Tabelle}}`` Also immer zwei geschweifte Klammern, den Namen eines Feldes aus der Datentabelle oder der Zieltabelle und dann wieder zwei geschweifte Klammern.
 
@@ -90,8 +90,8 @@ Im Fleximport haben Sie die Möglichkeit, selbst SQL-Views anzulegen und deren "
 Angenommen, Sie haben eine Rohdatentabelle für den Import von Veranstaltungen. Damit lassen sich auch prima Veranstaltungen neu anlegen. Aber wenn es zum Update kommt, passen die Rohdaten nicht, um die Seminar_id der bereits importierten Veranstaltungen zu berechnen. Das liegt ganz konkret daran, dass als eindeutiger Schlüssel bei den Rohdaten zwei Werte fungieren müssen, zum Beispiel `v_nr`, was der Veranstaltungsnummer entspricht, und `fach_nr`, was in einem Datenfeld gespeichert wird und sowas wie eine Modulbezeichnung sein könnte. Es ist bisher unmöglich, diese beiden Werte auf eine Seminar_id zu mappen. Unten stellen wir noch Plugin in Plugins vor, womit es gehen würde. Aber dazu müsste man programmieren. In diesem Fall kommen wir ohne Programmierung aus und können alles über die Oberfläche von Stud.IP erledigen, wenn wir SQL-Views anlegen. Klicken Sie in der Sidebar auf "Neue Tabelle anlegen" und wählen Sie als Datenquelle "SQL-View" aus. Darunter müssen Sie noch ein SELECT-Statement angeben, das wie folgt aussieht:
 
     SELECT fleximport_kurse_rohdaten.*, (
-            SELECT seminare.Seminar_id 
-            FROM seminare 
+            SELECT seminare.Seminar_id
+            FROM seminare
                 INNER JOIN datafields_entries AS de ON (de.range_id = seminare.Seminar_id)
                 INNER JOIN datafields AS d ON (d.datafield_id = de.datafield_id)
             WHERE seminare.VeranstaltungsNummer = fleximport_kurse_rohdaten.v_nr
@@ -111,3 +111,11 @@ Der Trick ist am Ende nur noch, dass die Rohdatentabelle gar nicht importiert wi
 Gelegentlich reichen die Möglichkeiten des Fleximportplugins immer noch nicht aus. Glauben Sie mir: Importe sind tückisch und jeder Import hat seine eigenen Fallstricke, die kein anderer Import vorher hatte. Für diese hartnäckigen Fälle gibt es die Möglichkeit, Plugins für das Fleximportplugin zu programmieren. Plugins im Plugin sozusagen.
 
 Diese Plugins liegen alle im plugins-Ordner und sind Klassen, die von `FleximportPluginFleximportPlugin` erben. Sie müssen zudem exakt den Klassennamen haben, die auch die Tabelle trägt, die von dem Plugin betroffen sein soll.
+
+## 7) Prozesse und Cronjobs
+
+Schon durch die Installation von Fleximport wird ein Stud.IP-Cronjob angelegt, der einen oder mehrere Prozesse automatisch ausführen kann. Beim Bearbeitungsdialog des Prozesses kann man anklicken, dass der Prozess durch einen Cronjob ausgelöst werden soll. Was ist aber, wenn man mehrere Prozesse erstellt hat, die zu unterschiedlicher Zeit laufen sollen - zum Beispiel weil ein Prozess eine Stunde dauert und am besten in der Nacht passiert und ein anderer Prozess in 10 Sekunden durchgelaufen ist und mehrmals pro Stunde durchlaufen soll?
+
+Für den Fall kann man seine Prozesse Chargen zuordnen. Zuerst muss man dazu unter Admin -> System -> Cronjobs einen neuen Cronjob erstellen (ein wenig genutzt Feature, das aber gut funktioniert). Dabei kann man einen eigenen Namen eingeben, wählt FleximportJob als Typ aus und kann den Zeitraum beliebig auswählen. Als Parameter gibt man dann noch einen beliebigen Bezeichner an wie "NightlySync". Danach geht man zu Fleximport und bearbeitet die Prozesse. Beim Bearbeiten-Dialog wählt man die Charge "NightlySync" aus. Die Spezialcharge "cli" ist dabei eine Besonderheit. Sie gilt nur für das Skript import.cli.php, das im Ordner des Fleximport-Plugins liegt und ist losgelöst von den typischen Stud.IP-Cronjobs.
+
+Auf diese Weise kann man beliebig viele Chargen von Prozessen definieren, die alle zu ganz unterschiedlichen Zeitpunkten regelmäßig oder einmalig automatisch ausgeführt werden.
