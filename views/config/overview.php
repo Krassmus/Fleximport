@@ -65,5 +65,12 @@ $actions->addLink(
     Icon::create("archive2", "clickable"),
     array('data-dialog' => 1)
 );
+$actions->addLink(
+    _("Prozess importieren"),
+    PluginEngine::getURL($plugin, array(), "process/import"),
+    Icon::create("upload", "clickable"),
+    array('data-dialog' => 1)
+);
+
 
 Sidebar::Get()->addWidget($actions);

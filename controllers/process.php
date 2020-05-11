@@ -1,7 +1,5 @@
 <?php
 
-require_once 'app/controllers/plugin_controller.php';
-
 class ProcessController extends PluginController {
 
     function before_filter(&$action, &$args)
@@ -41,5 +39,56 @@ class ProcessController extends PluginController {
             }
         }
         $this->charges = array_unique($this->charges);
+    }
+
+    public function export_action($process_id)
+    {
+        $this->process = new FleximportProcess($process_id);
+        $output = [
+            'process' => $this->process->toRawArray(),
+            'tables' => []
+        ];
+        unset($output['process']['process_id']);
+        unset($output['process']['mkdate']);
+        unset($output['process']['chdate']);
+        unset($output['process']['last_data_import']);
+
+        foreach ($this->process->tables as $table) {
+            $tabledata = $table->toRawArray();
+            unset($tabledata['table_id']);
+            unset($tabledata['process_id']);
+            unset($tabledata['mkdate']);
+            unset($tabledata['chdate']);
+            $tabledata['tabledata'] = $table->tabledata;
+            $output['tables'][] = $tabledata;
+        }
+
+        $this->response->add_header("Content-Disposition", 'attachment; filename="'.$this->process['name'].'.flxip"');
+        $this->render_json($output);
+    }
+
+    /**
+     * Imports a new process by a flxip (fleximport process) file
+     */
+    public function import_action()
+    {
+        if (Request::isPost()) {
+            var_dump($_FILES);
+            if (file_exists($_FILES['file']['tmp_name'])) {
+                $file = json_decode(file_get_contents($_FILES['file']['tmp_name']), true);
+
+                $process = new FleximportProcess();
+                $process->setData($file['process']);
+                $process->store();
+                foreach ($file['tables'] as $tabledata) {
+                    $table = new FleximportTable();
+                    $table->setData($tabledata);
+                    $table['process_id'] = $process->getId();
+                    $table->store();
+                }
+                PageLayout::postSuccess(sprintf(_("Prozess %s wurde angelegt."), $process['name']));
+                $this->redirect("import/overview/".$process->getId());
+            }
+        }
     }
 }
