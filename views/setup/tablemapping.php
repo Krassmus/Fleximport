@@ -34,7 +34,8 @@
 
         <? foreach ($dynamics as $dynamic) {
             $for = $dynamic->forClassFields();
-            foreach ((array) $for[$table['import_type']] as $fieldname => $placeholder) {
+            $for = array_merge((array) $for['*'], (array) $for[$table['import_type']]);
+            foreach ($for as $fieldname => $placeholder) {
                 echo $this->render_partial("setup/_field_mapping.php", array(
                     'field' => $fieldname,
                     'table' => $table,

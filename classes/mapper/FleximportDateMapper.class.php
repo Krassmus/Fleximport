@@ -18,7 +18,7 @@ class FleximportDateMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data) {
+    public function map($format, $value, $data, $sormclass) {
         switch ($format) {
             case "unixtimestamp":
                 return $value;

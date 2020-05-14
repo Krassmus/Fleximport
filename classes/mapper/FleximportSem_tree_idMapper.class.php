@@ -17,7 +17,7 @@ class FleximportSem_tree_idMapper implements FleximportMapper {
         );
     }
 
-    public function map($format, $value, $data) {
+    public function map($format, $value, $data, $sormclass) {
         switch ($format) {
             case "name":
                 $statement = DBManager::get()->prepare("

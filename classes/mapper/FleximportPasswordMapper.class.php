@@ -17,7 +17,7 @@ class FleximportPasswordMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data) {
+    public function map($format, $value, $data, $sormclass) {
         switch ($format) {
             case "generate":
                 return UserManagement::generate_password(8);

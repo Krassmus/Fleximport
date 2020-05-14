@@ -3,6 +3,7 @@
 require_once __DIR__."/classes/FleximportTable.php";
 require_once __DIR__."/classes/FleximportConfig.php";
 require_once __DIR__."/classes/FleximportProcess.php";
+require_once __DIR__."/classes/FleximportForeignKey.php";
 require_once __DIR__."/classes/FleximportMappedItem.php";
 require_once __DIR__ . "/classes/FleximportPlugin.abstract.php";
 require_once __DIR__ . "/classes/mapper/FleximportMapper.interface.php";

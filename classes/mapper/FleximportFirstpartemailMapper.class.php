@@ -17,7 +17,7 @@ class FleximportFirstpartemailMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data) {
+    public function map($format, $value, $data, $sormclass) {
         switch ($format) {
             case "firstpartemail":
                 $parts = explode("@", $value);

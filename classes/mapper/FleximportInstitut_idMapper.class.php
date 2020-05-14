@@ -21,7 +21,7 @@ class FleximportInstitut_idMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data) {
+    public function map($format, $value, $data, $sormclass) {
         switch ($format) {
             case "name":
                 $inst = Institute::findOneBySQL("Name = ?", array($value));

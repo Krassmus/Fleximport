@@ -20,7 +20,7 @@ class FleximportStarttimeMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data) {
+    public function map($format, $value, $data, $sormclass) {
         switch ($format) {
             case "name":
                 $semester =  Semester::findOneBySQL("name = ?", array($value));

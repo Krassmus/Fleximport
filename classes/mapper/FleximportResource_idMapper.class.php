@@ -28,7 +28,7 @@ class FleximportResource_idMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data) {
+    public function map($format, $value, $data, $sormclass) {
         switch ($format) {
             case "name":
                 $statement = DBManager::get()->prepare("
@@ -51,7 +51,7 @@ class FleximportResource_idMapper implements FleximportMapper {
             default:
                 //Eigenschaft der Ressource:
                 $statement = DBManager::get()->prepare("
-                    SELECT resource_id 
+                    SELECT resource_id
                     FROM resources_objects_properties
                     WHERE property_id = :property_id
                         AND `state` = :value

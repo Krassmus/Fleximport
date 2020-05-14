@@ -21,7 +21,7 @@ class FleximportLockruleMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data) {
+    public function map($format, $value, $data, $sormclass) {
         switch ($format) {
             case "name":
                 $lockrule = LockRule::findOneBySQL("name = ?", array($value));

@@ -19,7 +19,7 @@ class FleximportTermin_idMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data) {
+    public function map($format, $value, $data, $sormclass) {
         switch ($format) {
             case "content":
                 $date = CourseDate::findOneBySQL("content = ?", array($value));

@@ -543,7 +543,8 @@ class FleximportTable extends SimpleORMap {
         }
         foreach ($dynamics as $dynamic) {
             $for = $dynamic->forClassFields();
-            foreach ((array) $for[$classname] as $fieldname => $placeholder) {
+            $for = array_merge( (array) $for['*'], (array) $for[$classname]);
+            foreach ($for as $fieldname => $placeholder) {
                 if (isset($data[$fieldname])) {
                     $dynamic->applyValue($object, $data[$fieldname], $line, (bool) $this['tabledata']['simplematching'][$fieldname]['sync']);
                 }
@@ -723,7 +724,8 @@ class FleximportTable extends SimpleORMap {
         }
         foreach ($dynamics as $dynamic) {
             $for = $dynamic->forClassFields();
-            foreach ((array) $for[$this['import_type']] as $fieldname => $placeholder) {
+            $for = array_merge((array) $for['*'], (array) $for[$this['import_type']]);
+            foreach ($for as $fieldname => $placeholder) {
                 $fields[] = $fieldname;
             }
         }
@@ -785,7 +787,7 @@ class FleximportTable extends SimpleORMap {
             if ($this['tabledata']['simplematching'][$field]['column'] && (!$plugin || !in_array($field, $plugin->fieldsToBeMapped()))) {
                 foreach ($dynamics as $dynamic) {
                     $for = $dynamic->forClassFields();
-                    if (isset($for[$this['import_type']][$field]) && $dynamic->isMultiple()) {
+                    if ((isset($for[$this['import_type']][$field]) || isset($for['*'][$field])) && $dynamic->isMultiple()) {
                         if (!$data[$field]) {
                             $mapfrom = $this['tabledata']['simplematching'][$field]['mapfrom'] ?: $this['tabledata']['simplematching'][$field]['column'];
                             if (strpos($mapfrom, "fleximportconfig_") === 0) {
@@ -841,7 +843,8 @@ class FleximportTable extends SimpleORMap {
                                     $value[$k] = $mapper->map(
                                         $format,
                                         $v,
-                                        $data
+                                        $data,
+                                        $this['import_type']
                                     );
                                 }
                             }
@@ -850,7 +853,8 @@ class FleximportTable extends SimpleORMap {
                             $data[$field] = $mapper->map(
                                 $format,
                                 $value,
-                                $data
+                                $data,
+                                $this['import_type']
                             );
                         }
                     }

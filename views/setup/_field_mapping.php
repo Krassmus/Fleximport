@@ -31,18 +31,10 @@
                 </optgroup>
 
                 <? if (count($mapperclasses)) : ?>
-                    <? $mapper_exists = false ?>
-                    <? foreach ($mapperclasses as $class) {
-                        $mapper = new $class();
-                        if (in_array(strtolower($field), $mapper->possibleFieldnames())) {
-                            $mapper_exists = true;
-                        }
-                    } ?>
-                    <? if ($mapper_exists) : ?>
                     <optgroup label="<?= _("Spezialmapper") ?>">
                     <? foreach ($mapperclasses as $class) {
                         $mapper = new $class();
-                        if (in_array(strtolower($field), $mapper->possibleFieldnames())) {
+                        if (in_array("*", $mapper->possibleFieldnames()) || in_array(strtolower($field), $mapper->possibleFieldnames())) {
                             foreach ($mapper->possibleFormats() as $index => $value) : ?>
                                 <? $optionvalue = "fleximport_mapper__".$class."__".$index ?>
                                 <option value="<?= htmlReady($optionvalue) ?>"<?= $optionvalue === $table['tabledata']['simplematching'][$field]['column'] ? " selected" : "" ?>>
@@ -52,7 +44,6 @@
                         }
                     } ?>
                     </optgroup>
-                    <? endif ?>
                 <? endif ?>
 
                 <? $configs = FleximportConfig::all() ?>
