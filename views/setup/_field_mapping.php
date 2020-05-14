@@ -110,6 +110,18 @@
                 </select>
             <? endif ?>
 
+            <div class="fleximport_foreign_key_sormclass"
+                 id="simplematching_<?= md5($field) ?>_foreignkey_sormclass"
+                 style="<?= $table['tabledata']['simplematching'][$field]['column'] === "fleximport_mapper__FleximportForeignKeyMapper__fleximport_foreign_key" ? '' : 'display: none;'?>">
+                <label>
+                    <?= _("Name der SORM-Klasse des Schlüssels") ?>
+                    <input type="text"
+                           name="tabledata[simplematching][<?= htmlReady($field) ?>][fleximport_foreign_key_sormclass]"
+                           placeholder="<?= htmlReady($table['import_type']) ?>"
+                           value="<?= htmlReady($table['tabledata']['simplematching'][$field]['fleximport_foreign_key_sormclass']) ?>">
+                </label>
+            </div>
+
             <? if ($delimiter) : ?>
                 <div id="simplematching_<?= md5($field) ?>_delimiter" style="<?= $table['tabledata']['simplematching'][$field]['column'] ? "display: flex;" : ' display: none;' ?>">
                     <div style="width: 33%;">
@@ -168,6 +180,7 @@
                     </label>
                 </div>
             <? endif ?>
+
         <? endif ?>
     </td>
     <td>

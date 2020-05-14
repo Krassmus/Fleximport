@@ -837,6 +837,8 @@ class FleximportTable extends SimpleORMap {
                             $value = $data[$field] ?: ($data[$mapfrom] ?: $line[$mapfrom]);
                         }
                         //Anwenden der Mapper:
+                        $sormclass = $this['tabledata']['simplematching'][$field]['fleximport_foreign_key_sormclass']
+                            ?: $this['import_type'];
                         if (is_array($value)) {
                             foreach ($value as $k => $v) {
                                 if ($v) {
@@ -844,7 +846,7 @@ class FleximportTable extends SimpleORMap {
                                         $format,
                                         $v,
                                         $data,
-                                        $this['import_type']
+                                        $sormclass
                                     );
                                 }
                             }
@@ -854,7 +856,7 @@ class FleximportTable extends SimpleORMap {
                                 $format,
                                 $value,
                                 $data,
-                                $this['import_type']
+                                $sormclass
                             );
                         }
                     }

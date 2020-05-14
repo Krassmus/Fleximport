@@ -45,6 +45,7 @@ STUDIP.Fleximport = {
         );
         jQuery('#simplematching_' + field + '_format').toggle(this.value !== '');
         jQuery('#simplematching_' + field + '_delimiter').css('display', !this.value ? 'none' : 'flex');
+        jQuery('#simplematching_' + field + '_foreignkey_sormclass').toggle(this.value === "fleximport_mapper__FleximportForeignKeyMapper__fleximport_foreign_key");
     }
 };
 
