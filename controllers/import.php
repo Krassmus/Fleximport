@@ -122,7 +122,8 @@ class ImportController extends PluginController {
             if ($reflection->implementsInterface('FleximportDynamic') && ($class !== "FleximportDynamic")) {
                 $dynamic = new $class();
                 $for = $dynamic->forClassFields();
-                foreach ((array) $for[$classname] as $fieldname => $placeholder) {
+                $for = array_merge((array) $for['*'], (array) $for[$classname]);
+                foreach ($for as $fieldname => $placeholder) {
                     if ($this->table['tabledata']['simplematching'][$fieldname]['column']) {
                         $this->additional_fields[$fieldname] = method_exists($dynamic, "currentValue")
                             ? $dynamic->currentValue($this->object, $fieldname, (bool) $this->table['tabledata']['simplematching'][$fieldname]['sync'])

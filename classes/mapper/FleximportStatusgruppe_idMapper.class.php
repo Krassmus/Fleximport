@@ -19,7 +19,7 @@ class FleximportStatusgruppe_idMapper implements FleximportMapper {
         );
     }
 
-    public function map($format, $value, $data) {
+    public function map($format, $value, $data, $sormclass) {
         switch ($format) {
             case "uniquename":
                 $gruppe = Statusgruppen::findOneBySQL("name = ? AND range_id = ?", array($value, $data['range_id']));
