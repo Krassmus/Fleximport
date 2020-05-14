@@ -1,6 +1,6 @@
 <?php
 
-class FleximportResource_idMapper implements FleximportMapper
+class FleximportResourceCategory_idMapper implements FleximportMapper
 {
 
     public function getName()
@@ -32,7 +32,7 @@ class FleximportResource_idMapper implements FleximportMapper
         return $formats;
     }
 
-    public function map($format, $value, $data)
+    public function map($format, $value, $data, $sormclass)
     {
         switch ($format) {
             case "name":

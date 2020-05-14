@@ -60,6 +60,16 @@ Hat man das gemacht, werden die Veranstaltungen bei einem erneuten Import immer 
 
 Datenfelder spielen eine wichtige Rolle in Stud.IP. Sie können ganz normal gemapped werden, als wären sie Felder der Zieltabelle. Zudem kann man in Spezialmappings Objekte anhand ihrer Einträge in einem Datenfeld wie der Matrikelnummer identifizieren.
 
+### Mapping mit Fleximport-Fremdschlüsseln
+
+Es gibt einige Objekte, die keine Möglichkeit mit sich bringen, einen Fremdschlüssel abzulegen. Termine sind so ein Fall oder Statusgruppen. Fleximport bringt aber eine eigene Datenstruktur mit, in der man Fremdschlüssel speichern kann. Diese Datenstruktur nennt sich `fleximport_foreign_key`. Jedes Objekt, das man mit Fleximport importieren kann, hat im Mapping den Wert `fleximport_foreign_key`, den man mit den Daten einer Tabelle befüttern kann.
+
+Zudem kann man bei den anderen Feldern wie `user_id` die ID mappen über den *Fleximport-Fremdschlüssel*, und dahinter verbirgt sich der Wert von `fleximport_foreign_key`. Bei dem Mapping der Felder über den Fremdschlüssel kann man auch eine SORM-Klasse des Schlüssels angeben. Diese Klassen heißen *User* oder *CourseDate* und sind Unterklassen von `SimpleORMap`. Mit dieser Klasse sagt man nicht nur, welchen Fremdschlüssel wir haben (der Schlüssel selbst kommt aus den Daten), sondern auch für welche Tabelle in Stud.IP der Fremdschlüssel gilt.
+
+Beispiel: Ein CourseExDate Objekt wird importiert. Wenn man das Feld `resource_id` mappen will, macht man das mit einer ID eines Raumes. Das Fremdsystem kennt aber nicht die IDs in Stud.IP und schreibt dort den Wert 3 vor, was die ID des Raumes im Fremdsystem ist. 3 ist aber keine eindeutige ID, sondern es gibt eine ID 3 in der Räume-Tabelle und eine ID 3 in der Veranstaltungs-Tabelle. Zu welcher Entität gehört nun also diese 3? Dazu schreibt man ins Mapping, dass es zur SORM-Klasse `Resource` gilt. Dann weiß Flexiport auch, welches Objekt sich tatsächlich hinter der ID 3 verbirgt und kann sich die ID holen.
+
+Mit dieser Fremdschlüsseltabelle kann man praktisch alle Objekte importieren und updaten, auch wenn es in Stud.IP keine Datenfelder und kein anderes geeignetes Feld in der Datenbank gibt, das man zum Speichern der Fremdschlüssel nutzen kann.
+
 ### Spezialfelder mappen
 
 Manche Felder sind nicht wirklich Felder der Zieltabelle. Ihre Feldnamen beginnen stets mit `fleximport_...`, damit man sie unterscheiden kann. Sie haben aber eine besondere Bedeutung. Zum Beispiel kann man damit die importierten Veranstaltungen gleich sperren. Wenn das so ist, wird Fleximport automatisch die Veranstaltung mit einem speziellen Anmeldeset, der gesperrten Anmeldung, verknüpfen. Da diese Verknüpfung kein einfacher Eintrag in der Tabelle `seminare` ist, sondern eine weitere Tabelle, wird das der Einfachheit halber über so ein Spezialmapping behandelt. Theoretisch könnte man auch einen zweiten Import nur für die Verknüpfungstabelle starten. Das wäre aber arg kompliziert für diesen häufigen Anwendungsfall. Die Spezialfelder machen die Importe daher sehr viel einfacher (*hüstel*).
