@@ -617,7 +617,6 @@ class FleximportTable extends SimpleORMap {
                         $password = $data['password_plaintext']; //this is the not hashed password in cleartext
                         include("locale/$user_language/LC_MAILS/create_mail.inc.php");
                         $message = $mailbody;
-                        var_dump($message); die();
                     }
                     if ($message) {
                         $mail = new StudipMail();

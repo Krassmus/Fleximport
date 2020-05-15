@@ -73,7 +73,6 @@ class ProcessController extends PluginController {
     public function import_action()
     {
         if (Request::isPost()) {
-            var_dump($_FILES);
             if (file_exists($_FILES['file']['tmp_name'])) {
                 $file = json_decode(file_get_contents($_FILES['file']['tmp_name']), true);
 
