@@ -110,6 +110,7 @@ class SetupController extends PluginController {
         $datafield_object_types = array(
             'User' => "user",
             'Course' => "sem",
+            'Institute' => "inst",
             'CourseMember' => "usersemdata"
         );
         $this->datafields = DataField::findBySQL("object_type = :object_type", array(

@@ -650,6 +650,9 @@ class FleximportTable extends SimpleORMap {
             case "Course":
                 $datafields = DataField::findBySQL("object_type = 'sem'");
                 break;
+            case "Institute":
+                $datafields = DataField::findBySQL("object_type = 'inst'");
+                break;
             case "User":
                 $datafields = DataField::findBySQL("object_type = 'user'");
                 break;
@@ -705,6 +708,11 @@ class FleximportTable extends SimpleORMap {
         switch ($this['import_type']) {
             case "Course":
                 foreach (DataField::findBySQL("object_type = 'sem'") as $datafield) {
+                    $fields[] = $datafield['name'];
+                }
+                break;
+            case "Institute":
+                foreach (DataField::findBySQL("object_type = 'inst'") as $datafield) {
                     $fields[] = $datafield['name'];
                 }
                 break;

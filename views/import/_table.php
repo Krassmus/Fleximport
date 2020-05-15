@@ -32,6 +32,9 @@
                 case "Course":
                     echo Icon::create("seminar", "info")->asImg(20, array('class' => "text-bottom"));
                     break;
+                case "Institute":
+                    echo Icon::create("institute", "info")->asImg(20, array('class' => "text-bottom"));
+                    break;
                 case "fleximport_mysql_command":
                     echo Icon::create("unit-test", "info")->asImg(20, array('class' => "text-bottom"));
                     break;

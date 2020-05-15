@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- *** This is a generated XML file. Edit with care! *** -->
+<definitions name="StudIPServiceDefinition" targetNamespace="http://www.his.de/ws/StudIPService" xmlns="http://schemas.xmlsoap.org/wsdl/"
+xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wns="http://www.his.de/ws/StudIPService">
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.his.de/ws/StudIPService">
+            <complexType name="Account" abstract="false">
+                <sequence>
+                    <element name="username" type="string"></element>
+                    <element name="validFrom" type="date" nillable="true"></element>
+                    <element name="validTo" type="date" nillable="true"></element>
+                </sequence>
+            </complexType>
+            <complexType name="DegreeProgram" abstract="false">
+                <sequence>
+                    <element name="studynumber" type="integer"></element>
+                    <element name="subjectnumber" type="integer"></element>
+                    <element name="studysemester" type="decimal"></element>
+                    <element name="courseOfStudyId" type="long"></element>
+                    <element name="term" type="integer"></element>
+                </sequence>
+            </complexType>
+            <complexType name="KeyValue" abstract="false">
+                <sequence>
+                    <element name="id" type="long"></element>
+                    <element name="key" type="string" nillable="true"></element>
+                    <element name="label" type="string"></element>
+                    <element name="hiskeyId" type="integer" nillable="true"></element>
+                </sequence>
+            </complexType>
+            <complexType name="AffiliationPerson" abstract="false">
+                <sequence>
+                    <element name="validFrom" type="date"></element>
+                    <element name="validTo" type="date"></element>
+                    <element name="person" type="wns:Member"></element>
+                    <element name="affiliationType" type="wns:KeyValue"></element>
+                </sequence>
+            </complexType>
+            <complexType name="CTime" abstract="false">
+                <sequence>
+                    <element name="start" type="time" nillable="true"></element>
+                    <element name="end" type="time" nillable="true"></element>
+                    <element name="academicTimeSpecification" type="wns:KeyValue" nillable="true"></element>
+                </sequence>
+            </complexType>
+            <complexType name="AppCancel" abstract="false">
+                <sequence>
+                    <element name="planelementCancellationId" type="long"></element>
+                    <element name="plannedDatesId" type="long" nillable="true"></element>
+                    <element name="planelementId" type="long" nillable="true"></element>
+                    <element name="date" type="date"></element>
+                    <element name="time" type="wns:CTime"></element>
+                    <element name="remark" type="string" nillable="true"></element>
+                    <element name="weekday" type="wns:KeyValue"></element>
+                </sequence>
+            </complexType>
+            <complexType name="AppMod" abstract="false">
+                <sequence>
+                    <element name="planelementChangeId" type="long"></element>
+                    <element name="remark" type="string" nillable="true"></element>
+                    <element name="initialDate" type="date" nillable="true"></element>
+                    <element name="initialStart" type="time" nillable="true"></element>
+                    <element name="initialEnd" type="time" nillable="true"></element>
+                </sequence>
+            </complexType>
+            <complexType name="OrgunitChild" abstract="false">
+                <sequence>
+                    <element name="id" type="long"></element>
+                    <element name="lid" type="long"></element>
+                </sequence>
+            </complexType>
+            <complexType name="Student" abstract="false">
+                <sequence>
+                    <element name="registrationnumber" type="integer"></element>
+                    <element name="firstname" type="string"></element>
+                    <element name="surname" type="string"></element>
+                    <element name="dateofbirth" type="date"></element>
+                    <element name="gender" type="string"></element>
+                    <element name="birthcity" type="string"></element>
+                    <element name="country" type="wns:KeyValue" nillable="true"></element>
+                    <element name="nationality" type="wns:KeyValue"></element>
+                    <element name="enrollmentdate" type="date"></element>
+                    <element name="studystatus" type="wns:KeyValue"></element>
+                    <element name="term" type="integer"></element>
+                    <element name="disenrollmentDate" type="date" nillable="true"></element>
+                    <element name="account" type="wns:Account" nillable="true"></element>
+                    <element name="degreePrograms" type="wns:degreeProgramsType"></element>
+                </sequence>
+            </complexType>
+            <complexType name="ExaRegResponse" abstract="false">
+                <sequence>
+                    <element name="id" type="long"></element>
+                    <element name="lid" type="long"></element>
+                    <element name="shorttext" type="string" nillable="true"></element>
+                    <element name="defaulttext" type="string"></element>
+                    <element name="longtext" type="string" nillable="true"></element>
+                    <element name="elementnr" type="string" nillable="true"></element>
+                    <element name="elementtype" type="wns:KeyValue"></element>
+                    <element name="status" type="wns:KeyValue"></element>
+                    <element name="validFrom" type="date"></element>
+                    <element name="validTo" type="date"></element>
+                    <element name="erChildren" type="wns:erChildrenType"></element>
+                </sequence>
+            </complexType>
+            <complexType name="OrgunitShort" abstract="false">
+                <sequence>
+                    <element name="id" type="long"></element>
+                    <element name="lid" type="long"></element>
+                    <element name="uniquename" type="string"></element>
+                    <element name="defaulttext" type="string"></element>
+                </sequence>
+            </complexType>
+            <complexType name="PlannedDate" abstract="false">
+                <sequence>
+                    <element name="plannedDatesId" type="long"></element>
+                    <element name="rhythm" type="wns:KeyValue"></element>
+                    <element name="weekday" type="wns:KeyValue"></element>
+                    <element name="firstAppointment" type="date"></element>
+                    <element name="lastAppointment" type="date"></element>
+                    <element name="time" type="wns:CTime"></element>
+                    <element name="expectedAttendees" type="integer" nillable="true"></element>
+                    <element name="notice" type="string" nillable="true"></element>
+                    <element name="room" type="wns:Room" nillable="true"></element>
+                    <element name="appointmentModifications" type="wns:appointmentModificationsType"></element>
+                    <element name="appointmentCancellations" type="wns:appointmentCancellationsType"></element>
+                    <element name="personResponsible" type="wns:personResponsibleType"></element>
+                </sequence>
+            </complexType>
+            <complexType name="CosSearchResponse" abstract="false">
+                <sequence>
+                    <element name="id" type="long"></element>
+                    <element name="lid" type="long"></element>
+                    <element name="uniquename" type="string"></element>
+                    <element name="shorttext" type="string" nillable="true"></element>
+                    <element name="defaulttext" type="string"></element>
+                    <element name="longtext" type="string" nillable="true"></element>
+                    <element name="courseOfStudyTypeValue" type="wns:KeyValue" nillable="true"></element>
+                    <element name="courseSpecialization" type="wns:KeyValue" nillable="true"></element>
+                    <element name="degree" type="wns:KeyValue" nillable="true"></element>
+                    <element name="enrollment" type="wns:KeyValue" nillable="true"></element>
+                    <element name="examinationversion" type="wns:KeyValue" nillable="true"></element>
+                    <element name="formOfStudies" type="wns:KeyValue" nillable="true"></element>
+                    <element name="majorFieldOfStudy" type="wns:KeyValue" nillable="true"></element>
+                    <element name="orgunit" type="wns:OrgunitShort" nillable="true"></element>
+                    <element name="partOfStudies" type="integer" nillable="true"></element>
+                    <element name="partTimePercentage" type="integer" nillable="true"></element>
+                    <element name="placeOfStudies" type="wns:KeyValue" nillable="true"></element>
+                    <element name="regularNumberOfSemesters" type="integer" nillable="true"></element>
+                    <element name="subject" type="wns:KeyValue" nillable="true"></element>
+                    <element name="subjectIndicator" type="wns:KeyValue" nillable="true"></element>
+                    <element name="typeOfStudy" type="wns:KeyValue" nillable="true"></element>
+                    <element name="validFrom" type="date"></element>
+                    <element name="validTo" type="date"></element>
+                    <element name="examinationRegulationsIdList" type="wns:examinationRegulationsIdListType"></element>
+                </sequence>
+            </complexType>
+            <complexType name="Course" abstract="false">
+                <sequence>
+                    <element name="id" type="long"></element>
+                    <element name="attendeeMaximum" type="integer" nillable="true"></element>
+                    <element name="attendeeMinimum" type="integer" nillable="true"></element>
+                    <element name="cancelled" type="boolean" nillable="true"></element>
+                    <element name="defaulttext" type="string"></element>
+                    <element name="hoursPerWeek" type="decimal" nillable="true"></element>
+                    <element name="parallelgroup" type="wns:KeyValue"></element>
+                    <element name="compulsoryRequirement" type="string" nillable="true"></element>
+                    <element name="credits" type="string" nillable="true"></element>
+                    <element name="examinationAchievement" type="string" nillable="true"></element>
+                    <element name="grading" type="string" nillable="true"></element>
+                    <element name="targetGroup" type="string" nillable="true"></element>
+                    <element name="teachingLanguage" type="wns:KeyValue" nillable="true"></element>
+                    <element name="teachingMethod" type="string" nillable="true"></element>
+                    <element name="workload" type="string" nillable="true"></element>
+                    <element name="plannedDates" type="wns:plannedDatesType"></element>
+                </sequence>
+            </complexType>
+            <complexType name="UnitStudiesInfo" abstract="false">
+                <sequence>
+                    <element name="id" type="long"></element>
+                    <element name="unitId" type="long"></element>
+                    <element name="courseOfStudyId" type="long"></element>
+                    <element name="courseOfStudyLid" type="long"></element>
+                    <element name="rootElementtypeHiskey" type="integer"></element>
+                </sequence>
+            </complexType>
+            <complexType name="Member" abstract="false">
+                <sequence>
+                    <element name="id" type="long"></element>
+                    <element name="firstname" type="string"></element>
+                    <element name="surname" type="string"></element>
+                    <element name="gender" type="string"></element>
+                    <element name="birthname" type="string" nillable="true"></element>
+                    <element name="nameprefix" type="string" nillable="true"></element>
+                    <element name="namesuffix" type="string" nillable="true"></element>
+                    <element name="academicdegreesuffix" type="string" nillable="true"></element>
+                    <element name="academicdegree" type="wns:KeyValue" nillable="true"></element>
+                    <element name="title" type="wns:KeyValue" nillable="true"></element>
+                    <element name="account" type="wns:Account" nillable="true"></element>
+                </sequence>
+            </complexType>
+            <complexType name="Room" abstract="false">
+                <sequence>
+                    <element name="roomId" type="long"></element>
+                    <element name="room" type="string"></element>
+                    <element name="roomKey" type="string" nillable="true"></element>
+                    <element name="floor" type="string"></element>
+                    <element name="floorKey" type="string" nillable="true"></element>
+                    <element name="building" type="string"></element>
+                    <element name="buildingKey" type="string" nillable="true"></element>
+                    <element name="campus" type="string"></element>
+                    <element name="campusKey" type="string" nillable="true"></element>
+                </sequence>
+            </complexType>
+            <complexType name="Orgunit" abstract="false">
+                <sequence>
+                    <element name="id" type="long"></element>
+                    <element name="lid" type="long"></element>
+                    <element name="parentLid" type="long" nillable="true"></element>
+                    <element name="uniquename" type="string"></element>
+                    <element name="shorttext" type="string" nillable="true"></element>
+                    <element name="defaulttext" type="string"></element>
+                    <element name="longtext" type="string" nillable="true"></element>
+                    <element name="orgunitType" type="wns:KeyValue" nillable="true"></element>
+                    <element name="sortorder" type="long"></element>
+                    <element name="validFrom" type="date"></element>
+                    <element name="validTo" type="date"></element>
+                    <element name="children" type="wns:childrenType"></element>
+                    <element name="affiliations" type="wns:affiliationsType"></element>
+                </sequence>
+            </complexType>
+            <element name="findUnitForCourseOfStudy">
+                <complexType>
+                    <sequence>
+                        <element name="id" type="string" nillable="true" minOccurs="0"></element>
+                        <element name="unitId" type="string" nillable="true" minOccurs="0"></element>
+                        <element name="courseOfStudyId" type="string" nillable="true" minOccurs="0"></element>
+                        <element name="courseOfStudyLid" type="string" nillable="true" minOccurs="0"></element>
+                        <element name="rootElementtypeHiskey" type="string" nillable="true" minOccurs="0">
+                            <annotation>
+                                <documentation>hiskey des Wurzelelementes, zu der die Unit gehört: Prüfungsordnung(4), Eignungsordnung(1),
+                                Immatrikulationsordnung(10)</documentation>
+                            </annotation>
+                        </element>
+                        <element name="officialStatistics" type="string" nillable="true" minOccurs="0">
+                            <annotation>
+                                <documentation>Is unit relevant for official statistics, then use '1'. Currently only set for final exams.</documentation>
+                            </annotation>
+                        </element>
+                        <element name="elementtypeHiskey" type="string" nillable="true" minOccurs="0"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="findUnitForCourseOfStudyResponse">
+                <complexType>
+                    <sequence>
+                        <element name="unitStudiesList" type="wns:unitStudiesListType"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="readOrgunit">
+                <complexType>
+                    <sequence>
+                        <element name="lid" type="long" nillable="true">
+                            <annotation>
+                                <documentation>wenn leer, dann wird die Hochschule ausgegeben</documentation>
+                            </annotation>
+                        </element>
+                        <element name="versionDate" type="date" nillable="true"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="readOrgunitResponse">
+                <complexType>
+                    <sequence>
+                        <element name="orgunitResponse" type="wns:Orgunit"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="findCoursesOfStudy">
+                <complexType>
+                    <sequence>
+                        <element name="versionDate" type="date" nillable="true"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="findCoursesOfStudyResponse">
+                <complexType>
+                    <sequence>
+                        <element name="cosResponse" type="wns:cosResponseType"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="findActiveStudents">
+                <complexType>
+                    <sequence>
+                        <element name="termKey" type="integer">
+                            <annotation>
+                                <documentation>[YEAR][1|2]</documentation>
+                            </annotation>
+                        </element>
+                        <element name="disenrollmentDate" type="date" nillable="true"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="findActiveStudentsResponse">
+                <complexType>
+                    <sequence>
+                        <element name="findActiveStudentsResponse" type="wns:findActiveStudentsResponseType"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="readExaminationRegulations">
+                <complexType>
+                    <sequence>
+                        <element name="unitId" type="long"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="readExaminationRegulationsResponse">
+                <complexType>
+                    <sequence>
+                        <element name="examinationRegulationsResponse" type="wns:ExaRegResponse"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="findCoursesOfTerm">
+                <complexType>
+                    <sequence>
+                        <element name="unitId" type="long" nillable="true">
+                            <annotation>
+                                <documentation>UnitId der Veranstaltung/Prüfung</documentation>
+                            </annotation>
+                        </element>
+                        <element name="termKey" type="integer">
+                            <annotation>
+                                <documentation>[YEAR][1|2]</documentation>
+                            </annotation>
+                        </element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="findCoursesOfTermResponse">
+                <complexType>
+                    <sequence>
+                        <element name="findCoursesOfTermResponse" type="wns:findCoursesOfTermResponseType"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <complexType name="degreeProgramsType">
+                <sequence>
+                    <element name="degreeProgram" type="wns:DegreeProgram" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="appointmentCancellationsType">
+                <sequence>
+                    <element name="appointmentCancellation" type="wns:AppCancel" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="examinationRegulationsIdListType">
+                <sequence>
+                    <element name="id" type="long" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="unitStudiesListType">
+                <sequence>
+                    <element name="unitStudiesInfo" type="wns:UnitStudiesInfo" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="erChildrenType">
+                <sequence>
+                    <element name="examinationRegulationsResponse" type="wns:ExaRegResponse" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="findCoursesOfTermResponseType">
+                <sequence>
+                    <element name="course" type="wns:Course" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="personResponsibleType">
+                <sequence>
+                    <element name="person" type="wns:Member" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="cosResponseType">
+                <sequence>
+                    <element name="cos" type="wns:CosSearchResponse" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="appointmentModificationsType">
+                <sequence>
+                    <element name="appointmentModification" type="wns:AppMod" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="plannedDatesType">
+                <sequence>
+                    <element name="plannedDate" type="wns:PlannedDate" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="findActiveStudentsResponseType">
+                <sequence>
+                    <element name="student" type="wns:Student" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="childrenType">
+                <sequence>
+                    <element name="child" type="wns:OrgunitChild" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="affiliationsType">
+                <sequence>
+                    <element name="affiliation" type="wns:AffiliationPerson" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <element name="ServiceFault">
+                <complexType>
+                    <sequence>
+                        <element name="rootCause" type="string" minOccurs="0" maxOccurs="1" />
+                        <element name="message" type="string" />
+                        <element name="validationMessage" minOccurs="0" maxOccurs="unbounded" type="wns:ValidationMessage" />
+                    </sequence>
+                </complexType>
+            </element>
+            <complexType name="ValidationMessage">
+                <sequence>
+                    <element name="messageType" type="string" />
+                    <element name="messageKey" type="string" />
+                    <element name="messageParameter" minOccurs="0" maxOccurs="unbounded" type="string" />
+                </sequence>
+            </complexType>
+        </schema>
+    </types>
+    <message name="ServiceFault">
+        <part name="serviceFault" element="wns:ServiceFault" />
+    </message>
+    <message name="findUnitForCourseOfStudy">
+        <part name="parameters" element="wns:findUnitForCourseOfStudy" />
+    </message>
+    <message name="findUnitForCourseOfStudyResponse">
+        <part name="parameters" element="wns:findUnitForCourseOfStudyResponse" />
+    </message>
+    <message name="readOrgunit">
+        <part name="parameters" element="wns:readOrgunit" />
+    </message>
+    <message name="readOrgunitResponse">
+        <part name="parameters" element="wns:readOrgunitResponse" />
+    </message>
+    <message name="findCoursesOfStudy">
+        <part name="parameters" element="wns:findCoursesOfStudy" />
+    </message>
+    <message name="findCoursesOfStudyResponse">
+        <part name="parameters" element="wns:findCoursesOfStudyResponse" />
+    </message>
+    <message name="findActiveStudents">
+        <part name="parameters" element="wns:findActiveStudents" />
+    </message>
+    <message name="findActiveStudentsResponse">
+        <part name="parameters" element="wns:findActiveStudentsResponse" />
+    </message>
+    <message name="readExaminationRegulations">
+        <part name="parameters" element="wns:readExaminationRegulations" />
+    </message>
+    <message name="readExaminationRegulationsResponse">
+        <part name="parameters" element="wns:readExaminationRegulationsResponse" />
+    </message>
+    <message name="findCoursesOfTerm">
+        <part name="parameters" element="wns:findCoursesOfTerm" />
+    </message>
+    <message name="findCoursesOfTermResponse">
+        <part name="parameters" element="wns:findCoursesOfTermResponse" />
+    </message>
+    <portType name="StudIPServicePortType">
+        <operation name="findUnitForCourseOfStudy">
+            <documentation>SECURED BY [(cm.app.courseofstudy.VIEW_COURSE_OF_STUDY)]</documentation>
+            <input message="wns:findUnitForCourseOfStudy" />
+            <output message="wns:findUnitForCourseOfStudyResponse" />
+            <fault name="serviceFault" message="wns:ServiceFault" />
+        </operation>
+        <operation name="readOrgunit">
+            <documentation></documentation>
+            <input message="wns:readOrgunit" />
+            <output message="wns:readOrgunitResponse" />
+            <fault name="serviceFault" message="wns:ServiceFault" />
+        </operation>
+        <operation name="findCoursesOfStudy">
+            <documentation></documentation>
+            <input message="wns:findCoursesOfStudy" />
+            <output message="wns:findCoursesOfStudyResponse" />
+            <fault name="serviceFault" message="wns:ServiceFault" />
+        </operation>
+        <operation name="findActiveStudents">
+            <documentation></documentation>
+            <input message="wns:findActiveStudents" />
+            <output message="wns:findActiveStudentsResponse" />
+            <fault name="serviceFault" message="wns:ServiceFault" />
+        </operation>
+        <operation name="readExaminationRegulations">
+            <documentation></documentation>
+            <input message="wns:readExaminationRegulations" />
+            <output message="wns:readExaminationRegulationsResponse" />
+            <fault name="serviceFault" message="wns:ServiceFault" />
+        </operation>
+        <operation name="findCoursesOfTerm">
+            <documentation></documentation>
+            <input message="wns:findCoursesOfTerm" />
+            <output message="wns:findCoursesOfTermResponse" />
+            <fault name="serviceFault" message="wns:ServiceFault" />
+        </operation>
+    </portType>
+    <binding name="StudIPServiceBinding" type="wns:StudIPServicePortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <operation name="findUnitForCourseOfStudy">
+            <soap:operation soapAction="http://www.his.de/ws/StudIPService/findUnitForCourseOfStudy" />
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="serviceFault">
+                <soap:fault name="serviceFault" use="literal" />
+            </fault>
+        </operation>
+        <operation name="readOrgunit">
+            <soap:operation soapAction="http://www.his.de/ws/StudIPService/readOrgunit" />
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="serviceFault">
+                <soap:fault name="serviceFault" use="literal" />
+            </fault>
+        </operation>
+        <operation name="findCoursesOfStudy">
+            <soap:operation soapAction="http://www.his.de/ws/StudIPService/findCoursesOfStudy" />
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="serviceFault">
+                <soap:fault name="serviceFault" use="literal" />
+            </fault>
+        </operation>
+        <operation name="findActiveStudents">
+            <soap:operation soapAction="http://www.his.de/ws/StudIPService/findActiveStudents" />
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="serviceFault">
+                <soap:fault name="serviceFault" use="literal" />
+            </fault>
+        </operation>
+        <operation name="readExaminationRegulations">
+            <soap:operation soapAction="http://www.his.de/ws/StudIPService/readExaminationRegulations" />
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="serviceFault">
+                <soap:fault name="serviceFault" use="literal" />
+            </fault>
+        </operation>
+        <operation name="findCoursesOfTerm">
+            <soap:operation soapAction="http://www.his.de/ws/StudIPService/findCoursesOfTerm" />
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="serviceFault">
+                <soap:fault name="serviceFault" use="literal" />
+            </fault>
+        </operation>
+    </binding>
+    <service name="StudIPService">
+        <wsp:PolicyReference URI="#UsernameToken" />
+        <port name="StudIPServicePort" binding="wns:StudIPServiceBinding">
+            <soap:address location="http://localhost:8085/qisserver/services2/StudIPService" />
+        </port>
+    </service>
+<!-- Policy for UsernameToken with plaintext password, sent from client to server only -->
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="UsernameToken">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy />
+                        </sp:UsernameToken>
+                    </wsp:Policy>
+                </sp:SupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+</definitions>

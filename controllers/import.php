@@ -137,6 +137,9 @@ class ImportController extends PluginController {
             case "Course":
                 $this->datafields = DataField::findBySQL("object_type = 'sem'");
                 break;
+            case "Institute":
+                $this->datafields = DataField::findBySQL("object_type = 'inst'");
+                break;
             case "User":
                 $this->datafields = DataField::findBySQL("object_type = 'user'");
                 break;

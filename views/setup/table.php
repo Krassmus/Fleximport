@@ -20,11 +20,12 @@
             <option value="CourseMember"<?= $table['import_type'] === "CourseMember" ? " selected" : "" ?>><?= _("Teilnehmerimport") ?></option>
             <option value="Statusgruppen"<?= $table['import_type'] === "Statusgruppen" ? " selected" : "" ?>><?= _("Statusgruppenimport") ?></option>
             <option value="CourseDate"<?= $table['import_type'] === "CourseDate" ? " selected" : "" ?>><?= _("Veranstaltungstermine") ?></option>
+            <option value="Institute"<?= $table['import_type'] === "Institute" ? " selected" : "" ?>><?= _("Einrichtung") ?></option>
             <option value=""<?= !$table['import_type'] && !$table->isNew() ? " selected" : "" ?>><?= _("Tabelle nicht importieren") ?></option>
             <option value="fleximport_mysql_command"<?= $table['import_type'] === "fleximport_mysql_command" ? " selected" : "" ?>><?= _("MySQL-Anweisung") ?></option>
-            <option value="other"<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course", "CourseDate", "fleximport_mysql_command")) ? " selected" : "" ?>><?= _("SORM-Objekt") ?></option>
+            <option value="other"<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course", "CourseDate", "Institute", "fleximport_mysql_command")) ? " selected" : "" ?>><?= _("SORM-Objekt") ?></option>
         </select>
-        <div id="other_import_type" style="<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course", "CourseDate", "fleximport_mysql_command")) ? "" : "display: none; " ?>">
+        <div id="other_import_type" style="<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course", "CourseDate", "Institute", "fleximport_mysql_command")) ? "" : "display: none; " ?>">
             <input type="text" name="other_import_type" value="<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course", "CourseDate", "fleximport_mysql_command")) ? htmlReady($table['import_type']) : "" ?>" placeholder="<?= _("Name der SORM-Klasse") ?>">
         </div>
         <div id="fleximport_mysql_command" style="<?= $table['import_type'] === "fleximport_mysql_command" ? "" : "display: none; " ?>">
