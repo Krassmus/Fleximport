@@ -26,13 +26,12 @@ class Soap
                     : WSDL_CACHE_NONE,
                 'features' => SOAP_SINGLE_ELEMENT_ARRAYS
             ));
-            $file = strtolower(substr($evasys_wsdl, strrpos($evasys_wsdl, "/") + 1));
-            $soapHeaders = new \SoapHeader($file, 'Header'
-                /*array(
-                    'Login' => $evasys_user,
-                    'Password' => $evasys_password
-                )*/
-            );
+            $soapHeaders = new \SoapHeader("wsse", 'Security', array(
+                'UsernameToken' => array(
+                    'Username' => \FleximportConfig::get("HISINONE_SOAP_USERNAME"),
+                    'Password' => \FleximportConfig::get("HISINONE_SOAP_PASSWORD")
+                )
+            ));
             self::$instance->__setSoapHeaders($soapHeaders);
             if (is_soap_fault(self::$instance)) {
                 throw new Exception("SOAP-Error: " . self::$instance);

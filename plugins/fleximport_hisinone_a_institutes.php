@@ -26,78 +26,82 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
         $institutes = [];
         $affiliations = [];
         $data = $this->getInstituteData();
-        $institutes[] = $this->mapInstituteData($data);
-        foreach ($data->affiliations->affiliation as $affiliation_data) {
-            $affiliations[] = $this->mapAffiliationData($data, $affiliation_data);
-        }
-        $fetched_lids[] = $data->lid;
-        foreach ($data->children->child as $child) {
-            if (!in_array($child->lid, $fetched_lids)) {
-                $lids[] =  $child->lid;
+        if ($data) {
+            $institutes[] = $this->mapInstituteData($data);
+            foreach ($data->affiliations->affiliation as $affiliation_data) {
+                $affiliations[] = $this->mapAffiliationData($data, $affiliation_data);
             }
-        }
-        $max = 200;
-        while (($max === null || count($fetched_lids) < $max) && (count($lids) > 0)) {
-            $lid = array_shift($lids);
-            if (!in_array($lid, $fetched_lids)) {
-                $data = $this->getInstituteData($lid);
-                $institutes[] = $this->mapInstituteData($data);
-                foreach ($data->affiliations->affiliation as $affiliation_data) {
-                    $affiliations[] = $this->mapAffiliationData($data, $affiliation_data);
+            $fetched_lids[] = $data->lid;
+            foreach ($data->children->child as $child) {
+                if (!in_array($child->lid, $fetched_lids)) {
+                    $lids[] = $child->lid;
                 }
-                $fetched_lids[] = $data->lid;
-                foreach ($data->children->child as $child) {
-                    if (!in_array($child->lid, $fetched_lids)) {
-                        $lids[] = $child->lid;
+            }
+            $max = 500;
+            while (($max === null || count($fetched_lids) < $max) && (count($lids) > 0)) {
+                $lid = array_shift($lids);
+                if (!in_array($lid, $fetched_lids)) {
+                    $data = $this->getInstituteData($lid);
+                    $institutes[] = $this->mapInstituteData($data);
+                    foreach ($data->affiliations->affiliation as $affiliation_data) {
+                        $affiliations[] = $this->mapAffiliationData($data, $affiliation_data);
+                    }
+                    $fetched_lids[] = $data->lid;
+                    foreach ($data->children->child as $child) {
+                        if (!in_array($child->lid, $fetched_lids)) {
+                            $lids[] = $child->lid;
+                        }
                     }
                 }
             }
-        }
 
-        $fields = [
-            'id',
-            'lid',
-            'parentLid',
-            'uniquename',
-            'shorttext',
-            'defaulttext',
-            'longtext',
-            'orgunittype_id',
-            'orgunittype_key',
-            'orgunittype_label',
-            'orgunittype_hiskeyid',
-            'sortorder',
-            'validfrom',
-            'validTo'
-        ];
-
-        $this->table->createTable($fields, $institutes);
-
-        $affiliation_table = "fleximport_hisinone_c_institute_affiliations";
-        $aff_table = FleximportTable::findOneBySQL("name = ?", [$affiliation_table]);
-        if ($aff_table) {
             $fields = [
-                'institute_lid',
-                'institute_name',
+                'id',
+                'lid',
+                'parentLid',
+                'uniquename',
+                'shorttext',
+                'defaulttext',
+                'longtext',
+                'orgunittype_id',
+                'orgunittype_key',
+                'orgunittype_label',
+                'orgunittype_hiskeyid',
+                'sortorder',
                 'validfrom',
-                'validto',
-                'person_id',
-                'person_firstname',
-                'person_surname',
-                'person_gender',
-                'person_birthname',
-                'person_nameprefix',
-                'person_namesuffix',
-                'person_academicdegreesuffix',
-                'person_academicdegree',
-                'person_title',
-                'person_account_username',
-                'affiliationtype_id',
-                'affiliationtype_key',
-                'affiliationtype_label',
-                'affiliationtype_hiskeyid'
+                'validTo'
             ];
-            $aff_table->createTable($fields, $affiliations);
+
+            $this->table->createTable($fields, $institutes);
+
+            $affiliation_table = "fleximport_hisinone_c_institute_affiliations";
+            $aff_table = FleximportTable::findOneBySQL("name = ?", [$affiliation_table]);
+            if ($aff_table) {
+                $fields = [
+                    'institute_lid',
+                    'institute_name',
+                    'validfrom',
+                    'validto',
+                    'person_id',
+                    'person_firstname',
+                    'person_surname',
+                    'person_gender',
+                    'person_birthname',
+                    'person_nameprefix',
+                    'person_namesuffix',
+                    'person_academicdegreesuffix',
+                    'person_academicdegree',
+                    'person_title',
+                    'person_account_username',
+                    'affiliationtype_id',
+                    'affiliationtype_key',
+                    'affiliationtype_label',
+                    'affiliationtype_hiskeyid'
+                ];
+                $aff_table->createTable($fields, $affiliations);
+            }
+        } else {
+            PageLayout::postError(_("Konnte Daten nicht abrufen."));
         }
 
     }
