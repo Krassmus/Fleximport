@@ -45,7 +45,7 @@ class fleximport_hisinone_d_students extends FleximportPlugin
             'degreePrograms'
         ];
         $students = [];
-        foreach ($response->findActiveStudentsResponse->student as $student_data) {
+        foreach ((array) $response->findActiveStudentsResponse->student as $student_data) {
             $students[] = $this->mapStudentData($student_data);
         }
         $this->table->createTable($fields, $students);

@@ -112,6 +112,13 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
         $response = $soap->__soapCall("readOrgUnit", array(
             array('lid' => $lid)
         ));
+        if (is_a($response, "SoapFault")) {
+            echo $soap->__getLastRequest();
+            echo "<br><br>\n\n";
+            var_dump($response);
+            die();
+        }
+
         return $response->orgunitResponse;
     }
 
