@@ -26,7 +26,7 @@ class Soap
                 'Security',
                 $headerbody
             );
-            self::$instance->__setSoapHeaders($soapHeaders);
+            //self::$instance->__setSoapHeaders($soapHeaders);
             if (is_soap_fault(self::$instance)) {
                 throw new Exception("SOAP-Error: " . self::$instance);
             }
