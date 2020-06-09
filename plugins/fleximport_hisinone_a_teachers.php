@@ -49,6 +49,7 @@ class fleximport_hisinone_a_teachers extends FleximportPlugin
 
     protected function mapAffiliationData($data, $affiliation_data)
     {
+
         $mapped = [
             $data->lid,
             $data->defaulttext ?: "",

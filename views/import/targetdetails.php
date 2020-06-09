@@ -61,13 +61,12 @@
                 <? if (!$object->isNew()) : ?>
                     <td><?= htmlReady($object[$field]) ?></td>
                 <? endif ?>
-                <td>
-                    <? if (!$overwrite) : ?>
-                        <?= Icon::create("decline", "inactive")->asImg(16, array('title' => _("Wert wird nicht überschrieben."))) ?>
-                    <? else : ?>
-                        <?= htmlReady($data[$field]) ?>
-                    <? endif ?>
-                </td>
+                <td><?
+                    if (!$overwrite) {
+                        echo Icon::create("decline", "inactive")->asImg(16, array('title' => _("Wert wird nicht überschrieben.")));
+                    } else {
+                        echo htmlReady($data[$field]);
+                    } ?></td>
             </tr>
         <? endforeach ?>
         <? foreach ($datafields as $datafield) : ?>

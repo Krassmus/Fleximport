@@ -37,7 +37,7 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
                     $lids[] = $child->lid;
                 }
             }
-            $max = 500;
+            $max = 100000;
             while (($max === null || count($fetched_lids) < $max) && (count($lids) > 0)) {
                 $lid = array_shift($lids);
                 if (!in_array($lid, $fetched_lids)) {
@@ -47,7 +47,7 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
                         $affiliations[] = $this->mapAffiliationData($data, $affiliation_data);
                     }
                     $fetched_lids[] = $data->lid;
-                    foreach ($data->children->child as $child) {
+                    foreach ((array) $data->children->child as $child) {
                         if (!in_array($child->lid, $fetched_lids)) {
                             $lids[] = $child->lid;
                         }

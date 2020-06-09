@@ -20,13 +20,13 @@ class Soap
                 'features' => SOAP_SINGLE_ELEMENT_ARRAYS
             ));
 
-            $headerbody = new \SoapVar('<wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsse:UsernameToken><wsse:Username>'.htmlReady(\FleximportConfig::get("HISINONE_SOAP_USERNAME")).'</wsse:Username><wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">' .\FleximportConfig::get("HISINONE_SOAP_PASSWORD") .'</wsse:Password></wsse:UsernameToken></wsse:Security>', \XSD_ANYXML);
+            $headerbody = new \SoapVar('<wsse:Security SOAP-ENV:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsse:UsernameToken><wsse:Username>'.htmlReady(\FleximportConfig::get("HISINONE_SOAP_USERNAME")).'</wsse:Username><wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">' .\FleximportConfig::get("HISINONE_SOAP_PASSWORD") .'</wsse:Password></wsse:UsernameToken></wsse:Security>', \XSD_ANYXML);
             $soapHeaders = new \SoapHeader(
                 "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
                 'Security',
                 $headerbody
             );
-            //self::$instance->__setSoapHeaders($soapHeaders);
+            self::$instance->__setSoapHeaders($soapHeaders);
             if (is_soap_fault(self::$instance)) {
                 throw new Exception("SOAP-Error: " . self::$instance);
             }
