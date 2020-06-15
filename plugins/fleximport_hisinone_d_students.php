@@ -2,6 +2,7 @@
 
 require_once __DIR__."/HisInOne/Soap.php";
 require_once __DIR__."/HisInOne/SoapClient.php";
+require_once __DIR__."/HisInOne/DataMapper.php";
 
 class fleximport_hisinone_d_students extends FleximportPlugin
 {
@@ -15,43 +16,18 @@ class fleximport_hisinone_d_students extends FleximportPlugin
     {
         $soap = \HisInOne\Soap::get();
         $response = $soap->__soapCall("findActiveStudents", array(
-            array('termKey' => 20202) //1 = summer, 2 = winter, make for processconfig?
+            array('termKey' => (int) FleximportConfig::get("HISINONE_TERMKEY")) //1 = summer, 2 = winter, make for processconfig?
         ));
-        $fields = [
-            'registrationnumber',
-            'firstname',
-            'surname',
-            'dateofbirth',
-            'gender',
-            'birthcity',
-            'country_id',
-            'country_key',
-            'country_label',
-            'country_hiskeyid',
-            'nationality_id',
-            'nationality_key',
-            'nationality_label',
-            'nationality_hiskeyid',
-            'enrollmentdate',
-            'studystatus_id',
-            'studystatus_key',
-            'studystatus_label',
-            'studystatus_hiskeyid',
-            'term',
-            'disenrollmentDate',
-            'account_username',
-            'account_validfrom',
-            'account_validto',
-            'degreePrograms'
-        ];
-        $students = [];
-        foreach ((array) $response->findActiveStudentsResponse->student as $student_data) {
-            $students[] = $this->mapStudentData($student_data);
-        }
-        $this->table->createTable($fields, $students);
+        list($fields, $data) = \HisInOne\DataMapper::getData($response->findActiveStudentsResponse->student);
+        $this->table->createTable($fields, $data);
     }
 
-    protected function mapStudentData($data)
+    public function getDescription()
+    {
+        return "Holt sich die Studierendendaten aus HisInOne.";
+    }
+
+    /*protected function mapStudentData($data)
     {
         $mapped = [
             $data->registrationnumber,
@@ -77,7 +53,13 @@ class fleximport_hisinone_d_students extends FleximportPlugin
             $data->disenrollmentDate,
             $data->account->username,
             $data->account->validFrom,
-            $data->account->validTo
+            $data->account->validTo,
+            $data->email->adress,
+            $data->email->type->id,
+            $data->email->type->key,
+            $data->email->type->label,
+            $data->email->type->hiskeyId
+            //TODO degreePrograms
         ];
 
         $degreePrograms = [];
@@ -87,11 +69,6 @@ class fleximport_hisinone_d_students extends FleximportPlugin
         $mapped[] = implode("|", $degreePrograms);
 
         return $mapped;
-    }
-
-    public function getDescription()
-    {
-        return "Holt sich die Studierendendaten aus HisInOne.";
-    }
+    }*/
 }
 

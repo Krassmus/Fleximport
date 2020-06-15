@@ -2,6 +2,7 @@
 
 require_once __DIR__."/HisInOne/Soap.php";
 require_once __DIR__."/HisInOne/SoapClient.php";
+require_once __DIR__."/HisInOne/DataMapper.php";
 
 class fleximport_hisinone_a_institutes extends FleximportPlugin
 {

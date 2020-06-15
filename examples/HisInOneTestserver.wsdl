@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- *** This is a generated XML file. Edit with care! *** -->
 <definitions name="StudIPServiceDefinition" targetNamespace="http://www.his.de/ws/StudIPService" xmlns="http://schemas.xmlsoap.org/wsdl/"
-xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wns="http://www.his.de/ws/StudIPService">
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wns="http://www.his.de/ws/StudIPService">
     <types>
         <schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.his.de/ws/StudIPService">
             <complexType name="Account" abstract="false">
@@ -84,7 +84,22 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xml
                     <element name="term" type="integer"></element>
                     <element name="disenrollmentDate" type="date" nillable="true"></element>
                     <element name="account" type="wns:Account" nillable="true"></element>
+                    <element name="email" type="wns:EAddress" nillable="true"></element>
                     <element name="degreePrograms" type="wns:degreeProgramsType"></element>
+                </sequence>
+            </complexType>
+            <complexType name="EAddress" abstract="false">
+                <sequence>
+                    <element name="address" type="string"></element>
+                    <element name="type" type="wns:KeyValue"></element>
+                </sequence>
+            </complexType>
+            <complexType name="Attendee" abstract="false">
+                <sequence>
+                    <element name="personId" type="long"></element>
+                    <element name="registrationnumber" type="integer"></element>
+                    <element name="cancellation" type="boolean"></element>
+                    <element name="workstatus" type="wns:KeyValue"></element>
                 </sequence>
             </complexType>
             <complexType name="ExaRegResponse" abstract="false">
@@ -172,6 +187,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xml
                     <element name="teachingMethod" type="string" nillable="true"></element>
                     <element name="workload" type="string" nillable="true"></element>
                     <element name="plannedDates" type="wns:plannedDatesType"></element>
+                    <element name="orgunits" type="wns:orgunitsType"></element>
                 </sequence>
             </complexType>
             <complexType name="UnitStudiesInfo" abstract="false">
@@ -238,7 +254,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xml
                         <element name="rootElementtypeHiskey" type="string" nillable="true" minOccurs="0">
                             <annotation>
                                 <documentation>hiskey des Wurzelelementes, zu der die Unit gehört: Prüfungsordnung(4), Eignungsordnung(1),
-                                Immatrikulationsordnung(10)</documentation>
+                                    Immatrikulationsordnung(10)</documentation>
                             </annotation>
                         </element>
                         <element name="officialStatistics" type="string" nillable="true" minOccurs="0">
@@ -346,6 +362,34 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xml
                     </sequence>
                 </complexType>
             </element>
+            <element name="getAttendeesOfCourse">
+                <complexType>
+                    <sequence>
+                        <element name="courseId" type="long">
+                            <annotation>
+                                <documentation>Id der Veranstaltung/Prüfung</documentation>
+                            </annotation>
+                        </element>
+                        <element name="workstatusId" type="long" nillable="true">
+                            <annotation>
+                                <documentation>Art des Belegungssatzes</documentation>
+                            </annotation>
+                        </element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="getAttendeesOfCourseResponse">
+                <complexType>
+                    <sequence>
+                        <element name="getAttendeesOfCourseResponse" type="wns:getAttendeesOfCourseResponseType"></element>
+                    </sequence>
+                </complexType>
+            </element>
+            <complexType name="getAttendeesOfCourseResponseType">
+                <sequence>
+                    <element name="attendee" type="wns:Attendee" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
             <complexType name="degreeProgramsType">
                 <sequence>
                     <element name="degreeProgram" type="wns:DegreeProgram" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
@@ -359,6 +403,11 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xml
             <complexType name="examinationRegulationsIdListType">
                 <sequence>
                     <element name="id" type="long" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="orgunitsType">
+                <sequence>
+                    <element name="orgunitLid" type="long" minOccurs="0" maxOccurs="unbounded"></element>
                 </sequence>
             </complexType>
             <complexType name="unitStudiesListType">
@@ -468,6 +517,12 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xml
     <message name="findCoursesOfTermResponse">
         <part name="parameters" element="wns:findCoursesOfTermResponse" />
     </message>
+    <message name="getAttendeesOfCourse">
+        <part name="parameters" element="wns:getAttendeesOfCourse" />
+    </message>
+    <message name="getAttendeesOfCourseResponse">
+        <part name="parameters" element="wns:getAttendeesOfCourseResponse" />
+    </message>
     <portType name="StudIPServicePortType">
         <operation name="findUnitForCourseOfStudy">
             <documentation>SECURED BY [(cm.app.courseofstudy.VIEW_COURSE_OF_STUDY)]</documentation>
@@ -503,6 +558,12 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xml
             <documentation></documentation>
             <input message="wns:findCoursesOfTerm" />
             <output message="wns:findCoursesOfTermResponse" />
+            <fault name="serviceFault" message="wns:ServiceFault" />
+        </operation>
+        <operation name="getAttendeesOfCourse">
+            <documentation></documentation>
+            <input message="wns:getAttendeesOfCourse" />
+            <output message="wns:getAttendeesOfCourseResponse" />
             <fault name="serviceFault" message="wns:ServiceFault" />
         </operation>
     </portType>
@@ -580,6 +641,18 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xml
                 <soap:fault name="serviceFault" use="literal" />
             </fault>
         </operation>
+        <operation name="getAttendeesOfCourse">
+            <soap:operation soapAction="http://www.his.de/ws/StudIPService/getAttendeesOfCourse" />
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="serviceFault">
+                <soap:fault name="serviceFault" use="literal" />
+            </fault>
+        </operation>
     </binding>
     <service name="StudIPService">
         <wsp:PolicyReference URI="#UsernameToken" />
@@ -587,7 +660,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xml
             <soap:address location="http://localhost:8085/qisserver/services2/StudIPService" />
         </port>
     </service>
-<!-- Policy for UsernameToken with plaintext password, sent from client to server only -->
+    <!-- Policy for UsernameToken with plaintext password, sent from client to server only -->
     <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="UsernameToken">
         <wsp:ExactlyOne>
             <wsp:All>
