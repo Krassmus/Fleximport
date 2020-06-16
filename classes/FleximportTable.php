@@ -25,8 +25,8 @@ class FleximportTable extends SimpleORMap {
 
     function cbDeleteTable()
     {
-        DBManager::get()->exec("DROP TABLE IF EXISTS `".$this['name']."`;");
-        DBManager::get()->exec("DROP VIEW IF EXISTS `".$this['name']."`;");
+        DBManager::get()->exec("DROP TABLE IF EXISTS `".$this->getDBName()."`;");
+        DBManager::get()->exec("DROP VIEW IF EXISTS `".$this->getDBName()."`;");
     }
 
     function cbSerializeData()
@@ -49,11 +49,16 @@ class FleximportTable extends SimpleORMap {
                 AND TABLE_SCHEMA = :db_name
         ");
         $statement->execute(array(
-            'table' => $this['name'],
+            'table' => $this->getDBName(),
             'db_name' => $GLOBALS['DB_STUDIP_DATABASE']
         ));
         $is_in_db = $statement->fetch();
         return (bool) $is_in_db;
+    }
+
+    public function getDBName()
+    {
+        return $this->name;
     }
 
     public function fetchData()

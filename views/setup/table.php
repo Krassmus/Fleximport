@@ -21,6 +21,7 @@
             <option value="Statusgruppen"<?= $table['import_type'] === "Statusgruppen" ? " selected" : "" ?>><?= _("Statusgruppenimport") ?></option>
             <option value="CourseDate"<?= $table['import_type'] === "CourseDate" ? " selected" : "" ?>><?= _("Veranstaltungstermine") ?></option>
             <option value="Institute"<?= $table['import_type'] === "Institute" ? " selected" : "" ?>><?= _("Einrichtung") ?></option>
+
             <option value=""<?= !$table['import_type'] && !$table->isNew() ? " selected" : "" ?>><?= _("Tabelle nicht importieren") ?></option>
             <option value="fleximport_mysql_command"<?= $table['import_type'] === "fleximport_mysql_command" ? " selected" : "" ?>><?= _("MySQL-Anweisung") ?></option>
             <option value="other"<?= !$table->isNew() && $table['import_type'] && !in_array($table['import_type'], array("User", "CourseMember", "Course", "CourseDate", "Institute", "fleximport_mysql_command")) ? " selected" : "" ?>><?= _("SORM-Objekt") ?></option>
@@ -39,13 +40,14 @@
     <? if ($table->isNew() || !$table->getPlugin() || !$table->getPlugin()->customImportEnabled()) : ?>
         <label>
             <?= _("Import über") ?>
-            <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink'); jQuery('#path_info').toggle(this.value == 'csv_path'); jQuery('#sqlview_info').toggle(this.value == 'sqlview'); jQuery('#csv_studipfile_info').toggle(this.value == 'csv_studipfile'); jQuery('#csv_encoding').toggle(['csv_studipfile','csv_upload','csv_weblink','csv_path'].indexOf(this.value) !== -1);">
+            <select name="table[source]" onChange="jQuery('#server_settings').toggle(this.value == 'database'); jQuery('#weblink_info').toggle(this.value == 'csv_weblink'); jQuery('#path_info').toggle(this.value == 'csv_path'); jQuery('#tablecopy_info').toggle(this.value == 'tablecopy'); jQuery('#sqlview_info').toggle(this.value == 'sqlview'); jQuery('#csv_studipfile_info').toggle(this.value == 'csv_studipfile'); jQuery('#csv_encoding').toggle(['csv_studipfile','csv_upload','csv_weblink','csv_path'].indexOf(this.value) !== -1);">
                 <option value="csv_upload"<?= $table['source'] === "csv_upload" || $table->isNew() ? " selected" : "" ?>><?= _("CSV-Upload") ?></option>
                 <option value="csv_studipfile"<?= $table['source'] === "csv_studipfile" ? " selected" : "" ?>><?= _("CSV-Datei in Stud.IP") ?></option>
                 <option value="csv_weblink"<?= $table['source'] === "csv_weblink" ? " selected" : "" ?>><?= _("CSV-Internetquelle") ?></option>
                 <option value="csv_path"<?= $table['source'] === "csv_path" ? " selected" : "" ?>><?= _("CSV-Pfad auf dem Server") ?></option>
                 <option value="database"<?= $table['source'] === "database" ? " selected" : "" ?>><?= _("Datenbank") ?></option>
                 <option value="extern"<?= $table['source'] === "extern" ? " selected" : "" ?>><?= _("Externes Tool") ?></option>
+                <option value="tablecopy"<?= $table['source'] === "tablecopy" ? " selected" : "" ?>><?= _("Kopie einer Fleximport-Tabelle") ?></option>
                 <option value="sqlview"<?= $table['source'] === "sqlview" ? " selected" : "" ?>><?= _("SQL-View") ?></option>
             </select>
         </label>
@@ -72,6 +74,20 @@
     <label id="path_info" style="<?= $table['source'] !== "csv_path" ? "display: none;" : "" ?>">
         <?= _("Pfad der CSV-Datei auf dem Server") ?>
         <input type="text" name="table[tabledata][weblink][path]" value="<?= htmlReady($table['tabledata']['weblink']['path']) ?>">
+    </label>
+
+    <label id="tablecopy_info" style="<?= $table['source'] !== "tablecopy" ? "display: none;" : "" ?>">
+        <?= _("Zu kopierende Fleximport-Tabelle") ?>
+        <select name="table[tabledata][tablecopy][id]">
+            <option value=""> - </option>
+            <? foreach (FleximportTable::findAll() as $t) : ?>
+                <? if ($t->getId() !== $table->getId()) : ?>
+                <option value="<?= htmlReady($t->getId()) ?>"<?= $table['tabledata']['tablecopy']['id'] == $t->getId() ? " selected" : ""?>>
+                    <?= htmlReady($t['name']) ?>
+                </option>
+                <? endif ?>
+            <?php endforeach ?>
+        </select>
     </label>
 
     <label id="sqlview_info" style="<?= $table['source'] !== "sqlview" ? "display: none;" : "" ?>">

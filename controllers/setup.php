@@ -27,7 +27,7 @@ class SetupController extends PluginController {
         if (Request::isPost()) {
             $failed = false;
             $data = Request::getArray("table");
-            $oldname = $this->table['name'];
+            $oldname = $this->table['name']; //Todo: Brauchen wir später nicht mehr, wenn die ID im Tabellennamen steht.
             $data['tabledata'] = array_merge($this->table['tabledata'], $data['tabledata']);
             $data['synchronization'] = $data['synchronization'] ? 1 : 0;
             $this->table->setData($data);
@@ -39,10 +39,25 @@ class SetupController extends PluginController {
             if ($this->table['import_type'] === "other") {
                 $this->table['import_type'] = Request::get("other_import_type");
             }
+            if ($this->table['source'] === "tablecopy") {
+                try {
+                    $copied_table = FleximportTable::find($data['tabledata']['tablecopy']['id']);
+                    DBManager::get()->exec("DROP VIEW IF EXISTS `" . addslashes($this->table->getDBName()) . "`");
+                    DBManager::get()->exec("DROP TABLE IF EXISTS `" . addslashes($this->table->getDBName()) . "`");
+                    DBManager::get()->exec("
+                        CREATE VIEW `" . addslashes($data['name']) . "` AS (
+                            SELECT * FROM `" . addslashes($copied_table->getDBName()). "`
+                        );
+                    ");
+                } catch(Exception $e) {
+                    $failed = true;
+                    PageLayout::postMessage(MessageBox::error(_("SQL-View kann nicht erzeugt werden."), array($e->getMessage())));
+                }
+            }
             if ($this->table['source'] === "sqlview" && $GLOBALS['perm']->have_perm("root")) {
                 try {
-                    DBManager::get()->exec("DROP VIEW IF EXISTS `" . addslashes($data['name']) . "`");
-                    DBManager::get()->exec("DROP TABLE IF EXISTS `" . addslashes($data['name']) . "`");
+                    DBManager::get()->exec("DROP VIEW IF EXISTS `" . addslashes($this->table->getDBName()) . "`");
+                    DBManager::get()->exec("DROP TABLE IF EXISTS `" . addslashes($this->table->getDBName()) . "`");
                     DBManager::get()->exec("
                         CREATE VIEW `" . addslashes($data['name']) . "` AS (
                             " . $data['tabledata']['sqlview']['select'] . "
