@@ -182,6 +182,13 @@
     <? URLHelper::setBaseURL("/") ?>
 
     <? if ($table->isInDatabase()) : ?>
+
+        <label>
+            <?= Icon::create("info-circle", "info")->asImg(16, ['class' => "text-bottom"]) ?>
+            <?= _("Datenbankname der Tabelle") ?>
+            <input type="text" readonly value="<?= htmlReady($table->getDBName()) ?>">
+        </label>
+
         <div>
             <?= _("Nur folgende Spalten anzeigen") ?>
             <ul>
