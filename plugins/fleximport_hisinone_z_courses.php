@@ -12,14 +12,19 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
         return true;
     }
 
+    public function neededProcessConfigs()
+    {
+        return array("HISINONE_TERMKEY");
+    }
+
     public function fetchData()
     {
-        if (!FleximportConfig::get("HISINONE_TERMKEY")) {
+        if (!$this->table->process->getConfig("HISINONE_TERMKEY")) {
             PageLayout::postInfo(_("Es fehlt die Konfiguration HISINONE_TERMKEY."));
             return null;
         }
 
-        $data = $this->getCoursesData((int) FleximportConfig::get("HISINONE_TERMKEY"));
+        $data = $this->getCoursesData((int) $this->table->process->getConfig("HISINONE_TERMKEY"));
         if ($data) {
             list($fields, $courses) = \HisInOne\DataMapper::getData($data->course);
 

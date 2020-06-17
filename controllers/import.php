@@ -124,7 +124,8 @@ class ImportController extends PluginController {
                 $for = $dynamic->forClassFields();
                 $for = array_merge((array) $for['*'], (array) $for[$classname]);
                 foreach ($for as $fieldname => $placeholder) {
-                    if ($this->table['tabledata']['simplematching'][$fieldname]['column']) {
+                    if ($this->table['tabledata']['simplematching'][$fieldname]['column']
+                            || ($this->table->getPlugin() && in_array($fieldname, $this->table->getPlugin()->fieldsToBeMapped()))) {
                         $this->additional_fields[$fieldname] = method_exists($dynamic, "currentValue")
                             ? $dynamic->currentValue($this->object, $fieldname, (bool) $this->table['tabledata']['simplematching'][$fieldname]['sync'])
                             : false;

@@ -16,6 +16,10 @@ class FleximportTable extends SimpleORMap {
     static protected function configure($config = array())
     {
         $config['db_table'] = 'fleximport_tables';
+        $config['belongs_to']['process'] = array(
+            'class_name' => 'FleximportProcess',
+            'foreign_key' => 'process_id'
+        );
         $config['registered_callbacks']['before_store'][]     = 'cbSerializeData';
         $config['registered_callbacks']['after_store'][]      = 'cbUnserializeData';
         $config['registered_callbacks']['after_delete'][]      = 'cbDeleteTable';
@@ -1046,7 +1050,7 @@ class FleximportTable extends SimpleORMap {
     }
 
     public function getPlugin() {
-        $pluginname = $pluginname = $this['name'];
+        $pluginname = $this['name'];
         if (!$this->plugin && class_exists($pluginname)) {
             $this->plugin = new $pluginname($this);
         }
@@ -1068,6 +1072,15 @@ class FleximportTable extends SimpleORMap {
             return $this->getPlugin()->neededConfigs();
         } else {
             return array();
+        }
+    }
+
+    public function neededProcessConfigs()
+    {
+        if ($this->getPlugin()) {
+            return $this->getPlugin()->neededProcessConfigs();
+        } else {
+            return [];
         }
     }
 

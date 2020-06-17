@@ -27,6 +27,9 @@ class ProcessController extends PluginController {
                 $data['webhookable'] = $data['webhookable'] ? 1 : 0;
                 $this->process->setData($data);
                 $this->process->store();
+                foreach ((array) Request::getArray("configs") as $config_name => $value) {
+                    $this->process->setConfig($config_name, $value);
+                }
                 PageLayout::postMessage(MessageBox::success(_("Prozess wurde gespeichert")));
                 $this->redirect("import/overview/" . $this->process->getId());
             }
@@ -39,6 +42,11 @@ class ProcessController extends PluginController {
             }
         }
         $this->charges = array_unique($this->charges);
+        $this->neededConfigs = [];
+        foreach ($this->process->tables as $table) {
+            $this->neededConfigs = array_merge($this->neededConfigs, $table->neededProcessConfigs());
+        }
+        $this->neededConfigs = array_unique($this->neededConfigs);
     }
 
     public function export_action($process_id)

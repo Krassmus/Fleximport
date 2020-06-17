@@ -12,11 +12,20 @@ class fleximport_hisinone_d_students extends FleximportPlugin
         return true;
     }
 
+    public function neededProcessConfigs()
+    {
+        return array("HISINONE_TERMKEY");
+    }
+
     public function fetchData()
     {
+        if (!$this->table->process->getConfig("HISINONE_TERMKEY")) {
+            PageLayout::postInfo(_("Es fehlt die Konfiguration HISINONE_TERMKEY."));
+            return null;
+        }
         $soap = \HisInOne\Soap::get();
         $response = $soap->__soapCall("findActiveStudents", array(
-            array('termKey' => (int) FleximportConfig::get("HISINONE_TERMKEY")) //1 = summer, 2 = winter, make for processconfig?
+            array('termKey' => (int) $this->table->process->getConfig("HISINONE_TERMKEY")) //1 = summer, 2 = winter, make for processconfig?
         ));
         list($fields, $data) = \HisInOne\DataMapper::getData($response->findActiveStudentsResponse->student);
         $this->table->createTable($fields, $data);

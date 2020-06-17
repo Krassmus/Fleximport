@@ -11,12 +11,13 @@
  * @category    Stud.IP-Plugins
  * @since       4.0
  */
- 
+
 class fleximport_nsi_kurse extends FleximportPlugin
 {
-    
+
     //taken from NSI_Import plugin and modified:
-    public function getSemtreeId($parent_id, $ebene, $institut = true) {
+    public function getSemtreeId($parent_id, $ebene, $institut = true)
+    {
         $db = DBManager::get();
         return $db->query(
             "SELECT st.sem_tree_id " .
@@ -29,9 +30,8 @@ class fleximport_nsi_kurse extends FleximportPlugin
             "AND st.parent_id = ".$db->quote($parent_id)." " .
         "")->fetch(PDO::FETCH_COLUMN, 0);
     }
-    
-    
-    //taken from NSI_Import plugin
+
+
     /**
      * we want a sem_tree with the structure $ebene1 -> next ebene -> next ebene and so on
      * any ebene-variables except ebene1 may also be null to ignore this ebene.
@@ -97,10 +97,7 @@ class fleximport_nsi_kurse extends FleximportPlugin
         }
         return $sem_tree_id;
     }
-    
-    
-    
-    //own code starts here
+
 
     /**
      * Clean up old semesters and their data
@@ -119,7 +116,7 @@ class fleximport_nsi_kurse extends FleximportPlugin
             ));
         }
     }
-    
+
     public function fieldsToBeMapped()
     {
         return array(
@@ -131,8 +128,8 @@ class fleximport_nsi_kurse extends FleximportPlugin
             "lernorga"
         );
     }
-    
-    
+
+
     public function mapField($field, $line)
     {
         if($field === 'seminar_id') {
@@ -149,7 +146,7 @@ class fleximport_nsi_kurse extends FleximportPlugin
                 . "AND datafields.object_type = 'sem' "
                 . "AND seminare.veranstaltungsnummer = " . $db->quote($line['v_nr']) . ";"
             )->fetch(PDO::FETCH_BOTH);
-            
+
             if($courseId) {
                 return $courseId[0];
             } else {
@@ -166,16 +163,16 @@ class fleximport_nsi_kurse extends FleximportPlugin
             ));
         } elseif($field === "fleximport_dozenten") {
             $statement = DBManager::get()->prepare("
-                SELECT de.range_id 
-                FROM datafields_entries AS de 
-                    INNER JOIN datafields AS d ON (d.datafield_id = de.datafield_id) 
-                    INNER JOIN fleximport_nsi_vdozenten AS doz ON (de.content = doz.fp_idnr) 
+                SELECT de.range_id
+                FROM datafields_entries AS de
+                    INNER JOIN datafields AS d ON (d.datafield_id = de.datafield_id)
+                    INNER JOIN fleximport_nsi_vdozenten AS doz ON (de.content = doz.fp_idnr)
                     INNER JOIN auth_user_md5 AS u ON (u.user_id = de.range_id)
-                WHERE doz.v_nr = :v_nr 
+                WHERE doz.v_nr = :v_nr
                     AND doz.fach_nr =  :fach_nr
-                    AND u.perms = 'dozent' 
-                    AND d.object_type = 'user' 
-                    AND d.name = 'fp_idnr' 
+                    AND u.perms = 'dozent'
+                    AND d.object_type = 'user'
+                    AND d.name = 'fp_idnr'
             ");
             $statement->execute(array(
                 'v_nr' => $line['v_nr'],

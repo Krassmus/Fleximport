@@ -7,6 +7,16 @@ require_once __DIR__."/HisInOne/DataMapper.php";
 class fleximport_hisinone_a_institutes extends FleximportPlugin
 {
 
+    public function neededConfigs()
+    {
+        return [
+            "HISINONE_SOAP_ENDPOINT",
+            "HISINONE_WSDL_URL",
+            "HISINONE_SOAP_USERNAME",
+            "HISINONE_SOAP_PASSWORD"
+        ];
+    }
+
     public function customImportEnabled()
     {
         return true;

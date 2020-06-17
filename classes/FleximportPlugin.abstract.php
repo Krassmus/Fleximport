@@ -32,6 +32,15 @@ abstract class FleximportPlugin {
     }
 
     /**
+     * Returns an array of names of config-parameters that are relevant for this process.
+     * @return array of strings
+     */
+    public function neededProcessConfigs()
+    {
+        return array();
+    }
+
+    /**
      * Returns whether this plugins handles the import
      * @return bool
      */

@@ -17,7 +17,7 @@ class ConfigController extends PluginController {
     {
         PageLayout::addScript($this->plugin->getPluginURL()."/assets/jquery.elastic.source.js");
         $this->configs = FleximportConfig::all();
-        $this->possibleConfigs = array();
+        $this->possibleConfigs = [];
         foreach (FleximportTable::findAll() as $table) {
             $this->possibleConfigs = array_merge($this->possibleConfigs, $table->neededConfigs());
         }
