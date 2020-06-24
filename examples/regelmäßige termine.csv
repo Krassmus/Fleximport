@@ -1,2 +1,2 @@
-"Veranstaltungsnummer";"Name der Veranstaltung";"Tagesnummer";"Tag";"Beginn";"Ende";"Ausfälle";"Raum"
-"11";"Test-Lehrveranstaltung aus LSF";"3";"Mittwoch";"09:30:00";"11:00:00";"2020-06-24|2020-06-17|2020-07-15";"Hörsaal 2"
+"Veranstaltungsnummer";"Name der Veranstaltung";"Tagesnummer";"Tag";"Beginn";"Ende";"Ausfälle";"Raum";"Erster Termin";"Letzter Termin"
+"11";"Test-Lehrveranstaltung aus LSF";"3";"Mittwoch";"09:30:00";"11:00:00";"2020-06-24|2020-06-17";"Hörsaal 2";"2020-05-06";"2020-07-08"
