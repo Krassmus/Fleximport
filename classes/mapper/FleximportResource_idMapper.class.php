@@ -7,7 +7,10 @@ class FleximportResource_idMapper implements FleximportMapper {
     }
 
     public function possibleFieldnames() {
-        return array("resource_id", "ressource_id", "parent_id", "range_id", "root_id", "fleximport_course_date_assignment");
+        return array(
+            "resource_id", "ressource_id", "parent_id", "range_id",
+            "root_id", "fleximport_course_date_assignment", "fleximport_resource_id"
+        );
     }
 
     public function possibleFormats() {
@@ -17,7 +20,7 @@ class FleximportResource_idMapper implements FleximportMapper {
         );
         $statement = DBManager::get()->prepare("
             SELECT property_id, `name`
-            FROM resources_properties
+            FROM resource_property_definitions
             ORDER BY name ASC
         ");
         $statement->execute();
@@ -32,8 +35,8 @@ class FleximportResource_idMapper implements FleximportMapper {
         switch ($format) {
             case "name":
                 $statement = DBManager::get()->prepare("
-                    SELECT resource_id
-                    FROM resources_objects
+                    SELECT id
+                    FROM resources
                     WHERE name = ?
                     LIMIT 1
                 ");
@@ -41,8 +44,8 @@ class FleximportResource_idMapper implements FleximportMapper {
                 return $statement->fetch(PDO::FETCH_COLUMN, 0);
             case "description":
                 $statement = DBManager::get()->prepare("
-                    SELECT resource_id
-                    FROM resources_objects
+                    SELECT id
+                    FROM resources
                     WHERE description = ?
                     LIMIT 1
                 ");
@@ -52,7 +55,7 @@ class FleximportResource_idMapper implements FleximportMapper {
                 //Eigenschaft der Ressource:
                 $statement = DBManager::get()->prepare("
                     SELECT resource_id
-                    FROM resources_objects_properties
+                    FROM resources_properties
                     WHERE property_id = :property_id
                         AND `state` = :value
                 ");

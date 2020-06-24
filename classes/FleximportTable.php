@@ -819,7 +819,7 @@ class FleximportTable extends SimpleORMap {
                         }
                         $delimiter = $this['tabledata']['simplematching'][$field]['delimiter'] ?: ";";
                         $value = (array) preg_split(
-                            "/\s*" . $delimiter . "\s*/",
+                            "/\s*" . preg_quote($delimiter) . "\s*/",
                             $value,
                             null,
                             PREG_SPLIT_NO_EMPTY

@@ -20,6 +20,7 @@
             <option value="CourseMember"<?= $table['import_type'] === "CourseMember" ? " selected" : "" ?>><?= _("Teilnehmerimport") ?></option>
             <option value="Statusgruppen"<?= $table['import_type'] === "Statusgruppen" ? " selected" : "" ?>><?= _("Statusgruppenimport") ?></option>
             <option value="CourseDate"<?= $table['import_type'] === "CourseDate" ? " selected" : "" ?>><?= _("Veranstaltungstermine") ?></option>
+            <option value="SeminarCycleDate"<?= $table['import_type'] === "SeminarCycleDate" ? " selected" : "" ?>><?= _("Regelmäßige Termine") ?></option>
             <option value="Institute"<?= $table['import_type'] === "Institute" ? " selected" : "" ?>><?= _("Einrichtung") ?></option>
 
             <option value=""<?= !$table['import_type'] && !$table->isNew() ? " selected" : "" ?>><?= _("Tabelle nicht importieren") ?></option>

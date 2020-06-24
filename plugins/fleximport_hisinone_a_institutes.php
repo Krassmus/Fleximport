@@ -48,7 +48,7 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
                     $lids[] = $child->lid;
                 }
             }
-            $max = 100000;
+            $max = 100;
             while (($max === null || count($fetched_lids) < $max) && (count($lids) > 0)) {
                 $lid = array_shift($lids);
                 if (!in_array($lid, $fetched_lids)) {

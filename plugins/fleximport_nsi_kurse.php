@@ -15,6 +15,13 @@
 class fleximport_nsi_kurse extends FleximportPlugin
 {
 
+    public function neededConfigs()
+    {
+        return [
+            "NSI_OLD_SEMESTERS"
+        ];
+    }
+
     //taken from NSI_Import plugin and modified:
     public function getSemtreeId($parent_id, $ebene, $institut = true)
     {
