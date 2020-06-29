@@ -25,12 +25,13 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
         }
 
         $data = $this->getCoursesData((int) $this->table->process->getConfig("HISINONE_TERMKEY"));
-        //var_dump($data); die();
         if ($data) {
             list($fields, $courses) = \HisInOne\DataMapper::getData($data->course);
 
             $fields[] = "heimatinstitut_lid";
             $fields[] = "institut_lids";
+            $fields[] = "teachers_usernames";
+            $fields[] = "teachers_ids";
             $regular_dates_fields = [
                 'course_id',
                 'coursename',
@@ -63,6 +64,8 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
             ];
             $regular_dates = [];
 
+
+
             foreach ($data->course as $number => $coursedata) {
                 $courses[$number][] = $coursedata->orgunits && $coursedata->orgunits->orgunitLid
                     ? $coursedata->orgunits->orgunitLid[0]
@@ -70,8 +73,22 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                 $lids = $coursedata->orgunits && $coursedata->orgunits->orgunitLid
                     ? implode("|", (array) $coursedata->orgunits->orgunitLid)
                     : "";
+
                 $courses[$number][] = $lids;
 
+                $teacher_usernames = [];
+                $teacher_ids = [];
+
+                usort($coursedata->personResponsibles->personResponsible, function ($a, $b) {
+                    return $a->sortorder < $b->sortorder
+                        ? 1
+                        : ($a->sortorder == $b->sortorder ? 0 : -1);
+                });
+
+                foreach ((array) $coursedata->personResponsibles->personResponsible as $person) {
+                    $teacher_ids[] = $person->person->id;
+                    $teacher_usernames[] = $person->person->account->username;
+                }
 
                 //seminar_cycle_dates
                 foreach ((array) $coursedata->plannedDates->plannedDate as $datedata) {
@@ -113,6 +130,16 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                             $exdates[] = $cancellation->date;
                         }
 
+                        foreach ((array) $datedata->personResponsibles->personResponsible as $person_data) {
+
+                            if (!in_array($person_data->person->account->username, $teacher_usernames)) {
+                                $teacher_usernames[] = $person_data->person->account->username;
+                            }
+                            if (!in_array($person_data->person->id, $teacher_ids)) {
+                                $teacher_ids[] = $person_data->person->id;
+                            }
+                        }
+
                         $regular_date[] = implode("|", $exdates);
 
                         $regular_dates[] = $regular_date;
@@ -120,6 +147,8 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                         //unregelmäßige Termine in Stud.IP
                     }
                 }
+                $courses[$number][] = implode("|", $teacher_usernames);
+                $courses[$number][] = implode("|", $teacher_ids);
             }
 
             $this->table->createTable($fields, $courses);

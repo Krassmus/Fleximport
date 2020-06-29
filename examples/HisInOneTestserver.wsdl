@@ -61,6 +61,13 @@
                     <element name="initialDate" type="date" nillable="true"></element>
                     <element name="initialStart" type="time" nillable="true"></element>
                     <element name="initialEnd" type="time" nillable="true"></element>
+                    <element name="room" type="wns:Room" nillable="true"></element>
+                </sequence>
+            </complexType>
+            <complexType name="PersonResponsible" abstract="false">
+                <sequence>
+                    <element name="sortorder" type="integer" nillable="true"></element>
+                    <element name="person" type="wns:Member"></element>
                 </sequence>
             </complexType>
             <complexType name="OrgunitChild" abstract="false">
@@ -138,7 +145,7 @@
                     <element name="room" type="wns:Room" nillable="true"></element>
                     <element name="appointmentModifications" type="wns:appointmentModificationsType"></element>
                     <element name="appointmentCancellations" type="wns:appointmentCancellationsType"></element>
-                    <element name="personResponsible" type="wns:personResponsibleType"></element>
+                    <element name="personResponsibles" type="wns:personResponsiblesType"></element>
                 </sequence>
             </complexType>
             <complexType name="CosSearchResponse" abstract="false">
@@ -172,6 +179,7 @@
             <complexType name="Course" abstract="false">
                 <sequence>
                     <element name="id" type="long"></element>
+                    <element name="eventType" type="wns:KeyValue"></element>
                     <element name="attendeeMaximum" type="integer" nillable="true"></element>
                     <element name="attendeeMinimum" type="integer" nillable="true"></element>
                     <element name="cancelled" type="boolean" nillable="true"></element>
@@ -188,6 +196,7 @@
                     <element name="workload" type="string" nillable="true"></element>
                     <element name="plannedDates" type="wns:plannedDatesType"></element>
                     <element name="orgunits" type="wns:orgunitsType"></element>
+                    <element name="personResponsibles" type="wns:personResponsiblesType"></element>
                 </sequence>
             </complexType>
             <complexType name="UnitStudiesInfo" abstract="false">
@@ -425,11 +434,6 @@
                     <element name="course" type="wns:Course" minOccurs="0" maxOccurs="unbounded"></element>
                 </sequence>
             </complexType>
-            <complexType name="personResponsibleType">
-                <sequence>
-                    <element name="person" type="wns:Member" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
-                </sequence>
-            </complexType>
             <complexType name="cosResponseType">
                 <sequence>
                     <element name="cos" type="wns:CosSearchResponse" minOccurs="0" maxOccurs="unbounded"></element>
@@ -438,6 +442,11 @@
             <complexType name="appointmentModificationsType">
                 <sequence>
                     <element name="appointmentModification" type="wns:AppMod" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="personResponsiblesType">
+                <sequence>
+                    <element name="personResponsible" type="wns:PersonResponsible" nillable="true" minOccurs="0" maxOccurs="unbounded"></element>
                 </sequence>
             </complexType>
             <complexType name="plannedDatesType">

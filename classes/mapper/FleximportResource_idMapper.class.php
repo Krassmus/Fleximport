@@ -18,12 +18,22 @@ class FleximportResource_idMapper implements FleximportMapper {
             "name" => "Name der Ressource",
             "description" => "Beschreibung der Ressource"
         );
-        $statement = DBManager::get()->prepare("
-            SELECT property_id, `name`
-            FROM resource_property_definitions
-            ORDER BY name ASC
-        ");
-        $statement->execute();
+        if (StudipVersion::newerThan("4.4.99")) {
+            $statement = DBManager::get()->prepare("
+                SELECT property_id, `name`
+                FROM resource_property_definitions
+                ORDER BY name ASC
+            ");
+            $statement->execute();
+        } else {
+            //This is for Stud.IP < 4.5 with the old resources. We probably don't need this code, but here it is anyway:
+            $statement = DBManager::get()->prepare("
+                SELECT property_id, `name`
+                FROM resources_properties
+                ORDER BY name ASC
+            ");
+            $statement->execute();
+        }
 
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $property) {
             $formats[$property['property_id']] = _("Ressourceneigenschaft")." '".$property['name']."'";
@@ -34,31 +44,61 @@ class FleximportResource_idMapper implements FleximportMapper {
     public function map($format, $value, $data, $sormclass) {
         switch ($format) {
             case "name":
-                $statement = DBManager::get()->prepare("
-                    SELECT id
-                    FROM resources
-                    WHERE name = ?
-                    LIMIT 1
-                ");
+                if (StudipVersion::newerThan("4.4.99")) {
+                    $statement = DBManager::get()->prepare("
+                        SELECT id
+                        FROM resources
+                        WHERE name = ?
+                        LIMIT 1
+                    ");
+                } else {
+                    //This is for Stud.IP < 4.5 with the old resources. We probably don't need this code, but here it is anyway:
+                    $statement = DBManager::get()->prepare("
+                        SELECT resource_id
+                        FROM resources_objects
+                        WHERE name = ?
+                        LIMIT 1
+                    ");
+                }
                 $statement->execute(array($value));
                 return $statement->fetch(PDO::FETCH_COLUMN, 0);
             case "description":
-                $statement = DBManager::get()->prepare("
-                    SELECT id
-                    FROM resources
-                    WHERE description = ?
-                    LIMIT 1
-                ");
+                if (StudipVersion::newerThan("4.4.99")) {
+                    $statement = DBManager::get()->prepare("
+                        SELECT id
+                        FROM resources
+                        WHERE description = ?
+                        LIMIT 1
+                    ");
+                } else {
+                    //This is for Stud.IP < 4.5 with the old resources. We probably don't need this code, but here it is anyway:
+                    $statement = DBManager::get()->prepare("
+                        SELECT resource_id
+                        FROM resources_objects
+                        WHERE description = ?
+                        LIMIT 1
+                    ");
+                }
                 $statement->execute(array($value));
                 return $statement->fetch(PDO::FETCH_COLUMN, 0);
             default:
                 //Eigenschaft der Ressource:
-                $statement = DBManager::get()->prepare("
-                    SELECT resource_id
-                    FROM resources_properties
-                    WHERE property_id = :property_id
-                        AND `state` = :value
-                ");
+                if (StudipVersion::newerThan("4.4.99")) {
+                    $statement = DBManager::get()->prepare("
+                        SELECT resource_id
+                        FROM resources_properties
+                        WHERE property_id = :property_id
+                            AND `state` = :value
+                    ");
+                } else {
+                    //This is for Stud.IP < 4.5 with the old resources. We probably don't need this code, but here it is anyway:
+                    $statement = DBManager::get()->prepare("
+                        SELECT resource_id
+                        FROM resources_objects_properties
+                        WHERE property_id = :property_id
+                            AND `state` = :value
+                    ");
+                }
                 $statement->execute(array(
                     'property_id' => $format,
                     'value' => $value

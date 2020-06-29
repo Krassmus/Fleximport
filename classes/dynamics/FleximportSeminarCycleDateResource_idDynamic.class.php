@@ -20,26 +20,28 @@ class FleximportSeminarCycleDateResource_idDynamic implements FleximportDynamic 
         $user = User::findCurrent();
         foreach ($object->dates as $date) {
             if ($this->resource) {
-                try {
-                    $this->resource->createBooking(
-                        $user,
-                        $date->getId(),
-                        [[
-                            'begin' => $date['date'],
-                            'end' => $date['end_time']
-                        ]],
-                        null,
-                        0,
-                        null,
-                        0,
-                        '',
-                        '',
-                        0,
-                        false //force_booking
-                    );
-                } catch(Exception $e) {
-                    if ($date->room_booking) {
-                        $date->room_booking->delete();
+                if ($date->room_booking['resource_id'] != $value) {
+                    try {
+                        $this->resource->createBooking(
+                            $user,
+                            $date->getId(),
+                            [[
+                                'begin' => $date['date'],
+                                'end' => $date['end_time']
+                            ]],
+                            null,
+                            0,
+                            null,
+                            0,
+                            '',
+                            '',
+                            0,
+                            false //force_booking
+                        );
+                    } catch (Exception $e) {
+                        if ($date->room_booking) {
+                            $date->room_booking->delete();
+                        }
                     }
                 }
             } else {
