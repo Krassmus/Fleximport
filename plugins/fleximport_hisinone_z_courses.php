@@ -91,6 +91,8 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                 }
 
                 //seminar_cycle_dates
+                //var_dump($coursedata); die();
+                $regular_dates = [];
                 foreach ((array) $coursedata->plannedDates->plannedDate as $datedata) {
                     if (in_array($datedata->rhythm->id, [1, 2, 6, 9])) { //1 könnte falsch sein
 
@@ -145,6 +147,10 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                         $regular_dates[] = $regular_date;
                     } else {
                         //unregelmäßige Termine in Stud.IP
+                        foreach ($datedata->individualDates->individualDate as $individualDate) {
+
+                        }
+
                     }
                 }
                 $courses[$number][] = implode("|", $teacher_usernames);

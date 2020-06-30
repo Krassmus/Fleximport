@@ -64,6 +64,17 @@
                     <element name="room" type="wns:Room" nillable="true"></element>
                 </sequence>
             </complexType>
+            <complexType name="IndividualDate" abstract="false">
+                <sequence>
+                    <element name="id" type="long"></element>
+                    <element name="date" type="date"></element>
+                    <element name="remark" type="string" nillable="true"></element>
+                    <element name="from" type="time"></element>
+                    <element name="to" type="time"></element>
+                    <element name="weekdayId" type="long"></element>
+                    <element name="roomId" type="long" nillable="true"></element>
+                </sequence>
+            </complexType>
             <complexType name="PersonResponsible" abstract="false">
                 <sequence>
                     <element name="sortorder" type="integer" nillable="true"></element>
@@ -146,6 +157,7 @@
                     <element name="appointmentModifications" type="wns:appointmentModificationsType"></element>
                     <element name="appointmentCancellations" type="wns:appointmentCancellationsType"></element>
                     <element name="personResponsibles" type="wns:personResponsiblesType"></element>
+                    <element name="individualDates" type="wns:individualDatesType"></element>
                 </sequence>
             </complexType>
             <complexType name="CosSearchResponse" abstract="false">
@@ -334,6 +346,16 @@
                     </sequence>
                 </complexType>
             </element>
+            <element name="getKeys">
+                <complexType />
+            </element>
+            <element name="getKeysResponse">
+                <complexType>
+                    <sequence>
+                        <element name="success" type="boolean"></element>
+                    </sequence>
+                </complexType>
+            </element>
             <element name="readExaminationRegulations">
                 <complexType>
                     <sequence>
@@ -397,6 +419,11 @@
             <complexType name="getAttendeesOfCourseResponseType">
                 <sequence>
                     <element name="attendee" type="wns:Attendee" minOccurs="0" maxOccurs="unbounded"></element>
+                </sequence>
+            </complexType>
+            <complexType name="individualDatesType">
+                <sequence>
+                    <element name="individualDate" type="wns:IndividualDate" minOccurs="0" maxOccurs="unbounded"></element>
                 </sequence>
             </complexType>
             <complexType name="degreeProgramsType">
@@ -514,6 +541,12 @@
     <message name="findActiveStudentsResponse">
         <part name="parameters" element="wns:findActiveStudentsResponse" />
     </message>
+    <message name="getKeys">
+        <part name="parameters" element="wns:getKeys" />
+    </message>
+    <message name="getKeysResponse">
+        <part name="parameters" element="wns:getKeysResponse" />
+    </message>
     <message name="readExaminationRegulations">
         <part name="parameters" element="wns:readExaminationRegulations" />
     </message>
@@ -555,6 +588,12 @@
             <documentation></documentation>
             <input message="wns:findActiveStudents" />
             <output message="wns:findActiveStudentsResponse" />
+            <fault name="serviceFault" message="wns:ServiceFault" />
+        </operation>
+        <operation name="getKeys">
+            <documentation></documentation>
+            <input message="wns:getKeys" />
+            <output message="wns:getKeysResponse" />
             <fault name="serviceFault" message="wns:ServiceFault" />
         </operation>
         <operation name="readExaminationRegulations">
@@ -616,6 +655,18 @@
         </operation>
         <operation name="findActiveStudents">
             <soap:operation soapAction="http://www.his.de/ws/StudIPService/findActiveStudents" />
+            <input>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+            <fault name="serviceFault">
+                <soap:fault name="serviceFault" use="literal" />
+            </fault>
+        </operation>
+        <operation name="getKeys">
+            <soap:operation soapAction="http://www.his.de/ws/StudIPService/getKeys" />
             <input>
                 <soap:body use="literal" />
             </input>
