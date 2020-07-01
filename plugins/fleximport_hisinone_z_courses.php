@@ -64,6 +64,30 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
             ];
             $regular_dates = [];
 
+            $individual_dates_fields = [
+                'course_id',
+                'coursename',
+                'id',
+                'date',
+                'remark',
+                'from',
+                'to',
+                'weekdayId',
+                'roomId',
+                'room__roomid',
+                'room__room',
+                'room__roomkey',
+                'room__floor',
+                'room__floorkey',
+                'room__building',
+                'room__buildingkey',
+                'room__campus',
+                'room__campuskey',
+                'begin',
+                'end',
+                'series_id'
+            ];
+            $individual_dates_data = [];
 
 
             foreach ($data->course as $number => $coursedata) {
@@ -147,8 +171,32 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                         $regular_dates[] = $regular_date;
                     } else {
                         //unregelmäßige Termine in Stud.IP
+
                         foreach ($datedata->individualDates->individualDate as $individualDate) {
 
+                            $individual_dates_data[] = [
+                                $coursedata->id,
+                                $coursedata->defaulttext,
+                                $individualDate->id,
+                                $individualDate->date,
+                                $individualDate->remark,
+                                $individualDate->from,
+                                $individualDate->to,
+                                $individualDate->weekdayId,
+                                $individualDate->roomId,
+                                $datedata->room->roomId,
+                                $datedata->room->room,
+                                $datedata->room->roomKey,
+                                $datedata->room->floor,
+                                $datedata->room->floorKey,
+                                $datedata->room->building,
+                                $datedata->room->buildingKey,
+                                $datedata->room->campus,
+                                $datedata->room->campusKey,
+                                $individualDate->date . " " . $individualDate->from,
+                                $individualDate->date . " " . $individualDate->to,
+                                $coursedata->id
+                            ];
                         }
 
                     }
@@ -162,6 +210,11 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
             $regular_dates_table = FleximportTable::findOneBySQL("name = ?", ["fleximport_hisinone_z_regulardates"]);
             if ($regular_dates_table) {
                 $regular_dates_table->createTable($regular_dates_fields, $regular_dates);
+            }
+
+            $individual_dates_table = FleximportTable::findOneBySQL("name = ?", ["fleximport_hisinone_z_individualdates"]);
+            if ($individual_dates_table) {
+                $individual_dates_table->createTable($individual_dates_fields, $individual_dates_data);
             }
 
         } else {
