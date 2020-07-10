@@ -1,4 +1,6 @@
-<form class="<?= Fleximport::getCSSFormClass() ?>" action="<?= PluginEngine::getLink($plugin, array(), "process/edit".($process->isNew() ? "" : "/".$process->getId())) ?>" method="post">
+<form class="<?= Fleximport::getCSSFormClass() ?>"
+      action="<?= PluginEngine::getLink($plugin, array(), "process/".($direction ?: "edit").($process->isNew() ? "" : "/".$process->getId())) ?>"
+      method="post">
 
     <fieldset>
         <legend><?= _("Basiseinstellungen des Prozess") ?></legend>

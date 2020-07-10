@@ -139,7 +139,7 @@ class fleximport_nsi_kurse extends FleximportPlugin
 
     public function mapField($field, $line)
     {
-        if($field === 'seminar_id') {
+        if ($field === 'seminar_id') {
             $db = DBManager::get();
             $courseId = $db->query(
                   "SELECT seminare.seminar_id FROM seminare "

@@ -18,25 +18,35 @@
 
 <?
 $actions = new ActionsWidget();
-$actions->addLink(
-    _("Prozess erstellen"),
-    PluginEngine::getURL($plugin, array(), "process/edit"),
-    Icon::create("archive2", "clickable"),
-    ['data-dialog' => 1]
-);
+if (!FleximportConfig::get("DISALLOW_ADMINISTRATION")) {
+    $actions->addLink(
+        _("Prozess erstellen"),
+        PluginEngine::getURL($plugin, array(), "process/edit"),
+        Icon::create("archive2", "clickable"),
+        ['data-dialog' => 1]
+    );
+}
 if ($process) {
-    $actions->addLink(
-        _("Prozess bearbeiten"),
-        PluginEngine::getURL($plugin, array(), "process/edit/".$process->getId()),
-        Icon::create("edit", "clickable"),
-        ['data-dialog' => 1]
-    );
-    $actions->addLink(
-        _("Tabelle hinzufügen"),
-        PluginEngine::getURL($plugin, array('process_id' => $process->getId()), "setup/table"),
-        Icon::create("add", "clickable"),
-        ['data-dialog' => 1]
-    );
+    if (!FleximportConfig::get("DISALLOW_ADMINISTRATION")) {
+        $actions->addLink(
+            _("Prozess bearbeiten"),
+            PluginEngine::getURL($plugin, array(), "process/edit/" . $process->getId()),
+            Icon::create("edit", "clickable"),
+            ['data-dialog' => 1]
+        );
+        $actions->addLink(
+            _("Prozess duplizieren"),
+            PluginEngine::getURL($plugin, array(), "process/duplicate/" . $process->getId()),
+            Icon::create("wizard", "clickable"),
+            ['data-dialog' => 1]
+        );
+        $actions->addLink(
+            _("Tabelle hinzufügen"),
+            PluginEngine::getURL($plugin, array('process_id' => $process->getId()), "setup/table"),
+            Icon::create("add", "clickable"),
+            ['data-dialog' => 1]
+        );
+    }
     $actions->addLink(
         _("Prozess exportieren"),
         PluginEngine::getURL($plugin, array(), "process/export/".$process->getId()),
@@ -48,11 +58,13 @@ if ($process) {
 
 
 }
-$actions->addLink(
-    _("Prozess importieren"),
-    PluginEngine::getURL($plugin, array(), "process/import"),
-    Icon::create("upload", "clickable"),
-    ['data-dialog' => 1]
-);
+if (!FleximportConfig::get("DISALLOW_ADMINISTRATION")) {
+    $actions->addLink(
+        _("Prozess importieren"),
+        PluginEngine::getURL($plugin, array(), "process/import"),
+        Icon::create("upload", "clickable"),
+        ['data-dialog' => 1]
+    );
+}
 
 Sidebar::Get()->addWidget($actions);

@@ -62,7 +62,7 @@ class FleximportTable extends SimpleORMap {
 
     public function getDBName()
     {
-        return $this->name;
+        return "fleximport_table_".$this->getId();
     }
 
     public function fetchData()
@@ -141,7 +141,7 @@ class FleximportTable extends SimpleORMap {
                 AND TABLE_SCHEMA = :db_name
         ");
         $statement->execute(array(
-            'table_name' => $this['name'],
+            'table_name' => $this->getDBName(),
             'db_name' => $GLOBALS['DB_STUDIP_DATABASE']
         ));
         return $statement->fetchAll(PDO::FETCH_COLUMN, 0);
@@ -151,7 +151,7 @@ class FleximportTable extends SimpleORMap {
     {
         try {
             $statement = DBManager::get()->prepare("
-                SELECT COUNT(*) FROM `" . addslashes($this['name']) . "`
+                SELECT COUNT(*) FROM `" . addslashes($this->getDBName()) . "`
             ");
             $statement->execute();
             $count = $statement->fetch(PDO::FETCH_COLUMN);
@@ -165,7 +165,7 @@ class FleximportTable extends SimpleORMap {
     public function fetchLines()
     {
         $statement = DBManager::get()->prepare("
-            SELECT * FROM `".addslashes($this['name'])."`
+            SELECT * FROM `".addslashes($this->getDBName())."`
         ");
         $statement->execute();
         return $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -248,7 +248,7 @@ class FleximportTable extends SimpleORMap {
         }
         $db = DBManager::get();
         $this->drop();
-        $create_sql = "CREATE TABLE `".addslashes($this['name'])."` (";
+        $create_sql = "CREATE TABLE `".addslashes($this->getDBName())."` (";
         $create_sql .= "`IMPORT_TABLE_PRIMARY_KEY` BIGINT NOT NULL AUTO_INCREMENT ";
         $headers = array_map(function ($h) { return strtolower(self::reduceDiakritikaFromIso88591($h)); }, $headers);
         foreach ($headers as $key => $fieldname) {
@@ -277,7 +277,7 @@ class FleximportTable extends SimpleORMap {
                 }
             }
             if ($insertable) {
-                $insert_sql = "INSERT INTO `" . addslashes($this['name']) . "` SET ";
+                $insert_sql = "INSERT INTO `" . addslashes($this->getDBName()) . "` SET ";
                 foreach ($headers as $key => $field) {
                     if ($field) {
                         $key < 1 || $insert_sql .= ", ";
@@ -355,8 +355,8 @@ class FleximportTable extends SimpleORMap {
 
     public function drop()
     {
-        DBManager::get()->exec("DROP TABLE IF EXISTS `".addslashes($this['name'])."` ");
-        DBManager::get()->exec("DROP VIEW IF EXISTS `".addslashes($this['name'])."` ");
+        DBManager::get()->exec("DROP TABLE IF EXISTS `".addslashes($this->getDBName())."` ");
+        DBManager::get()->exec("DROP VIEW IF EXISTS `".addslashes($this->getDBName())."` ");
     }
 
 
@@ -378,7 +378,7 @@ class FleximportTable extends SimpleORMap {
             return array();
         }
         $statement = DBManager::get()->prepare("
-            SELECT * FROM `".addslashes($this['name'])."`
+            SELECT * FROM `".addslashes($this->getDBName())."`
         ");
         $statement->execute();
         $protocol = array();
@@ -477,7 +477,7 @@ class FleximportTable extends SimpleORMap {
     {
         $statement = DBManager::get()->prepare("
             SELECT *
-            FROM `".addslashes($this['name'])."`
+            FROM `".addslashes($this->getDBName())."`
             WHERE IMPORT_TABLE_PRIMARY_KEY = :id
         ");
         $statement->execute(array('id' => $id));
@@ -716,24 +716,32 @@ class FleximportTable extends SimpleORMap {
         switch ($this['import_type']) {
             case "Course":
                 foreach (DataField::findBySQL("object_type = 'sem'") as $datafield) {
-                    $fields[] = $datafield['name'];
+                    $fields[] = is_string($datafield['name'])
+                        ? $datafield['name']
+                        : $datafield['name']->original(); //this is an I18NString and we need the original name of the datafield
                 }
                 break;
             case "Institute":
                 foreach (DataField::findBySQL("object_type = 'inst'") as $datafield) {
-                    $fields[] = $datafield['name'];
+                    $fields[] = is_string($datafield['name'])
+                        ? $datafield['name']
+                        : $datafield['name']->original();
                 }
                 break;
             case "User":
                 foreach (DataField::findBySQL("object_type = 'user'") as $datafield) {
-                    $fields[] = $datafield['name'];
+                    $fields[] = is_string($datafield['name'])
+                        ? $datafield['name']
+                        : $datafield['name']->original();
                 }
                 $fields[] = "fleximport_username_prefix";
                 $fields[] = "fleximport_welcome_message";
                 break;
             case "CourseMember":
                 foreach (DataField::findBySQL("object_type = 'usersemdata'") as $datafield) {
-                    $fields[] = $datafield['name'];
+                    $fields[] = is_string($datafield['name'])
+                        ? $datafield['name']
+                        : $datafield['name']->original();
                 }
                 $fields[] = "fleximport_welcome_message";
                 break;
@@ -1041,8 +1049,8 @@ class FleximportTable extends SimpleORMap {
 
     public function getTargetPK()
     {
+        $classname = $this['import_type'];
         if (count($this->sorm_metadata) === 0 && $classname && $classname !== "fleximport_mysql_command") {
-            $classname = $this['import_type'];
             $object = new $classname();
             $this->sorm_metadata = $object->getTableMetadata();
         }
@@ -1096,7 +1104,7 @@ class FleximportTable extends SimpleORMap {
 
     public function calculateChangeHash()
     {
-        $statement = DBManager::get()->prepare("CHECKSUM TABLE `".addslashes($this['name'])."`");
+        $statement = DBManager::get()->prepare("CHECKSUM TABLE `".addslashes($this->getDBName())."`");
         $statement->execute();
         $data = $statement->fetch(PDO::FETCH_ASSOC);
         if ($data['Checksum']) {
@@ -1104,7 +1112,7 @@ class FleximportTable extends SimpleORMap {
         } else {
             //wir haben vermutlich einen View und müssen den Hash selbst berechnen
 
-            $statement = DBManager::get()->prepare("SELECT CRC32(SUM(CRC32(CONCAT_WS(`".implode("`,`", $this->getTableHeader())."`)))) AS hash FROM `".addslashes($this['name'])."`;");
+            $statement = DBManager::get()->prepare("SELECT CRC32(SUM(CRC32(CONCAT_WS(`".implode("`,`", $this->getTableHeader())."`)))) AS hash FROM `".addslashes($this->getDBName())."`;");
             $statement->execute();
             $data = $statement->fetch(PDO::FETCH_COLUMN, 0);
             return $data ?: floor(time() / (60 * 15));

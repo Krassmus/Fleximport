@@ -47,17 +47,19 @@
                         <?= Icon::create("download", "clickable")->asImg(20) ?>
                     </a>
                 <? endif ?>
-                <? if ($table['import_type'] && !in_array($table['import_type'], array("fleximport_mysql_command"))) : ?>
-                    <a href="<?= PluginEngine::getLink($plugin, array(), "setup/tablemapping/".$table->getId()) ?>" data-dialog title="<?= _("Datenmapping einstellen") ?>">
-                        <?= Icon::create("group", "clickable")->asImg(20) ?>
+                <? if (!FleximportConfig::get("DISALLOW_ADMINISTRATION")) : ?>
+                    <? if ($table['import_type'] && !in_array($table['import_type'], array("fleximport_mysql_command"))) : ?>
+                        <a href="<?= PluginEngine::getLink($plugin, array(), "setup/tablemapping/".$table->getId()) ?>" data-dialog title="<?= _("Datenmapping einstellen") ?>">
+                            <?= Icon::create("group", "clickable")->asImg(20) ?>
+                        </a>
+                    <? endif ?>
+                    <a href="<?= PluginEngine::getLink($plugin, array(), "setup/table/".$table->getId()) ?>" data-dialog title="<?= _("Tabelleneinstellung bearbeiten") ?>">
+                        <?= Icon::create("admin", "clickable")->asImg(20) ?>
+                    </a>
+                    <a href="<?= PluginEngine::getLink($plugin, array(), "setup/removetable/".$table->getId()) ?>" onClick="STUDIP.Dialog.confirm('<?= _("Wirklich die Tabelle löschen?") ?>', function () { STUDIP.Fleximport.deleteTable('<?= $table->getId() ?>') }); return false;">
+                        <?= Icon::create("trash", "clickable")->asImg(20) ?>
                     </a>
                 <? endif ?>
-                <a href="<?= PluginEngine::getLink($plugin, array(), "setup/table/".$table->getId()) ?>" data-dialog title="<?= _("Tabelleneinstellung bearbeiten") ?>">
-                    <?= Icon::create("admin", "clickable")->asImg(20) ?>
-                </a>
-                <a href="<?= PluginEngine::getLink($plugin, array(), "setup/removetable/".$table->getId()) ?>" onClick="STUDIP.Dialog.confirm('<?= _("Wirklich die Tabelle löschen?") ?>', function () { STUDIP.Fleximport.deleteTable('<?= $table->getId() ?>') }); return false;">
-                    <?= Icon::create("trash", "clickable")->asImg(20) ?>
-                </a>
             </div>
         </div>
     </caption>

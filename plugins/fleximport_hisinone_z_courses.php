@@ -12,6 +12,13 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
         return true;
     }
 
+    public function neededConfigs()
+    {
+        return [
+            "HISINONE_REGULAR_DATETYPES"
+        ];
+    }
+
     public function neededProcessConfigs()
     {
         return array("HISINONE_TERMKEY");
@@ -89,6 +96,9 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
             ];
             $individual_dates_data = [];
 
+            $regular_date_types = FleximportConfig::get("HISINONE_REGULAR_DATETYPES");
+            $regular_date_types = preg_split("/[\s,]/", $regular_date_types, -1, PREG_SPLIT_NO_EMPTY);
+
 
             foreach ($data->course as $number => $coursedata) {
                 $courses[$number][] = $coursedata->orgunits && $coursedata->orgunits->orgunitLid
@@ -118,7 +128,7 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                 //var_dump($coursedata); die();
                 $regular_dates = [];
                 foreach ((array) $coursedata->plannedDates->plannedDate as $datedata) {
-                    if (in_array($datedata->rhythm->id, [1, 2, 6, 9])) { //1 könnte falsch sein
+                    if (in_array($datedata->rhythm->id, $regular_date_types)) {
 
                         //regelmäßige Termine in Stud.IP
                         $regular_date = [
@@ -169,6 +179,16 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                         $regular_date[] = implode("|", $exdates);
 
                         $regular_dates[] = $regular_date;
+
+                        //Terminänderungen:
+                        foreach ((array) $datedata->appointmentModifications->appointmentModification as $modification) {
+                            $begin = strtotime($modification->initialDate ." " . $modification->initialStart);
+                            $end = strtotime($modification->initialDate ." " . $modification->initialEnd);
+                            if ($modification->room) {
+
+                            }
+                        }
+
                     } else {
                         //unregelmäßige Termine in Stud.IP
 

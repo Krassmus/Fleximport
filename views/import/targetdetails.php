@@ -70,7 +70,8 @@
             </tr>
         <? endforeach ?>
         <? foreach ($datafields as $datafield) : ?>
-            <? $overwrite = isset($data[$datafield['name']]) && ($data[$datafield['name']] !== false) ?>
+            <? $datafieldname = is_string($datafield['name']) ? $datafield['name'] : $datafield['name']->original() ?>
+            <? $overwrite = isset($data[$datafieldname]) && ($data[$datafieldname] !== false) ?>
             <tr<?= $overwrite ? "" : ' style="opacity: 0.5;"' ?>>
                 <? if (!$object->isNew()) : ?>
                     <td>

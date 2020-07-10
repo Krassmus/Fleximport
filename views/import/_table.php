@@ -8,12 +8,14 @@
 <? else : ?>
     <div style="margin-bottom: 50px;" id="table_<?= $table->getId() ?>_container" class="tablecontainer" data-name="<?= htmlReady($table['name']) ?>" data-table_id="<?= $table->getId() ?>">
         <div style="float: right;">
-            <a href="<?= PluginEngine::getLink($plugin, array(), "setup/table/".$table->getId()) ?>" data-dialog>
-                <?= Icon::create("admin", "clickable")->asImg(20) ?>
-            </a>
-            <a href="<?= PluginEngine::getLink($plugin, array(), "setup/removetable/".$table->getId()) ?>" onClick="STUDIP.Dialog.confirm('<?= _("Wirklich die Tabelle löschen?") ?>', function () { STUDIP.Fleximport.deleteTable('<?= $table->getId() ?>') }); return false;">
-                <?= Icon::create("trash", "clickable")->asImg(20) ?>
-            </a>
+            <? if (!FleximportConfig::get("DISALLOW_ADMINISTRATION")) : ?>
+                <a href="<?= PluginEngine::getLink($plugin, array(), "setup/table/".$table->getId()) ?>" data-dialog>
+                    <?= Icon::create("admin", "clickable")->asImg(20) ?>
+                </a>
+                <a href="<?= PluginEngine::getLink($plugin, array(), "setup/removetable/".$table->getId()) ?>" onClick="STUDIP.Dialog.confirm('<?= _("Wirklich die Tabelle löschen?") ?>', function () { STUDIP.Fleximport.deleteTable('<?= $table->getId() ?>') }); return false;">
+                    <?= Icon::create("trash", "clickable")->asImg(20) ?>
+                </a>
+            <? endif ?>
         </div>
         <h2>
             <? switch ($table['import_type']) {

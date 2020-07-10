@@ -49,6 +49,47 @@ class ProcessController extends PluginController {
         $this->neededConfigs = array_unique($this->neededConfigs);
     }
 
+    public function duplicate_action($process_id)
+    {
+        $this->process = new FleximportProcess($process_id);
+        if (Request::isPost()) {
+            $new_process = new FleximportProcess();
+            $data = Request::getArray("data");
+            $data['triggered_by_cronjob'] = $data['triggered_by_cronjob'] ? 1 : 0;
+            $data['webhookable'] = $data['webhookable'] ? 1 : 0;
+            $new_process->setData($data);
+            $new_process->store();
+            foreach ((array) Request::getArray("configs") as $config_name => $value) {
+                $new_process->setConfig($config_name, $value);
+            }
+            foreach ($this->process->tables as $table) {
+                $new_table = new FleximportTable();
+                $new_table->setData($table->toRawArray());
+                $new_table->setId($new_table->getNewId());
+                $new_table['process_id'] = $new_process->getId();
+                $new_table->store();
+            }
+            PageLayout::postMessage(MessageBox::success(_("Prozess wurde dupliziert")));
+            $this->redirect("import/overview/" . $new_process->getId());
+            return;
+        }
+        $this->direction = "duplicate";
+        $schedules = CronjobSchedule::findBySQL("INNER JOIN cronjobs_tasks USING (task_id) WHERE cronjobs_tasks.`class` = 'FleximportJob'");
+        $this->charges = [];
+        foreach ($schedules as $schedule) {
+            if ($schedule->parameters['charge']) {
+                $this->charges[] = $schedule->parameters['charge'];
+            }
+        }
+        $this->charges = array_unique($this->charges);
+        $this->neededConfigs = [];
+        foreach ($this->process->tables as $table) {
+            $this->neededConfigs = array_merge($this->neededConfigs, $table->neededProcessConfigs());
+        }
+        $this->neededConfigs = array_unique($this->neededConfigs);
+        $this->render_action("edit");
+    }
+
     public function export_action($process_id)
     {
         $this->process = new FleximportProcess($process_id);
