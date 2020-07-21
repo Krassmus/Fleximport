@@ -30,6 +30,7 @@ foreach (scandir(__DIR__."/plugins") as $plugin) {
         require_once __DIR__."/plugins/".$plugin;
     }
 }
+require_once __DIR__ . "/classes/sorm/SeminarCycleDateWithoutImplications.php";
 
 class Fleximport extends StudIPPlugin implements SystemPlugin {
 

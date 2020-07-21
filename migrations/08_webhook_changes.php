@@ -58,8 +58,12 @@ class WebhookChanges extends Migration {
     function down()
     {
         DBManager::get()->exec("
-	        ALTER TABLE `fleximport_mapped_items`
-	        DROP `table_id` `import_type` VARCHAR(200) NOT NULL DEFAULT '0'
+	        DELETE FROM `cronjobs_tasks`
+            WHERE `class` = 'FleximportWebhookJob'
+	    ");
+        DBManager::get()->exec("
+	        DELETE FROM `cronjobs_schedules`
+            WHERE `task_id` NOT IN (SELECT `task_id` FROM `cronjobs_tasks`)
 	    ");
         SimpleORMap::expireTableScheme();
     }

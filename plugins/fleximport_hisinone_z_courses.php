@@ -75,6 +75,7 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                 'course_id',
                 'coursename',
                 'id',
+                'metadate_id',
                 'date',
                 'remark',
                 'from',
@@ -181,13 +182,39 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                         $regular_dates[] = $regular_date;
 
                         //Terminänderungen:
-                        foreach ((array) $datedata->appointmentModifications->appointmentModification as $modification) {
+                        foreach ($datedata->individualDates->individualDate as $individualDate) {
+                            $individual_dates_data[] = [
+                                $coursedata->id,
+                                $coursedata->defaulttext,
+                                $individualDate->id,
+                                $datedata->plannedDatesId,
+                                $individualDate->date,
+                                $individualDate->remark,
+                                $individualDate->from,
+                                $individualDate->to,
+                                $individualDate->weekdayId,
+                                $individualDate->roomId,
+                                $datedata->room->roomId,
+                                $datedata->room->room,
+                                $datedata->room->roomKey,
+                                $datedata->room->floor,
+                                $datedata->room->floorKey,
+                                $datedata->room->building,
+                                $datedata->room->buildingKey,
+                                $datedata->room->campus,
+                                $datedata->room->campusKey,
+                                $individualDate->date . " " . $individualDate->from,
+                                $individualDate->date . " " . $individualDate->to,
+                                $coursedata->id
+                            ];
+                        }
+                        /*foreach ((array) $datedata->appointmentModifications->appointmentModification as $modification) {
                             $begin = strtotime($modification->initialDate ." " . $modification->initialStart);
                             $end = strtotime($modification->initialDate ." " . $modification->initialEnd);
                             if ($modification->room) {
 
                             }
-                        }
+                        }*/
 
                     } else {
                         //unregelmäßige Termine in Stud.IP
@@ -198,6 +225,7 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                                 $coursedata->id,
                                 $coursedata->defaulttext,
                                 $individualDate->id,
+                                "",
                                 $individualDate->date,
                                 $individualDate->remark,
                                 $individualDate->from,

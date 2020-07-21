@@ -59,7 +59,7 @@ class MoveTables extends Migration {
                 LIMIT 1
             ");
             $statememt->execute();
-            $exists = (bool)$statememt->fetch(PDO::FETCH_COLUMN, 0);
+            $exists = (bool) $statememt->fetch(PDO::FETCH_COLUMN, 0);
         } catch (Exception $e) {
             return false;
         }
