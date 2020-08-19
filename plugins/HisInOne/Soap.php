@@ -10,6 +10,14 @@ class Soap
     static public function get()
     {
         if (!self::$instance) {
+            $context = stream_context_create([
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                ]
+            ]);
+
             self::$instance = new SoapClient(\FleximportConfig::get("HISINONE_WSDL_URL"), array(
                 'connection_timeout' => 1, //Zeit für den Verbindungsaufbau
                 'trace' => true,
@@ -17,7 +25,8 @@ class Soap
                 'cache_wsdl' => ($GLOBALS['CACHING_ENABLE'] || !isset($GLOBALS['CACHING_ENABLE']))
                     ? WSDL_CACHE_DISK
                     : WSDL_CACHE_NONE,
-                'features' => SOAP_SINGLE_ELEMENT_ARRAYS
+                'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
+                'stream_context' => $context
             ));
 
             $headerbody = new \SoapVar('<wsse:Security SOAP-ENV:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsse:UsernameToken><wsse:Username>'.htmlReady(\FleximportConfig::get("HISINONE_SOAP_USERNAME")).'</wsse:Username><wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">' .\FleximportConfig::get("HISINONE_SOAP_PASSWORD") .'</wsse:Password></wsse:UsernameToken></wsse:Security>', \XSD_ANYXML);
