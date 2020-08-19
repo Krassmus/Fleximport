@@ -39,11 +39,11 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
         $data = $this->getInstituteData();
         if ($data) {
             $institutes[] = $this->mapInstituteData($data);
-            foreach ($data->affiliations->affiliation as $affiliation_data) {
+            foreach ((array) $data->affiliations->affiliation as $affiliation_data) {
                 $affiliations[] = $this->mapAffiliationData($data, $affiliation_data);
             }
             $fetched_lids[] = $data->lid;
-            foreach ($data->children->child as $child) {
+            foreach ((array) $data->children->child as $child) {
                 if (!in_array($child->lid, $fetched_lids)) {
                     $lids[] = $child->lid;
                 }
