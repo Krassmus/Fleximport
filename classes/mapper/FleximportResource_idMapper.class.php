@@ -1,19 +1,23 @@
 <?php
 
-class FleximportResource_idMapper implements FleximportMapper {
+class FleximportResource_idMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "resource_id";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array(
             "resource_id", "ressource_id", "parent_id", "range_id",
             "root_id", "fleximport_course_date_assignment", "fleximport_resource_id"
         );
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             "name" => "Name der Ressource",
             "description" => "Beschreibung der Ressource"
@@ -26,7 +30,7 @@ class FleximportResource_idMapper implements FleximportMapper {
             ");
             $statement->execute();
         } else {
-            //This is for Stud.IP < 4.5 with the old resources. We probably don't need this code, but here it is anyway:
+            //This is for Stud.IP <= 4.4 with the old resources. We probably don't need this code, but here it is anyway:
             $statement = DBManager::get()->prepare("
                 SELECT property_id, `name`
                 FROM resources_properties
@@ -41,7 +45,8 @@ class FleximportResource_idMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "name":
                 if (StudipVersion::newerThan("4.4.99")) {
