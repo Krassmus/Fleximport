@@ -11,7 +11,7 @@ class FleximportResource_idMapper implements FleximportMapper
     public function possibleFieldnames()
     {
         return array(
-            "resource_id", "ressource_id", "parent_id", "range_id",
+            "id", "resource_id", "ressource_id", "parent_id", "range_id",
             "root_id", "fleximport_course_date_assignment", "fleximport_resource_id"
         );
     }
