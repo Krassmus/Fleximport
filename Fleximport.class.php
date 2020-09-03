@@ -25,11 +25,7 @@ foreach (scandir(__DIR__."/classes/dynamics") as $dynamic) {
         require_once __DIR__."/classes/dynamics/".$dynamic;
     }
 }
-foreach (scandir(__DIR__."/plugins") as $plugin) {
-    if ($plugin[0] !== "." && substr($plugin, -4) === ".php") {
-        require_once __DIR__."/plugins/".$plugin;
-    }
-}
+StudipAutoloader::addAutoloadPath(__DIR__ . '/plugins');
 require_once __DIR__ . "/classes/sorm/SeminarCycleDateWithoutImplications.php";
 
 class Fleximport extends StudIPPlugin implements SystemPlugin {
