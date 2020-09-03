@@ -687,6 +687,25 @@ class FleximportTable extends SimpleORMap {
                 $entry->store();
             }
         }
+        if ($classname === "Resource" && StudipVersion::newerThan("4.4.99")) {
+            foreach (ResourcePropertyDefinition::findBySQL("1 ORDER BY name") as $property) {
+                if (isset($data[$property['name']])) {
+                    $id = array($property->getId());
+                    foreach (array_reverse((array) $object->getId()) as $id_part) {
+                        $id[] = $id_part;
+                    }
+                    if (count($id) < 3) {
+                        $id[] = "";
+                    }
+                    $entry = new ResourceProperty([
+                        $object->getId(),
+                        $property->getId()
+                    ]);
+                    $entry['state'] = $data[$fieldname];
+                    $entry->store();
+                }
+            }
+        }
 
         if ($plugin && !$object->isNew()) {
             $plugin->afterUpdate($object, $line);
@@ -745,6 +764,11 @@ class FleximportTable extends SimpleORMap {
                 }
                 $fields[] = "fleximport_welcome_message";
                 break;
+        }
+        if ($this['import_type'] === "Resource" && StudipVersion::newerThan("4.4.99")) {
+            foreach (ResourcePropertyDefinition::findBySQL("1 ORDER BY name") as $property) {
+                $fields[] = $property['name'];
+            }
         }
         foreach ($dynamics as $dynamic) {
             $for = $dynamic->forClassFields();

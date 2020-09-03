@@ -31,6 +31,16 @@
             )) ?>
         <? endforeach ?>
 
+        <? if (StudipVersion::newerThan("4.4.99") && $table['import_type'] === "Resource") : ?>
+            <? foreach ($resourceproperties as $property) : ?>
+                <?= $this->render_partial("setup/_field_mapping.php", array(
+                    'field' => $property['name'],
+                    'table' => $table,
+                    'mapperclasses' => $mapperclasses
+                )) ?>
+            <? endforeach ?>
+        <? endif ?>
+
 
         <? foreach ($dynamics as $dynamic) {
             $for = $dynamic->forClassFields();

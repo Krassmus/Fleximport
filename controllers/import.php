@@ -148,6 +148,9 @@ class ImportController extends PluginController {
                 $this->datafields = DataField::findBySQL("object_type = 'usersemdata'");
                 break;
         }
+        if ($classname === "Resource" && StudipVersion::newerThan("4.4.99")) {
+            $this->resourceproperties = ResourcePropertyDefinition::findBySQL("1 ORDER BY name");
+        }
     }
 
     public function deletables_action($table_id)

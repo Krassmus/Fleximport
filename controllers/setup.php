@@ -131,6 +131,9 @@ class SetupController extends PluginController {
         $this->datafields = DataField::findBySQL("object_type = :object_type", array(
             'object_type' => $datafield_object_types[$this->table['import_type']]
         ));
+        if (StudipVersion::newerThan("4.4.99")) {
+            $this->resourceproperties = ResourcePropertyDefinition::findBySQL("1 ORDER BY name");
+        }
         if (Request::isAjax() && Request::isPost()) {
             $output = array(
                 'func' => "STUDIP.Fleximport.updateTable",

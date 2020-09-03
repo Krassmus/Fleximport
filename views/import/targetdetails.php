@@ -109,6 +109,35 @@
                 </td>
             </tr>
         <? endforeach ?>
+        <? foreach ((array) $resourceproperties as $property) : ?>
+            <? $overwrite = isset($data[$property['name']]) && ($data[$property['name']] !== false) ?>
+            <tr<?= $overwrite ? "" : ' style="opacity: 0.5;"' ?>>
+                <? if (!$object->isNew()) : ?>
+                    <td>
+                        <?
+                        $entry = new ResourceProperty([$object->getId(), $property['name']->getId()]);
+                        $oldvalue = $entry->state;
+                        ?>
+                        <? if ($overwrite && ($oldvalue != $data[$property['name']])) : ?>
+                            <?= Icon::create("arr_2right", "inactive")->asImg(20, array('class' => "text-bottom", 'title' => _("Es gibt Veränderungen in diesem Feld."))) ?>
+                        <? endif ?>
+                    </td>
+                <? endif ?>
+                <td style="font-family: MONOSPACE;">
+                    <?= htmlReady($property['name']) ?>
+                </td>
+                <? if (!$object->isNew()) : ?>
+                    <td><?= htmlReady($oldvalue) ?></td>
+                <? endif ?>
+                <td>
+                    <? if (!$overwrite) : ?>
+                        <?= Icon::create("decline", "inactive")->asImg(16, array('title' => _("Wert wird nicht überschrieben."))) ?>
+                    <? else : ?>
+                        <?= htmlReady($data[$property['name']]) ?>
+                    <? endif ?>
+                </td>
+            </tr>
+        <? endforeach ?>
         <? foreach ((array) $additional_fields as $field => $currentValue) : ?>
             <tr>
                 <? if (!$object->isNew()) : ?>
