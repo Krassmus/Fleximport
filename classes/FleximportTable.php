@@ -649,6 +649,7 @@ class FleximportTable extends SimpleORMap {
                         "Durch Fleximport der Tabelle ".$this['name'].": " . join(';', $object->toArray('username vorname nachname perms email'))
                     );
                 }
+                AutoInsert::instance()->saveUser($object->getId());
                 break;
         }
 

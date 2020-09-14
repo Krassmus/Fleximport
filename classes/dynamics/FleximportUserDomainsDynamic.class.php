@@ -28,7 +28,7 @@ class FleximportUserDomainsDynamic implements FleximportDynamic {
             $domain = new UserDomain($userdomain);
             $domain->addUser($object->getId());
         }
-        AutoInsert::instance()->saveUser($object->getId());
+        //AutoInsert::instance()->saveUser($object->getId());
 
         foreach ($value as $domain_id) {
             if (!in_array($domain_id, $olddomains)) {
