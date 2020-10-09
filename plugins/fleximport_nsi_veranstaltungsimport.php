@@ -12,17 +12,9 @@
  * @since       4.0
  */
 
-class fleximport_nsi_kurse extends FleximportPlugin
+class fleximport_nsi_veranstaltungsimport extends FleximportPlugin
 {
 
-    public function neededConfigs()
-    {
-        return [
-            "NSI_OLD_SEMESTERS"
-        ];
-    }
-
-    //taken from NSI_Import plugin and modified:
     public function getSemtreeId($parent_id, $ebene, $institut = true)
     {
         $db = DBManager::get();
@@ -106,60 +98,17 @@ class fleximport_nsi_kurse extends FleximportPlugin
     }
 
 
-    /**
-     * Clean up old semesters and their data
-     */
-    public function afterDataFetching()
-    {
-        //$old_semesters = array("2011/12", "2012/13", "2013/14", "2014/15", "2015/16", "2016/17");
-        $old_semesters = preg_split("/\s+/", FleximportConfig::get("NSI_OLD_SEMESTERS"), -1, PREG_SPLIT_NO_EMPTY);
-        if (count($old_semesters)) {
-            $statement = DBManager::get()->prepare("
-                DELETE FROM `fleximport_table_686a2c4810437e176f5fc4867d7c1e2d`
-                WHERE `ausbildungsjahr` IN (:old_semesters)
-            ");
-            $statement->execute(array(
-                'old_semesters' => $old_semesters
-            ));
-        }
-    }
-
     public function fieldsToBeMapped()
     {
         return array(
-            "seminar_id",
-            "fleximport_studyarea",
-            "fleximport_dozenten",
-            "leistungsnachweis",
-            "sonstiges",
-            "lernorga"
+            "fleximport_studyarea"
         );
     }
 
 
     public function mapField($field, $line)
     {
-        if ($field === 'seminar_id') {
-            $db = DBManager::get();
-            $courseId = $db->query(
-                  "SELECT seminare.seminar_id FROM seminare "
-                . "INNER JOIN datafields_entries "
-                . "ON seminare.seminar_id = datafields_entries.range_id "
-                . "INNER JOIN datafields "
-                . "ON datafields.datafield_id = datafields_entries.datafield_id "
-                . "WHERE "
-                . "datafields_entries.content = " . $db->quote($line['fach_nr']) . " "
-                . "AND datafields.name = 'Fachnummer' "
-                . "AND datafields.object_type = 'sem' "
-                . "AND seminare.veranstaltungsnummer = " . $db->quote($line['v_nr']) . ";"
-            )->fetch(PDO::FETCH_BOTH);
-
-            if($courseId) {
-                return $courseId[0];
-            } else {
-                return false;
-            }
-        } elseif($field === 'fleximport_studyarea') {
+        if($field === 'fleximport_studyarea') {
             return array($this->getOrCreateSemTreeId(
                 $line['ebene1'],
                 $line['ebene2'],
@@ -168,43 +117,6 @@ class fleximport_nsi_kurse extends FleximportPlugin
                 $line['ebene5'],
                 $line['ebene6']
             ));
-        } elseif($field === "fleximport_dozenten") {
-            $statement = DBManager::get()->prepare("
-                SELECT de.range_id
-                FROM datafields_entries AS de
-                    INNER JOIN datafields AS d ON (d.datafield_id = de.datafield_id)
-                    INNER JOIN fleximport_table_7c3304aaa948cd02904b9a82029a2fbb AS doz ON (de.content = doz.fp_idnr)
-                    INNER JOIN auth_user_md5 AS u ON (u.user_id = de.range_id)
-                WHERE doz.v_nr = :v_nr
-                    AND doz.fach_nr =  :fach_nr
-                    AND u.perms = 'dozent'
-                    AND d.object_type = 'user'
-                    AND d.name = 'fp_idnr'
-            ");
-            $statement->execute(array(
-                'v_nr' => $line['v_nr'],
-                'fach_nr' => $line['fach_nr']
-            ));
-            return $statement->fetchAll(PDO::FETCH_COLUMN, 0);
-        } elseif($field === "leistungsnachweis") {
-            if ($line['pruefung_schr'] || $line['pruefung_mdl']) {
-                return "Schriftliche Prüfungen: ".$line['pruefung_schr']."\n" .
-                "Mündliche Prüfungen: ".$line['pruefung_mdl'];
-            } else {
-                return "";
-            }
-        } elseif ($field === "sonstiges") {
-            if ($line['sachbearbeitung'] || $line['sb_mail'] || $line['sb_telefon']) {
-                return _("Sachbearbeitung:")."\n".$line['sachbearbeitung']."\n".$line['sb_mail']."\n"._("Telefon:")." ".$line['sb_telefon'];
-            } else {
-                return "";
-            }
-        } elseif($field === "lernorga") {
-            if ($line['beginn'] || $line['ende']) {
-                return $line['beginn']." - ".$line['ende'];
-            } else {
-                return "";
-            }
         }
     }
 }
