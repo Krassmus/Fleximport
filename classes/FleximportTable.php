@@ -65,6 +65,12 @@ class FleximportTable extends SimpleORMap {
         return "fleximport_table_".$this->getId();
     }
 
+    public function needsFetching()
+    {
+        return $this->customImportEnabled()
+            || !in_array($this['source'], array("csv_upload", "extern"));
+    }
+
     public function fetchData()
     {
         if ($this->already_fetched) {

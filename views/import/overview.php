@@ -4,11 +4,25 @@
           enctype="multipart/form-data"
           id="process_form">
         <? foreach ($tables as $table) : ?>
+            <? if ($table['active']) : ?>
             <?= $this->render_partial("import/_table.php", array('table' => $table)) ?>
+            <? endif ?>
         <? endforeach ?>
     </form>
 
     <div style="text-align: center;">
+        <?
+        $needsFetching = false;
+        foreach ($tables as $table) {
+            if ($table->needsFetching()) {
+                $needsFetching = true;
+                break;
+            }
+        }
+        ?>
+        <? if ($needsFetching) : ?>
+        <?= \Studip\LinkButton::create(_("Daten abrufen"), PluginEngine::getURL($plugin, array(), "import/processfetch/".$process->getId())) ?>
+        <? endif ?>
         <?= \Studip\Button::create(_("Import starten"), 'start', array(
             'onClick' => "return window.confirm('"._("Wirklich importieren?")."');",
             'form' => "process_form"
@@ -45,6 +59,13 @@ if ($process) {
             PluginEngine::getURL($plugin, array('process_id' => $process->getId()), "setup/table"),
             Icon::create("add", "clickable"),
             ['data-dialog' => 1]
+        );
+    }
+    if ($needsFetching) {
+        $actions->addLink(
+            _("Daten abrufen"),
+            PluginEngine::getURL($plugin, array(), "import/processfetch/".$process->getId()),
+            Icon::create("arr_1down", "clickable")
         );
     }
     $actions->addLink(

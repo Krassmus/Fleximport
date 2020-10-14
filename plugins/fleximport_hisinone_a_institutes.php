@@ -53,14 +53,16 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
                 $lid = array_shift($lids);
                 if (!in_array($lid, $fetched_lids)) {
                     $data = $this->getInstituteData($lid);
-                    $institutes[] = $this->mapInstituteData($data);
-                    foreach ($data->affiliations->affiliation as $affiliation_data) {
-                        $affiliations[] = $this->mapAffiliationData($data, $affiliation_data);
-                    }
-                    $fetched_lids[] = $data->lid;
-                    foreach ((array) $data->children->child as $child) {
-                        if (!in_array($child->lid, $fetched_lids)) {
-                            $lids[] = $child->lid;
+                    if ($data !== false) {
+                        $institutes[] = $this->mapInstituteData($data);
+                        foreach ((array) $data->affiliations->affiliation as $affiliation_data) {
+                            $affiliations[] = $this->mapAffiliationData($data, $affiliation_data);
+                        }
+                        $fetched_lids[] = $data->lid;
+                        foreach ((array) $data->children->child as $child) {
+                            if (!in_array($child->lid, $fetched_lids)) {
+                                $lids[] = $child->lid;
+                            }
                         }
                     }
                 }
@@ -124,6 +126,8 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
             array('lid' => $lid)
         ));
         if (is_a($response, "SoapFault")) {
+            PageLayout::postError("[inst lid=".$lid."] ".$response->getMessage());
+            return false;
             echo $soap->__getLastRequest();
             echo "<br><br>\n\n";
             var_dump($response);

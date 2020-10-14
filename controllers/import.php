@@ -21,17 +21,6 @@ class ImportController extends PluginController {
     {
         $this->process = FleximportProcess::find($process_id);
         if ($this->process) {
-            if (!$this->process['cache_tables']
-                    || (time() - $this->process['last_data_import'] * 60 > $this->process['cache_tables'])) {
-                foreach ($this->process->tables as $table) {
-                    $table->fetchData();
-                }
-                foreach ($this->process->tables as $table) {
-                    $table->afterDataFetching();
-                }
-                $this->process['last_data_import'] = time();
-                $this->process->store();
-            }
             Navigation::activateItem("/fleximport/process_".$process_id);
             $this->tables = $this->process->tables;
             if ($this->process['description']) {
@@ -52,10 +41,19 @@ class ImportController extends PluginController {
                 $this->process = FleximportProcess::find($process_id);
                 $this->tables = $this->process->tables;
                 foreach ($this->tables as $table) {
-                    $table->fetchData();
+                    if ($table['active']) {
+                        $table->fetchData();
+                    }
                 }
                 foreach ($this->tables as $table) {
-                    $table->doImport();
+                    if ($table['active']) {
+                        $table->afterDataFetching();
+                    }
+                }
+                foreach ($this->tables as $table) {
+                    if ($table['active']) {
+                        $table->doImport();
+                    }
                 }
                 $duration = time() - $starttime;
                 if ($duration >= 60) {
@@ -80,6 +78,25 @@ class ImportController extends PluginController {
             }
 
         }
+        $this->redirect("import/overview/".$process_id);
+    }
+
+    public function processfetch_action($process_id)
+    {
+        $this->process = FleximportProcess::find($process_id);
+        foreach ($this->process->tables as $table) {
+            if ($table['active']) {
+                $table->fetchData();
+            }
+        }
+        foreach ($this->process->tables as $table) {
+            if ($table['active']) {
+                $table->afterDataFetching();
+            }
+        }
+        $this->process['last_data_import'] = time();
+        $this->process->store();
+        PageLayout::postSuccess(_("Daten wurden abgerufen."));
         $this->redirect("import/overview/".$process_id);
     }
 
