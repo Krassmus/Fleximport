@@ -13,21 +13,47 @@
     <div style="text-align: center;">
         <?
         $needsFetching = false;
+        $fetchduration = 0;
+        $importduration = 0;
         foreach ($tables as $table) {
             if ($table->needsFetching()) {
                 $needsFetching = true;
-                break;
+            }
+            if ($table['last_fetch_duration'] != -1) {
+                $fetchduration += $table['last_fetch_duration'];
+            }
+            if ($table['last_import_duration'] != -1) {
+                $importduration += $table['last_import_duration'];
             }
         }
         ?>
         <? if ($needsFetching) : ?>
-        <?= \Studip\LinkButton::create(_("Daten abrufen"), PluginEngine::getURL($plugin, array(), "import/processfetch/".$process->getId())) ?>
+            <?= \Studip\LinkButton::create(_("Daten abrufen"), PluginEngine::getURL($plugin, array(), "import/processfetch/".$process->getId()), [
+                'onClick' => "return STUDIP.Fleximport.showProgress.call(this);",
+                'data-duration' => $fetchduration
+            ]) ?>
         <? endif ?>
-        <?= \Studip\Button::create(_("Import starten"), 'start', array(
-            'onClick' => "return window.confirm('"._("Wirklich importieren?")."');",
-            'form' => "process_form"
-        )) ?>
+        <?= \Studip\Button::create(_("Import starten"), 'start', [
+            'onClick' => "let confirm = window.confirm('"._("Wirklich importieren?")."'); if (confirm) { STUDIP.Fleximport.showProgress.call(this); } return confirm;",
+            'form' => "process_form",
+            'data-duration' => $fetchduration + $importduration
+        ]) ?>
     </div>
+
+    <div id="waiting_window"
+         style="display: none;"
+         data-title_process="<?= _("Prozess wird import ...") ?>"
+         data-title_fetch="<?= _("Daten werden abgerufen ...") ?>">
+        <div class="bar"></div>
+
+        <dl>
+            <dt><?= _("Aktuelle Dauer") ?></dt>
+            <dd class="recent"></dd>
+            <dt><?= _("Dauer der letzten Ausführung") ?></dt>
+            <dd class="last"></dd>
+        </dl>
+    </div>
+
 <? endif ?>
 
 <?
@@ -65,7 +91,11 @@ if ($process) {
         $actions->addLink(
             _("Daten abrufen"),
             PluginEngine::getURL($plugin, array(), "import/processfetch/".$process->getId()),
-            Icon::create("arr_1down", "clickable")
+            Icon::create("arr_1down", "clickable"),
+            [
+                'onClick' => "STUDIP.Fleximport.showProgress.call(this);",
+                'data-duration' => $fetchduration
+            ]
         );
     }
     $actions->addLink(

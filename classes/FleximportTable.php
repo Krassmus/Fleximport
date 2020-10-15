@@ -76,6 +76,7 @@ class FleximportTable extends SimpleORMap {
         if ($this->already_fetched) {
             return;
         }
+        $start = time();
         $this->already_fetched = true;
         try {
             if (!$this->customImportEnabled()) {
@@ -114,6 +115,8 @@ class FleximportTable extends SimpleORMap {
                 )
             );
         }
+        $this['last_fetch_duration'] = time() - $start;
+        $this->store();
     }
 
     /**
@@ -297,7 +300,8 @@ class FleximportTable extends SimpleORMap {
         }
     }
 
-    static public function reduceDiakritikaFromIso88591($text) {
+    static public function reduceDiakritikaFromIso88591($text)
+    {
         $text = str_replace(array("ä","Ä","ö","Ö","ü","Ü","ß"), array('ae','Ae','oe','Oe','ue','Ue','ss'), $text);
         $text = str_replace(array('À','Á','Â','Ã','Å','Æ'), 'A' , $text);
         $text = str_replace(array('à','á','â','ã','å','æ'), 'a' , $text);
@@ -313,7 +317,8 @@ class FleximportTable extends SimpleORMap {
         return $text;
     }
 
-    public function CSV2Array($content, $delim = ';', $encl = '"', $optional = 1) {
+    public function CSV2Array($content, $delim = ';', $encl = '"', $optional = 1)
+    {
         if ($content[strlen($content)-1]!="\r" && $content[strlen($content)-1]!="\n")
             $content .= "\r\n";
 
@@ -331,7 +336,8 @@ class FleximportTable extends SimpleORMap {
         return $liste;
     }
 
-    public function getCSVDataFromFile($file_path, $delim = ';', $encl = '"', $optional = 1) {
+    public function getCSVDataFromFile($file_path, $delim = ';', $encl = '"', $optional = 1)
+    {
         if (!file_exists($file_path)) {
             PageLayout::postError(_("Datei ist nicht vorhanden."));
             return array();
@@ -349,7 +355,8 @@ class FleximportTable extends SimpleORMap {
         return $this->CSV2Array($contents, $delim, $encl, $optional);
     }
 
-    public function getCSVDataFromURL($file_path, $delim = ';', $encl = '"', $optional = 1) {
+    public function getCSVDataFromURL($file_path, $delim = ';', $encl = '"', $optional = 1)
+    {
         $contents = file_get_contents($file_path);
         $bom = pack('H*','EFBBBF');
         $contents = preg_replace("/^$bom/", '', $contents);
@@ -369,6 +376,7 @@ class FleximportTable extends SimpleORMap {
 
     public function doImport()
     {
+        $start = time();
         if (!$this['import_type']) {
             return array();
         }
@@ -442,10 +450,13 @@ class FleximportTable extends SimpleORMap {
                 $mapped->store();
             }
         }
+        $this['last_import_duration'] = time() - $start;
+        $this->store();
         return $protocol;
     }
 
-    public function findDeletableItems($not = array()) {
+    public function findDeletableItems($not = array())
+    {
         return FleximportMappedItem::findBySQL(
             "table_id = :table_id AND item_id NOT IN (:ids)",
             array(
@@ -455,7 +466,8 @@ class FleximportTable extends SimpleORMap {
         );
     }
 
-    public function countDeletableItems($not = array()) {
+    public function countDeletableItems($not = array())
+    {
         return FleximportMappedItem::countBySQL(
             "table_id = :table_id AND item_id NOT IN (:ids)",
             array(
@@ -465,7 +477,8 @@ class FleximportTable extends SimpleORMap {
         );
     }
 
-    public function clearIndicators() {
+    public function clearIndicators()
+    {
         return FleximportMappedItem::deleteBySQL(
             "table_id = :table_id",
             array(
@@ -1088,7 +1101,8 @@ class FleximportTable extends SimpleORMap {
         return $this->sorm_metadata['pk'];
     }
 
-    public function getPlugin() {
+    public function getPlugin()
+    {
         $pluginname = $this['name'];
         if (!$this->plugin && class_exists($pluginname)) {
             $this->plugin = new $pluginname($this);

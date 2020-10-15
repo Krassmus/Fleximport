@@ -9,6 +9,7 @@ class MakeTablesInactive extends Migration {
             ALTER TABLE `fleximport_tables`
             ADD COLUMN `active` tinyint(1) DEFAULT 1 AFTER `pushupdate`
         ");
+        SimpleORMap::expireTableScheme();
     }
 
     function down()
@@ -17,5 +18,7 @@ class MakeTablesInactive extends Migration {
             ALTER TABLE `fleximport_tables`
             DROP COLUMN `active`;
         ");
+        SimpleORMap::expireTableScheme();
+
     }
 }

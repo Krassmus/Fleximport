@@ -46,6 +46,56 @@ STUDIP.Fleximport = {
         jQuery('#simplematching_' + field + '_format').toggle(this.value !== '');
         jQuery('#simplematching_' + field + '_delimiter').css('display', !this.value ? 'none' : 'flex');
         jQuery('#simplematching_' + field + '_foreignkey_sormclass').toggle(this.value === "fleximport_mapper__FleximportForeignKeyMapper__fleximport_foreign_key");
+    },
+    "showProgress": function () {
+        let displayTime = function (seconds) {
+            let hours = Math.floor(seconds / 60 / 60);
+            let minutes = Math.floor((seconds - (hours * 60)) / 60);
+            seconds = seconds - (minutes * 60) - (hours * 60 * 60);
+            if (hours > 0) {
+                return hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + " Stunden";
+            } else if (minutes > 0) {
+                return minutes + ":" + (seconds < 10 ? "0" + seconds : seconds) + " Minuten";
+            } else {
+                return seconds + " Sekunden";
+            }
+        };
+
+        if ($(this).data("duration") < 2) {
+            return true;
+        }
+
+        let importing = $(this).is("button");
+        let title = jQuery("#waiting_window").data(importing ? "title_process" : "title_fetch");
+        let start = Date.now();
+        jQuery("#waiting_window .recent").text(
+            displayTime(0)
+        );
+        jQuery("#waiting_window .last").text(
+            displayTime($(this).data("duration"))
+        );
+        jQuery("#waiting_window .bar").progressbar({
+            "max": $(this).data("duration") * 1000
+        })
+        window.setInterval(function () {
+            let now = Date.now();
+            let milliseconds = now - start;
+            if (milliseconds <= jQuery("#waiting_window .bar").progressbar("option", "max")) {
+                jQuery("#waiting_window .bar").progressbar("option", "value", milliseconds);
+            } else {
+                jQuery("#waiting_window .bar").progressbar("option", "value", jQuery("#waiting_window .bar").progressbar("option", "max"));
+            }
+            jQuery("#waiting_window .recent").text(
+                displayTime(Math.floor((now - start) / 1000))
+            );
+        }, 100);
+        window.setTimeout(function () {
+            jQuery("#waiting_window").dialog({
+                "title": title,
+                "modal": true
+            });
+        }, 1000);
+        return true;
     }
 };
 

@@ -16,11 +16,6 @@
         </label>
 
         <label>
-            <?= _("Tabellen wieviele Minuten zwischenspeichern?") ?>
-            <input name="data[cache_tables]" type="number" min="0" value="<?= htmlReady($process['cache_tables'] ?: 0) ?>">
-        </label>
-
-        <label>
             <input type="checkbox"
                    value="1"
                    onChange="$('#edit_charge').toggle('fade');"

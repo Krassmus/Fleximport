@@ -126,12 +126,8 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
             array('lid' => $lid)
         ));
         if (is_a($response, "SoapFault")) {
-            PageLayout::postError("[inst lid=".$lid."] ".$response->getMessage());
+            PageLayout::postError("[readOrgUnit lid=".$lid."] ".$response->getMessage());
             return false;
-            echo $soap->__getLastRequest();
-            echo "<br><br>\n\n";
-            var_dump($response);
-            die();
         }
 
         return $response->orgunitResponse;
