@@ -76,7 +76,7 @@ STUDIP.Fleximport = {
         );
         jQuery("#waiting_window .bar").progressbar({
             "max": $(this).data("duration") * 1000
-        })
+        });
         window.setInterval(function () {
             let now = Date.now();
             let milliseconds = now - start;
