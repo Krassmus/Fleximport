@@ -30,6 +30,11 @@ class ProcessController extends PluginController {
                 foreach ((array) Request::getArray("configs") as $config_name => $value) {
                     $this->process->setConfig($config_name, $value);
                 }
+                $activetables = Request::getArray("activetable");
+                foreach ($this->process->tables as $table) {
+                    $table['active'] = $activetables[$table->getId()];
+                    $table->store();
+                }
                 PageLayout::postMessage(MessageBox::success(_("Prozess wurde gespeichert")));
                 $this->redirect("import/overview/" . $this->process->getId());
             }

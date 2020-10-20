@@ -70,6 +70,22 @@
         </fieldset>
     <? endif ?>
 
+    <? if (count($process->tables) > 0) : ?>
+        <fieldset>
+            <legend>
+                <?= _("Tabellen aktivieren") ?>
+            </legend>
+
+            <?php foreach ($process->tables as $table) : ?>
+                <input type="hidden" value="0" name="activetable[<?= htmlReady($table->getId()) ?>]">
+                <label>
+                    <input type="checkbox" value="1" name="activetable[<?= htmlReady($table->getId()) ?>]"<?= $table['active'] ? " checked" : "" ?>>
+                    <?= htmlReady($table['name']) ?>
+                </label>
+            <? endforeach ?>
+        </fieldset>
+    <? endif ?>
+
     <div data-dialog-button>
         <?= \Studip\Button::create(_("Speichern")) ?>
         <? if (!$process->isNew()) : ?>
