@@ -9,7 +9,8 @@
  * die Veranstaltungstabelle anzulegen oder die Veranstaltungsbeschreibung über ein Template zu ermöglichen.
  */
 
-abstract class FleximportPlugin {
+abstract class FleximportPlugin
+{
 
     protected $table;           //an instance of FleximportTable
     public $api = array();      //just some variable to store data of needed
@@ -18,7 +19,8 @@ abstract class FleximportPlugin {
      * The constructor. Usually you don't need to care about this.
      * @param FleximportTable $table
      */
-    public function __construct(FleximportTable $table) {
+    public function __construct(FleximportTable $table)
+    {
         $this->table = $table;
     }
 
@@ -133,7 +135,8 @@ abstract class FleximportPlugin {
      * Returns a description of what this plugin is doing.
      * @return null\string
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return null;
     }
 }

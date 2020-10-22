@@ -18,8 +18,10 @@ class fleximport_hisinone_g_examinationregulations extends FleximportPlugin
         $response = $soap->__soapCall("readExaminationRegulations", [
             array('unitId' => 4)
         ]);
-        //var_dump($response->examinationRegulationsResponse); die();
-        return;
+        if (is_a($response, "SoapFault")) {
+            PageLayout::postError("[readExaminationRegulations] ".$response->getMessage());
+            return false;
+        }
         list($fields, $data) = \HisInOne\DataMapper::getData($response->examinationRegulationsResponse->cos);
 
         $this->table->createTable($fields, $data);

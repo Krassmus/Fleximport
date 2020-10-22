@@ -16,6 +16,10 @@ class fleximport_hisinone_f_studycourses extends FleximportPlugin
     {
         $soap = \HisInOne\Soap::get();
         $response = $soap->__soapCall("findCoursesOfStudy", []);
+        if (is_a($response, "SoapFault")) {
+            PageLayout::postError("[findCoursesOfStudy] ".$response->getMessage());
+            return false;
+        }
         list($fields, $data) = \HisInOne\DataMapper::getData($response->cosResponse->cos);
         $this->table->createTable($fields, $data);
     }

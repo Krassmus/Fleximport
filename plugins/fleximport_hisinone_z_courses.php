@@ -277,10 +277,8 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
             array('termKey' => $termkey)
         ));
         if (is_a($response, "SoapFault")) {
-            echo $soap->__getLastRequest();
-            echo "<br><br>\n\n";
-            var_dump($response);
-            die();
+            PageLayout::postError("[findCoursesOfTerm termKey=".$termkey."] ".$response->getMessage());
+            return false;
         }
 
         return $response->findCoursesOfTermResponse;
