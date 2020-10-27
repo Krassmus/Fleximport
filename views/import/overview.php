@@ -16,14 +16,16 @@
         $fetchduration = 0;
         $importduration = 0;
         foreach ($tables as $table) {
-            if ($table->needsFetching()) {
-                $needsFetching = true;
-            }
-            if ($table['last_fetch_duration'] != -1) {
-                $fetchduration += $table['last_fetch_duration'];
-            }
-            if ($table['last_import_duration'] != -1) {
-                $importduration += $table['last_import_duration'];
+            if ($table['active']) {
+                if ($table->needsFetching()) {
+                    $needsFetching = true;
+                }
+                if ($table['last_fetch_duration'] != -1) {
+                    $fetchduration += $table['last_fetch_duration'];
+                }
+                if ($table['last_import_duration'] != -1) {
+                    $importduration += $table['last_import_duration'];
+                }
             }
         }
         ?>

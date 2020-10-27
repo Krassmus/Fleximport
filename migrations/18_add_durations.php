@@ -19,12 +19,12 @@ class AddDurations extends Migration {
 
     function down()
     {
-        DBManager::get()->exec("
+        /*DBManager::get()->exec("
 	        ALTER TABLE `fleximport_processes`
 	        ADD `cache_tables` int(11) NOT NULL DEFAULT '0',
             DROP COLUMN `last_fetch_duration`,
             DROP COLUMN `last_import_duration`
         ");
-        SimpleORMap::expireTableScheme();
+        SimpleORMap::expireTableScheme();*/
     }
 }

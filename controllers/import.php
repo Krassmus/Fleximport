@@ -14,6 +14,14 @@ class ImportController extends PluginController {
             set_time_limit(FleximportConfig::get("MAXIMUM_EXECUTION_TIME"));
         }
         PageLayout::addScript($this->plugin->getPluginURL()."/assets/fleximport.js");
+
+        Helpbar::Get()->addLink(
+            _("Hilfe zum Fleximport"),
+            "https://github.com/Krassmus/Fleximport",
+            null,
+            "_blank"
+        );
+
         Navigation::activateItem("/fleximport");
     }
 

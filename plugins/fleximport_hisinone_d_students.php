@@ -28,7 +28,7 @@ class fleximport_hisinone_d_students extends FleximportPlugin
             array(
                 'termKey' => (int) $this->table->process->getConfig("HISINONE_TERMKEY"), //1 = summer, 2 = winter, make for processconfig?
                 'offset' => 0,
-                'limit' => 1
+                'limit' => 100
             )
         ));
         if (is_a($response, "SoapFault")) {
