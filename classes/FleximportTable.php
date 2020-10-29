@@ -276,7 +276,15 @@ class FleximportTable extends SimpleORMap {
         $create_sql .= ") ";
         $db->exec($create_sql);
 
+        $this->addEntries($headers, $entries);
+    }
 
+    public function addEntries($headers, $entries = array())
+    {
+        if (!$headers) {
+            return;
+        }
+        $db = DBManager::get();
         foreach ($entries as $line) {
             $insertable = false;
             foreach ($headers as $key => $fieldname) {

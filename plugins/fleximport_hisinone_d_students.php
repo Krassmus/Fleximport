@@ -23,12 +23,13 @@ class fleximport_hisinone_d_students extends FleximportPlugin
             PageLayout::postInfo(_("Es fehlt die Konfiguration HISINONE_TERMKEY."));
             return null;
         }
+        $limit = 500;
         $soap = \HisInOne\Soap::get();
         $response = $soap->__soapCall("findActiveStudents", array(
             array(
                 'termKey' => (int) $this->table->process->getConfig("HISINONE_TERMKEY"), //1 = summer, 2 = winter, make for processconfig?
                 'offset' => 0,
-                'limit' => 100
+                'limit' => $limit
             )
         ));
         if (is_a($response, "SoapFault")) {
@@ -36,7 +37,24 @@ class fleximport_hisinone_d_students extends FleximportPlugin
             return false;
         }
         list($fields, $data) = \HisInOne\DataMapper::getData($response->findActiveStudentsResponse->students->student);
+        $max = $response->findActiveStudentsResponse->countAll;
         $this->table->createTable($fields, $data);
+
+        for ($i = 1; $i * $limit < $max; $i++) {
+            $response = $soap->__soapCall("findActiveStudents", array(
+                array(
+                    'termKey' => (int) $this->table->process->getConfig("HISINONE_TERMKEY"), //1 = summer, 2 = winter, make for processconfig?
+                    'offset' => $i * $limit + 1,
+                    'limit' => $limit
+                )
+            ));
+            if (is_a($response, "SoapFault")) {
+                PageLayout::postError("[findActiveStudents termKey=".(int) $this->table->process->getConfig("HISINONE_TERMKEY")."] ".$response->getMessage());
+                return false;
+            }
+            list($fields, $data) = \HisInOne\DataMapper::getData($response->findActiveStudentsResponse->students->student);
+            $this->table->addEntries($fields, $data);
+        }
     }
 
     public function getDescription()
