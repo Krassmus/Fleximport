@@ -24,9 +24,9 @@ class fleximport_hisinone_d_students extends FleximportPlugin
             return null;
         }
         $soap = \HisInOne\Soap::get();
-        $response = $soap->__soapCall("findActiveStudents", array(
-            array('termKey' => (int) $this->table->process->getConfig("HISINONE_TERMKEY")) //1 = summer, 2 = winter, make for processconfig?
-        ));
+        $response = $soap->__soapCall("findActiveStudents", [
+            ['termKey' => (int) $this->table->process->getConfig("HISINONE_TERMKEY")] //1 = summer, 2 = winter, make for processconfig?
+        ]);
         list($fields, $data) = \HisInOne\DataMapper::getData($response->findActiveStudentsResponse->student);
         $this->table->createTable($fields, $data);
     }

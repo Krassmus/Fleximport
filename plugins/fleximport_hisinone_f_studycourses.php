@@ -15,7 +15,9 @@ class fleximport_hisinone_f_studycourses extends FleximportPlugin
     public function fetchData()
     {
         $soap = \HisInOne\Soap::get();
-        $response = $soap->__soapCall("findCoursesOfStudy", []);
+        $response = $soap->__soapCall("findCoursesOfStudy", [
+            ['versionDate' => "2020.10.23"]
+        ]);
         list($fields, $data) = \HisInOne\DataMapper::getData($response->cosResponse->cos);
         $this->table->createTable($fields, $data);
     }
