@@ -263,7 +263,7 @@ class FleximportTable extends SimpleORMap {
         foreach ($headers as $key => $fieldname) {
             if ($fieldname) {
                 $create_sql .= ", ";
-                $create_sql .= "`" . addslashes($fieldname) . "` TEXT NOT NULL";
+                $create_sql .= "`" . addslashes($fieldname) . "` TEXT NULL";
             }
         }
         $create_sql .= ", PRIMARY KEY (`IMPORT_TABLE_PRIMARY_KEY`) ";
