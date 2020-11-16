@@ -27,7 +27,6 @@ foreach (scandir(__DIR__."/classes/dynamics") as $dynamic) {
 }
 StudipAutoloader::addAutoloadPath(__DIR__ . '/plugins');
 require_once __DIR__ . "/classes/sorm/SeminarCycleDateWithoutImplications.php";
-
 class Fleximport extends StudIPPlugin implements SystemPlugin {
 
     static public function getCSSFormClass()

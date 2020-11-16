@@ -16,7 +16,7 @@ class fleximport_hisinone_f_studycourses extends FleximportPlugin
     {
         $soap = \HisInOne\Soap::get();
         $response = $soap->__soapCall("findCoursesOfStudy", [
-            ['versionDate' => "2020-10-23"]
+            ['versionDate' => "2020-10-23"] //this date doesn't seem to be relevant
         ]);
         if (is_a($response, "SoapFault")) {
             PageLayout::postError("[findCoursesOfStudy] ".$response->getMessage());

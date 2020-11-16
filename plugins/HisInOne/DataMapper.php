@@ -17,17 +17,21 @@ class DataMapper
                 if (is_array($value) || is_object($value)) {
                     $value = self::getStructure($value);
                     foreach ($value as $k => $v) {
+                        if (!is_array($structure[$key])) {
+                            $structure[$key] = [];
+                        }
                         $structure[$key][$k] = $v;
                     }
                 } else {
-                    $structure[$key] = $value || $structure[$key];
+                    if (!is_array($structure[$key])) {
+                        $structure[$key] = $value || $structure[$key];
+                    }
                 }
             }
             if (self::structureComplete($structure)) {
                 break;
             }
         }
-
 
 
         //get the fields
