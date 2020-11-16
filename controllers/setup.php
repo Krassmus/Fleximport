@@ -45,8 +45,10 @@ class SetupController extends PluginController {
                     DBManager::get()->exec("DROP VIEW IF EXISTS `" . addslashes($this->table->getDBName()) . "`");
                     DBManager::get()->exec("DROP TABLE IF EXISTS `" . addslashes($this->table->getDBName()) . "`");
                     DBManager::get()->exec("
-                        CREATE VIEW `" . addslashes($data['name']) . "` AS (
-                            SELECT * FROM `" . addslashes($copied_table->getDBName()). "`
+                        CREATE VIEW `" . addslashes($this->table->getDBName()) . "` AS (
+                            SELECT *
+                            FROM `" . addslashes($copied_table->getDBName()). "`
+                            ".($data['tabledata']['tablecopy']['where'] ?: "")."
                         );
                     ");
                 } catch(Exception $e) {
@@ -59,7 +61,7 @@ class SetupController extends PluginController {
                     DBManager::get()->exec("DROP VIEW IF EXISTS `" . addslashes($this->table->getDBName()) . "`");
                     DBManager::get()->exec("DROP TABLE IF EXISTS `" . addslashes($this->table->getDBName()) . "`");
                     DBManager::get()->exec("
-                        CREATE VIEW `" . addslashes($data['name']) . "` AS (
+                        CREATE VIEW `" . addslashes($this->table->getDBName()) . "` AS (
                             " . $data['tabledata']['sqlview']['select'] . "
                         );
                     ");

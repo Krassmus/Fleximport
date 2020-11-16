@@ -77,19 +77,26 @@
         <input type="text" name="table[tabledata][weblink][path]" value="<?= htmlReady($table['tabledata']['weblink']['path']) ?>">
     </label>
 
-    <label id="tablecopy_info" style="<?= $table['source'] !== "tablecopy" ? "display: none;" : "" ?>">
-        <?= _("Zu kopierende Fleximport-Tabelle") ?>
-        <select name="table[tabledata][tablecopy][id]">
-            <option value=""> - </option>
-            <? foreach (FleximportTable::findAll() as $t) : ?>
-                <? if ($t->getId() !== $table->getId()) : ?>
-                <option value="<?= htmlReady($t->getId()) ?>"<?= $table['tabledata']['tablecopy']['id'] == $t->getId() ? " selected" : ""?>>
-                    <?= htmlReady($t['name']) ?>
-                </option>
-                <? endif ?>
-            <?php endforeach ?>
-        </select>
-    </label>
+    <div id="tablecopy_info" style="<?= $table['source'] !== "tablecopy" ? "display: none;" : "" ?>">
+        <label>
+            <?= _("Zu kopierende Fleximport-Tabelle") ?>
+            <select name="table[tabledata][tablecopy][id]">
+                <option value=""> - </option>
+                <? foreach (FleximportTable::findAll() as $t) : ?>
+                    <? if ($t->getId() !== $table->getId()) : ?>
+                    <option value="<?= htmlReady($t->getId()) ?>"<?= $table['tabledata']['tablecopy']['id'] == $t->getId() ? " selected" : ""?>>
+                        <?= htmlReady($t['name']) ?>
+                    </option>
+                    <? endif ?>
+                <?php endforeach ?>
+            </select>
+        </label>
+
+        <label>
+            <?= _("Zusatzklausel") ?>
+            <textarea name="table[tabledata][tablecopy][where]" placeholder="WHERE ... GROUP BY ..."><?= htmlReady($table['tabledata']['tablecopy']['where']) ?></textarea>
+        </label>
+    </div>
 
     <label id="sqlview_info" style="<?= $table['source'] !== "sqlview" ? "display: none;" : "" ?>">
         <?= _("SELECT-Statement") ?>

@@ -62,6 +62,9 @@ class FleximportTable extends SimpleORMap {
 
     public function getDBName()
     {
+        if (!$this->getId()) {
+            $this->setId($this->getNewId());
+        }
         return "fleximport_table_".$this->getId();
     }
 
