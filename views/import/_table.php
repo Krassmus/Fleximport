@@ -37,6 +37,9 @@
                 case "Institute":
                     echo Icon::create("institute", "info")->asImg(20, array('class' => "text-bottom"));
                     break;
+                case "Abschluss":
+                    echo Icon::create("doctoral-cap", "info")->asImg(20, array('class' => "text-bottom"));
+                    break;
                 case "fleximport_mysql_command":
                     echo Icon::create("unit-test", "info")->asImg(20, array('class' => "text-bottom"));
                     break;

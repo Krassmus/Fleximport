@@ -21,6 +21,12 @@
                     case "Course":
                         echo Icon::create("seminar", "info")->asImg(20, array('class' => "text-bottom", 'title' => _("Es werden Veranstaltungen import.")));
                         break;
+                    case "Institute":
+                        echo Icon::create("institute", "info")->asImg(20, array('class' => "text-bottom"));
+                        break;
+                    case "Abschluss":
+                        echo Icon::create("doctoral-cap", "info")->asImg(20, array('class' => "text-bottom"));
+                        break;
                     case "":
                         echo Icon::create("remove-circle", "info")->asImg(20, array('class' => "text-bottom", 'title' => _("Dies ist eine Hilfstabelle und wird nicht für sich importiert.")));
                         break;
