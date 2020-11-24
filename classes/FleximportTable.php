@@ -976,6 +976,18 @@ class FleximportTable extends SimpleORMap {
             }
         }
 
+        if ($this['import_type'] === "Institute") {
+            if ($data['fakultaets_id'] === "fakultaet") {
+                if (!$data['institut_id']) {
+                    do {
+                        $new_id = md5(uniqid());
+                    } while (Institute::find($new_id));
+                    $data['institut_id'] = $new_id;
+                }
+                $data['fakultaets_id'] = $data['institut_id'];
+            }
+        }
+
         if (($this['import_type'] === "User")) {
             if ($this['tabledata']['simplematching']["username"]['column']) {
                 if ($this['tabledata']['simplematching']["fleximport_username_prefix"]['column']) {

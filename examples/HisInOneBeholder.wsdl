@@ -958,7 +958,7 @@
     <service name="StudIPService">
         <wsp:PolicyReference URI="#UsernameToken" />
         <port name="StudIPServicePort" binding="wns:StudIPServiceBinding">
-            <soap:address location="https://hisinone-test.zvw.uni-goettingen.de/demo/services2/StudIPService" />
+            <soap:address location="https://hisinone-test.zvw.uni-goettingen.de/qisserver/services2/StudIPService" />
         </port>
     </service>
     <!-- Policy for UsernameToken with plaintext password, sent from client to server only -->

@@ -2,9 +2,11 @@
 
 namespace HisInOne;
 
-class SoapClient extends \SoapClient {
+class SoapClient extends \SoapClient
+{
 
-    public function __soapCall ($function_name,  $arguments,  $options = null, $input_headers = null,  &$output_headers = null) {
+    public function __soapCall($function_name,  $arguments,  $options = null, $input_headers = null,  &$output_headers = null)
+    {
         $starttime = \microtime(true);
         $result = parent::__soapCall($function_name, $arguments, $options, $input_headers, $output_headers);
         $soapcalltime = \microtime(true) - $starttime;

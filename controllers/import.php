@@ -104,7 +104,9 @@ class ImportController extends PluginController {
         }
         $this->process['last_data_import'] = time();
         $this->process->store();
-        PageLayout::postSuccess(_("Daten wurden abgerufen."));
+        if (!isset($_SESSION['messages']) || !count($_SESSION['messages'])) {
+            PageLayout::postSuccess(_("Daten wurden abgerufen."));
+        }
         $this->redirect("import/overview/".$process_id);
     }
 

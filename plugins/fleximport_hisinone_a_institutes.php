@@ -13,7 +13,8 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
             "HISINONE_SOAP_ENDPOINT",
             "HISINONE_WSDL_URL",
             "HISINONE_SOAP_USERNAME",
-            "HISINONE_SOAP_PASSWORD"
+            "HISINONE_SOAP_PASSWORD",
+            "HISINONE_VIRTUAL_INSTITUT_ROOT_LID"
         ];
     }
 
@@ -117,6 +118,59 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
             PageLayout::postError(_("Konnte Daten nicht abrufen."));
         }
 
+    }
+
+    /**
+     * Executed directly after the
+     */
+    public function afterDataFetching()
+    {
+        if (FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
+            $db_name = $this->table->getDBName();
+
+            $statement = DBManager::get()->prepare("
+                DELETE FROM `".$db_name."`
+                WHERE `lid` = ?
+            ");
+            $statement->execute([
+                FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")
+            ]);
+        }
+    }
+
+    public function fieldsToBeMapped()
+    {
+        return array(
+            "fakultaets_id"
+        );
+    }
+
+    public function mapField($field, $line) {
+        $datafield_name = "hio_lid";
+        if ($field === "fakultaets_id") {
+            $parent_lid = $line['parentlid'];
+            if ($parent_lid == FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
+                return "fakultaet"; //means that the institut_id should become the fakultaet_id like it is usual in Stud.IP
+            }
+            $fakultaet_id = null;
+            if ($parent_lid) {
+                $statement = DBManager::get()->prepare("
+                    SELECT Institute.Institut_id
+                    FROM Institute
+                        INNER JOIN datafields_entries ON (datafields_entries.range_id = Institute.Institut_id)
+                        INNER JOIN datafields USING (datafield_id)
+                    WHERE datafields_entries.content = :lid
+                        AND datafields.name = :name
+                ");
+                $statement->execute([
+                    'name' => $datafield_name,
+                    'lid' => $parent_lid
+                ]);
+                $fakultaet_id = $statement->fetch(PDO::FETCH_COLUMN, 0);
+            }
+            return $fakultaet_id;
+        }
+        return false;
     }
 
     protected function getInstituteData($lid = null)

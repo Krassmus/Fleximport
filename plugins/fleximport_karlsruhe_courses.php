@@ -1,6 +1,7 @@
 <?php
 
-class fleximport_karlsruhe_courses extends FleximportPlugin {
+class fleximport_karlsruhe_courses extends FleximportPlugin
+{
 
     public function fieldsToBeMapped()
     {
@@ -69,8 +70,8 @@ class fleximport_karlsruhe_courses extends FleximportPlugin {
                 $day = strtolower($matches[1]);
                 if (isset($weekdays[$day])) {
                     $statement = DBManager::get()->prepare("
-                        SELECT metadate_id 
-                        FROM seminar_cycle_dates 
+                        SELECT metadate_id
+                        FROM seminar_cycle_dates
                         WHERE seminar_id = :course_id
                             AND start_time = :start_time
                             AND end_time = :end_time
