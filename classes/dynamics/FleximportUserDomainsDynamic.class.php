@@ -17,6 +17,8 @@ class FleximportUserDomainsDynamic implements FleximportDynamic {
     public function applyValue($object, $value, $line, $sync)
     {
         $olddomains = UserDomain::getUserDomainsForUser($object->getId());
+        $olddomain_ids = array_map(function ($d) { return $d->getID(); }, $olddomains);
+
         if ($sync) {
             foreach ($olddomains as $olddomain) {
                 if (!in_array($olddomain->getID(), (array) $value)) {
@@ -28,10 +30,11 @@ class FleximportUserDomainsDynamic implements FleximportDynamic {
             $domain = new UserDomain($userdomain);
             $domain->addUser($object->getId());
         }
-        //AutoInsert::instance()->saveUser($object->getId());
+        AutoInsert::instance()->saveUser($object->getId());
 
         foreach ($value as $domain_id) {
-            if (!in_array($domain_id, $olddomains)) {
+            if (!in_array($domain_id, $olddomain_ids)) {
+
                 $welcome = FleximportConfig::get("USERDOMAIN_WELCOME_" . $domain_id);
                 if ($welcome) {
                     $welcome = FleximportConfig::template($welcome, $object->toArray(), $line);
