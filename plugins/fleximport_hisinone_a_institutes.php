@@ -87,31 +87,33 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
                 'validTo'
             ];
 
-            //remove root institute which we don't need in Stud.IP:
-            foreach ($institutes as $key => $institute_data) {
-                if ($institute_data[1] == FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
-                    unset($institutes[$key]);
-                }
-            }
-
-            //map fakultaet_lid
-            $parent_lids = [];
-            foreach ($institutes as $key => $institute_data) {
-                $parent_lids[$institute_data[1]] = $institute_data[3];
-            }
-            do {
-                $workleft = false;
+            if (FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
+                //remove root institute which we don't need in Stud.IP:
                 foreach ($institutes as $key => $institute_data) {
-                    if (($institute_data[2] != FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID"))
-                            && ($parent_lids[$institute_data[2]] != FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID"))) {
-                        $institute_data[2] = $parent_lids[$institute_data[2]];
-                        $institutes[$key] = $institute_data;
-                        if ($parent_lids[$institute_data[2]] != FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
-                            $workleft = true;
-                        }
+                    if ($institute_data[1] == FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
+                        unset($institutes[$key]);
                     }
                 }
-            } while ($workleft);
+
+                //map fakultaet_lid
+                $parent_lids = [];
+                foreach ($institutes as $key => $institute_data) {
+                    $parent_lids[$institute_data[1]] = $institute_data[3];
+                }
+                do {
+                    $workleft = false;
+                    foreach ($institutes as $key => $institute_data) {
+                        if (($institute_data[2] != FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID"))
+                            && ($parent_lids[$institute_data[2]] != FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID"))) {
+                            $institute_data[2] = $parent_lids[$institute_data[2]];
+                            $institutes[$key] = $institute_data;
+                            if ($parent_lids[$institute_data[2]] != FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
+                                $workleft = true;
+                            }
+                        }
+                    }
+                } while ($workleft);
+            }
 
             $this->table->createTable($fields, $institutes);
 
