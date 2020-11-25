@@ -72,6 +72,7 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
             $fields = [
                 'id',
                 'lid',
+                'fakultaet_lid',
                 'parentLid',
                 'uniquename',
                 'shorttext',
@@ -85,6 +86,32 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
                 'validfrom',
                 'validTo'
             ];
+
+            //remove root institute which we don't need in Stud.IP:
+            foreach ($institutes as $key => $institute_data) {
+                if ($institute_data[1] == FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
+                    unset($institutes[$key]);
+                }
+            }
+
+            //map fakultaet_lid
+            $parent_lids = [];
+            foreach ($institutes as $key => $institute_data) {
+                $parent_lids[$institute_data[1]] = $institute_data[3];
+            }
+            do {
+                $workleft = false;
+                foreach ($institutes as $key => $institute_data) {
+                    if (($institute_data[2] != FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID"))
+                            && ($parent_lids[$institute_data[2]] != FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID"))) {
+                        $institute_data[2] = $parent_lids[$institute_data[2]];
+                        $institutes[$key] = $institute_data;
+                        if ($parent_lids[$institute_data[2]] != FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
+                            $workleft = true;
+                        }
+                    }
+                }
+            } while ($workleft);
 
             $this->table->createTable($fields, $institutes);
 
@@ -120,24 +147,6 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
 
     }
 
-    /**
-     * Executed directly after the
-     */
-    public function afterDataFetching()
-    {
-        if (FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
-            $db_name = $this->table->getDBName();
-
-            $statement = DBManager::get()->prepare("
-                DELETE FROM `".$db_name."`
-                WHERE `lid` = ?
-            ");
-            $statement->execute([
-                FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")
-            ]);
-        }
-    }
-
     public function fieldsToBeMapped()
     {
         return array(
@@ -145,12 +154,13 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
         );
     }
 
-    public function mapField($field, $line) {
+    public function mapField($field, $line)
+    {
         $datafield_name = "hio_lid";
         if ($field === "fakultaets_id") {
-            $parent_lid = $line['parentlid'];
+            $parent_lid = $line['fakultaet_lid'];
             if ($parent_lid == FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
-                return "fakultaet"; //means that the institut_id should become the fakultaet_id like it is usual in Stud.IP
+                return "fakultaet"; //means that the institut_id should be written into fakultaet_id like it is usual in Stud.IP
             }
             $fakultaet_id = null;
             if ($parent_lid) {
@@ -192,6 +202,7 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
         $mapped = [
             $data->id,
             $data->lid,
+            $data->parentLid,
             $data->parentLid,
             $data->uniquename,
             $data->shorttext,

@@ -11,6 +11,14 @@ class FleximportInstituteChecker implements FleximportChecker {
                 $errors .= "Keine gültige Fakultät. ";
             }
         }
+        if ($data['fakultaets_id']) {
+            $parent = Institute::find($data['fakultaets_id']);
+            if ($parent) {
+                if (!$parent->isFaculty()) {
+                    $errors .= "Elterninstitut ist keine Fakultät. ";
+                }
+            }
+        }
 
         return $errors;
     }
