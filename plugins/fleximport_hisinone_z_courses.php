@@ -32,6 +32,7 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
         }
 
         $data = $this->getCoursesData((int) $this->table->process->getConfig("HISINONE_TERMKEY"));
+        //var_dump($data); die();
         if ($data) {
             list($fields, $courses) = \HisInOne\DataMapper::getData($data->course);
 
@@ -98,8 +99,14 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
             $individual_dates_data = [];
 
             $regular_date_types = FleximportConfig::get("HISINONE_REGULAR_DATETYPES");
-            $regular_date_types = preg_split("/[\s,]/", $regular_date_types, -1, PREG_SPLIT_NO_EMPTY);
+            $regular_date_types = preg_split("/[\s*\n\s*]/", $regular_date_types, -1, PREG_SPLIT_NO_EMPTY);
 
+            $regular_date_types_2 = [];
+            foreach ($regular_date_types as $date_type) {
+                $date_type = explode("=", $date_type, 1);
+                $regular_date_types_2[$date_type[0]] = $date_type[1];
+            }
+            $regular_date_types = $regular_date_types_2;
 
             foreach ($data->course as $number => $coursedata) {
                 $courses[$number][] = $coursedata->orgunits && $coursedata->orgunits->orgunitLid
@@ -114,11 +121,13 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                 $teacher_usernames = [];
                 $teacher_ids = [];
 
-                usort($coursedata->personResponsibles->personResponsible, function ($a, $b) {
+                $personResponsibles = (array) $coursedata->personResponsibles->personResponsible;
+                usort($personResponsibles, function ($a, $b) {
                     return $a->sortorder < $b->sortorder
                         ? 1
                         : ($a->sortorder == $b->sortorder ? 0 : -1);
                 });
+                $coursedata->personResponsibles->personResponsible = $personResponsibles;
 
                 foreach ((array) $coursedata->personResponsibles->personResponsible as $person) {
                     $teacher_ids[] = $person->person->id;
@@ -127,9 +136,10 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
 
                 //seminar_cycle_dates
                 //var_dump($coursedata); die();
-                $regular_dates = [];
+
                 foreach ((array) $coursedata->plannedDates->plannedDate as $datedata) {
-                    if (in_array($datedata->rhythm->id, $regular_date_types)) {
+
+                    if (in_array($datedata->rhythm->id, array_keys($regular_date_types))) {
 
                         //regelmäßige Termine in Stud.IP
                         $regular_date = [
@@ -182,7 +192,7 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                         $regular_dates[] = $regular_date;
 
                         //Terminänderungen:
-                        foreach ($datedata->individualDates->individualDate as $individualDate) {
+                        /*foreach ((array) $datedata->individualDates->individualDate as $individualDate) {
                             $individual_dates_data[] = [
                                 $coursedata->id,
                                 $coursedata->defaulttext,
@@ -207,7 +217,7 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                                 $individualDate->date . " " . $individualDate->to,
                                 $coursedata->id
                             ];
-                        }
+                        }*/
                         /*foreach ((array) $datedata->appointmentModifications->appointmentModification as $modification) {
                             $begin = strtotime($modification->initialDate ." " . $modification->initialStart);
                             $end = strtotime($modification->initialDate ." " . $modification->initialEnd);
@@ -219,7 +229,7 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                     } else {
                         //unregelmäßige Termine in Stud.IP
 
-                        foreach ($datedata->individualDates->individualDate as $individualDate) {
+                        foreach ((array) $datedata->individualDates->individualDate as $individualDate) {
 
                             $individual_dates_data[] = [
                                 $coursedata->id,
@@ -253,16 +263,25 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                 $courses[$number][] = implode("|", $teacher_ids);
             }
 
-            $this->table->createTable($fields, $courses);
+            $this->table->createTable(
+                $fields,
+                $courses
+            );
 
             $regular_dates_table = FleximportTable::findOneBySQL("name = ?", ["fleximport_hisinone_z_regulardates"]);
             if ($regular_dates_table) {
-                $regular_dates_table->createTable($regular_dates_fields, $regular_dates);
+                $regular_dates_table->createTable(
+                    $regular_dates_fields,
+                    $regular_dates
+                );
             }
 
             $individual_dates_table = FleximportTable::findOneBySQL("name = ?", ["fleximport_hisinone_z_individualdates"]);
             if ($individual_dates_table) {
-                $individual_dates_table->createTable($individual_dates_fields, $individual_dates_data);
+                $individual_dates_table->createTable(
+                    $individual_dates_fields,
+                    $individual_dates_data
+                );
             }
 
         } else {
