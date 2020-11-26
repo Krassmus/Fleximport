@@ -1,23 +1,28 @@
 <?php
 
-class FleximportSwsMapper implements FleximportMapper {
+class FleximportSwsMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "SWS";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("sws");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             "seminar_cycle_date" => "Start und Ende eines regelmäßigen Termins"
         );
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "seminar_cycle_date":
                 $start = explode(":", $data['start_time']);

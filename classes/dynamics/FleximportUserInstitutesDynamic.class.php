@@ -1,6 +1,7 @@
 <?php
 
-class FleximportUserInstitutesDynamic implements FleximportDynamic {
+class FleximportUserInstitutesDynamic extends FleximportDynamic
+{
 
     public function forClassFields()
     {
@@ -41,7 +42,7 @@ class FleximportUserInstitutesDynamic implements FleximportDynamic {
     public function currentValue($object, $field, $sync)
     {
         $select = DBManager::get()->prepare("
-            SELECT institut_id 
+            SELECT institut_id
             FROM user_inst
             WHERE user_id = ?
         ");

@@ -1,16 +1,19 @@
 <?php
 
-class FleximportStatusgruppe_idMapper implements FleximportMapper {
+class FleximportStatusgruppe_idMapper implements FleximportMapper
+{
 
     public function getName() {
         return "statusgruppe_id";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("statusgruppe_id");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         return array(
             "uniquename" => "Gruppenname in range_id",
             "uniquename_semname" => "Gruppenname in Veranstaltungsname (Spalte kontext)",
@@ -19,7 +22,8 @@ class FleximportStatusgruppe_idMapper implements FleximportMapper {
         );
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "uniquename":
                 $gruppe = Statusgruppen::findOneBySQL("name = ? AND range_id = ?", array($value, $data['range_id']));

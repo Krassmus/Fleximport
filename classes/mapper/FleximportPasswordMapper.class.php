@@ -1,23 +1,28 @@
 <?php
 
-class FleximportPasswordMapper implements FleximportMapper {
+class FleximportPasswordMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "Passwort";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("password");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             'generate' => "Passwortgenerator zufällig"
         );
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "generate":
                 return UserManagement::generate_password(8);

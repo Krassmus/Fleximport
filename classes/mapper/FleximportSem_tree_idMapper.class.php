@@ -1,23 +1,28 @@
 <?php
 
-class FleximportSem_tree_idMapper implements FleximportMapper {
+class FleximportSem_tree_idMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "sem_tree_id";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("sem_tree_id", "fleximport_studyarea");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         return array(
             "name" => "Studienbereichsname",
             "info" => "Infotext"
         );
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "name":
                 $statement = DBManager::get()->prepare("

@@ -1,6 +1,7 @@
 <?php
 
-class FleximportCourseDateAssignmentDynamic implements FleximportDynamic {
+class FleximportCourseDateAssignmentDynamic extends FleximportDynamic
+{
 
     public function forClassFields()
     {

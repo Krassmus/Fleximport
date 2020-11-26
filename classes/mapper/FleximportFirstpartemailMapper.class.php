@@ -1,23 +1,28 @@
 <?php
 
-class FleximportFirstpartemailMapper implements FleximportMapper {
+class FleximportFirstpartemailMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "Erster Teil einer Email-Adresse (bis zum @)";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("username");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             'firstpartemail' => "Erster Teil einer Email-Adresse (bis zum @)"
         );
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "firstpartemail":
                 $parts = explode("@", $value);

@@ -1,6 +1,7 @@
 <?php
 
-class FleximportCourseDateGroupsDynamic implements FleximportDynamic {
+class FleximportCourseDateGroupsDynamic extends FleximportDynamic
+{
 
     public function forClassFields()
     {
@@ -45,7 +46,7 @@ class FleximportCourseDateGroupsDynamic implements FleximportDynamic {
     public function currentValue($object, $field, $sync)
     {
         $statement = DBManager::get()->prepare("
-            SELECT statusgruppe_id 
+            SELECT statusgruppe_id
             FROM termin_related_groups
             WHERE termin_id = :termin_id
         ");

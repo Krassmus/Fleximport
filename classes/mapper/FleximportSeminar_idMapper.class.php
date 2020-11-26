@@ -1,16 +1,20 @@
 <?php
 
-class FleximportSeminar_idMapper implements FleximportMapper {
+class FleximportSeminar_idMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "Seminar_id";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("seminar_id", "range_id");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             "number" => "Veranstaltungsnummer",
             "name" => "Veranstaltungsname"
@@ -22,7 +26,8 @@ class FleximportSeminar_idMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "number":
                 $course = Course::findOneBySQL("VeranstaltungsNummer = ?", array($value));

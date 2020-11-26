@@ -1,23 +1,28 @@
 <?php
 
-class FleximportEndoffsetMapper implements FleximportMapper {
+class FleximportEndoffsetMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "end_offset";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("end_offset");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             "datetime" => "Spätestem Termin"
         );
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         if (!is_numeric($value)) {
             $value = strtotime($value);
         }

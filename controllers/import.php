@@ -145,8 +145,7 @@ class ImportController extends PluginController {
         }
         $this->additional_fields = array();
         foreach (get_declared_classes() as $class) {
-            $reflection = new ReflectionClass($class);
-            if ($reflection->implementsInterface('FleximportDynamic') && ($class !== "FleximportDynamic")) {
+            if (is_subclass_of($class, "FleximportDynamic") && ($class !== "FleximportDynamic")) {
                 $dynamic = new $class();
                 $for = $dynamic->forClassFields();
                 $for = array_merge((array) $for['*'], (array) $for[$classname]);

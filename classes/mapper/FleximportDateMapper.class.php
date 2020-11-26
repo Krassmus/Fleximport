@@ -1,16 +1,20 @@
 <?php
 
-class FleximportDateMapper implements FleximportMapper {
+class FleximportDateMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "date";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("date", "end_time", "start", "end");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             "unixtimestamp" => "Unix-Timestamp",
             "strtotime" => "Lesbares Datum (tt.mm.jjjj 12:00)"
@@ -18,7 +22,8 @@ class FleximportDateMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "unixtimestamp":
                 return $value;

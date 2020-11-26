@@ -1,6 +1,7 @@
 <?php
 
-class FleximportForeignKeyDynamic implements FleximportDynamic {
+class FleximportForeignKeyDynamic extends FleximportDynamic
+{
 
     public function forClassFields()
     {

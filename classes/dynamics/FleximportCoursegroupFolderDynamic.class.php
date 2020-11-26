@@ -1,6 +1,7 @@
 <?php
 
-class FleximportCoursegroupFolderDynamic implements FleximportDynamic {
+class FleximportCoursegroupFolderDynamic extends FleximportDynamic
+{
 
     public function forClassFields()
     {

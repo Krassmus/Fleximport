@@ -1,16 +1,20 @@
 <?php
 
-class FleximportStarttimeMapper implements FleximportMapper {
+class FleximportStarttimeMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "start_time";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("start_time");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             "name" => "Semestername",
             "timestamp" => "Semester-Zeitpunkt",
@@ -20,7 +24,8 @@ class FleximportStarttimeMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "name":
                 $semester =  Semester::findOneBySQL("name = ?", array($value));

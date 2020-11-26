@@ -567,19 +567,30 @@ class FleximportTable extends SimpleORMap {
             $plugin->beforeUpdate($object, $line, $data);
         }
 
+        //get dynamics special fields:
+        $dynamics = array();
+        foreach (get_declared_classes() as $class) {
+            if (is_subclass_of($class, "FleximportDynamic") && ($class !== "FleximportDynamic")) {
+                $dynamics[] = new $class();
+            }
+        }
+
+        //apply values to dynamic special fields before storing:
+        foreach ($dynamics as $dynamic) {
+            $for = $dynamic->forClassFields();
+            $for = array_merge( (array) $for['*'], (array) $for[$classname]);
+            foreach ($for as $fieldname => $placeholder) {
+                if (isset($data[$fieldname])) {
+                    $dynamic->applyValueBeforeStore($object, $data[$fieldname], $line, (bool) $this['tabledata']['simplematching'][$fieldname]['sync']);
+                }
+            }
+        }
+
         $object->store();
 
         $output['pk'] = (array) $object->getId();
 
-        //Dynamic special fields:
-
-        $dynamics = array();
-        foreach (get_declared_classes() as $class) {
-            $reflection = new ReflectionClass($class);
-            if ($reflection->implementsInterface('FleximportDynamic') && ($class !== "FleximportDynamic")) {
-                $dynamics[] = new $class();
-            }
-        }
+        //apply values to dynamic special fields:
         foreach ($dynamics as $dynamic) {
             $for = $dynamic->forClassFields();
             $for = array_merge( (array) $for['*'], (array) $for[$classname]);
@@ -756,8 +767,7 @@ class FleximportTable extends SimpleORMap {
 
         $dynamics = array();
         foreach (get_declared_classes() as $class) {
-            $reflection = new ReflectionClass($class);
-            if ($reflection->implementsInterface('FleximportDynamic') && ($class !== "FleximportDynamic")) {
+            if (is_subclass_of($class, "FleximportDynamic") && ($class !== "FleximportDynamic")) {
                 $dynamics[] = new $class();
             }
         }

@@ -1,16 +1,20 @@
 <?php
 
-class FleximportLockruleMapper implements FleximportMapper {
+class FleximportLockruleMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "Sperrebene";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("lock_rule");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             "name" => "Sperrebenenname",
             "description" => "Beschreibung der Sperrebene",
@@ -21,7 +25,8 @@ class FleximportLockruleMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "name":
                 $lockrule = LockRule::findOneBySQL("name = ?", array($value));

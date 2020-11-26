@@ -157,8 +157,7 @@ class SetupController extends PluginController {
 
         $this->dynamics = array();
         foreach (get_declared_classes() as $class) {
-            $reflection = new ReflectionClass($class);
-            if ($reflection->implementsInterface('FleximportDynamic') && ($class !== "FleximportDynamic")) {
+            if (is_subclass_of($class, "FleximportDynamic") && ($class !== "FleximportDynamic")) {
                 $this->dynamics[] = new $class();
             }
         }

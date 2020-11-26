@@ -1,16 +1,20 @@
 <?php
 
-class FleximportTermin_idMapper implements FleximportMapper {
+class FleximportTermin_idMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "termin_id";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("termin_id");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             "content" => "Termin-content",
             "description" => "Termin-description",
@@ -19,7 +23,8 @@ class FleximportTermin_idMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "content":
                 $date = CourseDate::findOneBySQL("content = ?", array($value));

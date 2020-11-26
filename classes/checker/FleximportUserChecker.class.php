@@ -2,7 +2,8 @@
 
 require_once __DIR__."/FleximportChecker.interface.php";
 
-class FleximportUserChecker implements FleximportChecker {
+class FleximportUserChecker implements FleximportChecker
+{
 
     public function check($data, $virtualobject, $relevantfields) {
         $errors = "";

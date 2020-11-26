@@ -1,6 +1,7 @@
 <?php
 
-class FleximportUserExpirationdateDynamic implements FleximportDynamic {
+class FleximportUserExpirationdateDynamic extends FleximportDynamic
+{
 
     public function forClassFields()
     {

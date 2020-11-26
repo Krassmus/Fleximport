@@ -10,7 +10,9 @@ class FleximportInstitut_idMapper implements FleximportMapper
 
     public function possibleFieldnames()
     {
-        return array("Institut_id", "institut_id", "inst_id", "fakultaets_id", "fakultaet_id", "range_id", "fleximport_user_inst", "fleximport_related_institutes");
+        return array("Institut_id", "institut_id", "inst_id", "fakultaets_id",
+            "fakultaet_id", "range_id", "fleximport_user_inst", "fleximport_related_institutes",
+            "fleximport_fach_departments");
     }
 
     public function possibleFormats()

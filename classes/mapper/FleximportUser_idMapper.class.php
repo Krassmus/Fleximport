@@ -1,16 +1,20 @@
 <?php
 
-class FleximportUser_idMapper implements FleximportMapper {
+class FleximportUser_idMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "user_id";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("user_id", "range_id", "fleximport_dozenten");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             "username" => "Nutzername",
             "email" => "Email",
@@ -24,7 +28,8 @@ class FleximportUser_idMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "username":
                 $user = User::findOneByUsername($value);

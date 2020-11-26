@@ -1,6 +1,7 @@
 <?php
 
-interface FleximportMapper {
+interface FleximportMapper
+{
 
     public function getName();
 

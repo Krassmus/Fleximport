@@ -1,6 +1,7 @@
 <?php
 
-class FleximportUserDomainsDynamic implements FleximportDynamic {
+class FleximportUserDomainsDynamic extends FleximportDynamic
+{
 
     public function forClassFields()
     {

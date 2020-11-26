@@ -1,16 +1,20 @@
 <?php
 
-class FleximportAbschluss_idMapper implements FleximportMapper {
+class FleximportAbschluss_idMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "abschluss_id";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("abschluss_id");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             "name" => "Abschlussname",
             "fach_kurz" => "Kurzname des Abschlusses"
@@ -18,7 +22,8 @@ class FleximportAbschluss_idMapper implements FleximportMapper {
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         switch ($format) {
             case "name":
                 $abschluss = Abschluss::findOneBySQL("name = ?", array($value));

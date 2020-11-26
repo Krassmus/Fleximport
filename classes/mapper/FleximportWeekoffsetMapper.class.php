@@ -1,23 +1,28 @@
 <?php
 
-class FleximportWeekoffsetMapper implements FleximportMapper {
+class FleximportWeekoffsetMapper implements FleximportMapper
+{
 
-    public function getName() {
+    public function getName()
+    {
         return "week_offset";
     }
 
-    public function possibleFieldnames() {
+    public function possibleFieldnames()
+    {
         return array("week_offset");
     }
 
-    public function possibleFormats() {
+    public function possibleFormats()
+    {
         $formats = array(
             "datetime" => "Frühestem Termin"
         );
         return $formats;
     }
 
-    public function map($format, $value, $data, $sormclass) {
+    public function map($format, $value, $data, $sormclass)
+    {
         if (!is_numeric($value)) {
             $value = strtotime($value);
         }
