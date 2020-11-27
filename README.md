@@ -46,6 +46,16 @@ Um das zu bauen, kann man in Fleximport im Reiter Konfiguration eine Konfigurati
 
 Zurück zum Mapping der Zieltabellenfelder: Dort erscheint nun "Konfiguration: Templatename" als mögliches Mapping in dem Auswahlfeld. Die Werte der Rohdatentabelle werden in das Template eingesetzt und der erzeugte Endtext dann in das Feld der Zieltabelle eingetragen.
 
+### Mapping mit Key-Value-Mappern
+
+In manchen Fällen hat man Werte in den Rohdaten, die auf andere Werte in Stud.IP zugeordnet werden sollen. Das Geschlecht bei Personendaten ist häufig so ein Fall. In den Rohdaten steht dann meist "w" für weiblich, "m" für männlich und "d" für diverses Geschlecht. Stud.IP braucht in dem Feld `geschlecht` aber eine Zahl (1, 2 oder 3 oder 0 für nicht-zugeordnet). Dazu kann man unter den Konfigurationen ein Template anlegen, das so aussieht:
+
+    m=1
+    w=2
+    d=3
+
+Beim Mapping wählt man dann den Key-Value-Mapper mit dem entsprechenden Namen der Konfiguration auswählen. Fleximport schaut dann beim Mappen in diese Konfiguration, sucht dann nach "W" und findet den Wert "2", der dann in das Feld von Stud.IP eingetragen wird.
+
 ### Mapping durch "Von XYZ ermitteln"
 
 Dieses ist ein Spezialmapping, das sehr *sehr* wichtig ist, um Objekte nicht nur anzulegen, sondern auch durch einen mehrmaligen Import updaten zu können. Dies betrifft in der Regel Felder wie `Seminar_id` oder `user_id`, also oft den Primärschlüsseln von Tabellen.

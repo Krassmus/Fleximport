@@ -124,7 +124,10 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
             $this->table->createTable($fields, $institutes);
 
             $affiliation_table = "fleximport_hisinone_c_institute_affiliations";
-            $aff_table = FleximportTable::findOneBySQL("name = ?", [$affiliation_table]);
+            $aff_table = FleximportTable::findOneBySQL("process_id = ? AND name = ?", [
+                $this->table['process_id'],
+                $affiliation_table
+            ]);
             if ($aff_table) {
                 $fields = [
                     'institute_lid',

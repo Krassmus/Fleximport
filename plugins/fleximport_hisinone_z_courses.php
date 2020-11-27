@@ -268,7 +268,10 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                 $courses
             );
 
-            $regular_dates_table = FleximportTable::findOneBySQL("name = ?", ["fleximport_hisinone_z_regulardates"]);
+            $regular_dates_table = FleximportTable::findOneBySQL("process_id = ? AND name = ?", [
+                $this->table['process_id'],
+                "fleximport_hisinone_z_regulardates"
+            ]);
             if ($regular_dates_table) {
                 $regular_dates_table->createTable(
                     $regular_dates_fields,
@@ -276,7 +279,10 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
                 );
             }
 
-            $individual_dates_table = FleximportTable::findOneBySQL("name = ?", ["fleximport_hisinone_z_individualdates"]);
+            $individual_dates_table = FleximportTable::findOneBySQL("process_id = ? AND name = ?", [
+                $this->table['process_id'],
+                "fleximport_hisinone_z_individualdates"
+            ]);
             if ($individual_dates_table) {
                 $individual_dates_table->createTable(
                     $individual_dates_fields,
