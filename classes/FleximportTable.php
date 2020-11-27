@@ -586,7 +586,14 @@ class FleximportTable extends SimpleORMap {
             }
         }
 
-        $object->store();
+        try {
+            $object->store();
+        } catch(InvalidValuesException $e) {
+            PageLayout::postError($e->getMessage(), [
+                json_encode($object->toRawArray())
+            ]);
+            return;
+        }
 
         $output['pk'] = (array) $object->getId();
 
@@ -596,7 +603,12 @@ class FleximportTable extends SimpleORMap {
             $for = array_merge( (array) $for['*'], (array) $for[$classname]);
             foreach ($for as $fieldname => $placeholder) {
                 if (isset($data[$fieldname])) {
-                    $dynamic->applyValue($object, $data[$fieldname], $line, (bool) $this['tabledata']['simplematching'][$fieldname]['sync']);
+                    $dynamic->applyValue(
+                        $object,
+                        $data[$fieldname],
+                        $line,
+                        (bool) $this['tabledata']['simplematching'][$fieldname]['sync']
+                    );
                 }
             }
         }

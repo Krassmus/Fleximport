@@ -17,10 +17,7 @@ class FleximportAbschlussKategorieDynamic extends FleximportDynamic
 
     public function applyValueBeforeStore($object, $value, $line, $sync)
     {
-        $value = array_filter($value);
-        foreach ($value as $v) {
-            $object->assignKategorie($v);
-        }
+        $object->assignKategorie($value);
     }
 
     public function currentValue($object, $field, $sync)
