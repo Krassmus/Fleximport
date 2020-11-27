@@ -113,6 +113,12 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
                         }
                     }
                 } while ($workleft);
+
+                foreach ($institutes as $key => $institute_data) {
+                    if ($institute_data[2] == FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
+                        $institutes[$key][2] = "fakultaet";
+                    }
+                }
             }
 
             $this->table->createTable($fields, $institutes);
