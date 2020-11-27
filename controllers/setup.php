@@ -47,6 +47,7 @@ class SetupController extends PluginController {
                     DBManager::get()->exec("
                         CREATE VIEW `" . addslashes($this->table->getDBName()) . "` AS (
                             SELECT *
+                            ".($data['tabledata']['tablecopy']['select'] ? ", ".$data['tabledata']['tablecopy']['select'] : "")."
                             FROM `" . addslashes($copied_table->getDBName()). "`
                             ".($data['tabledata']['tablecopy']['where'] ?: "")."
                         );

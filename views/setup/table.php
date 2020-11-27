@@ -94,6 +94,11 @@
         </label>
 
         <label>
+            <?= _("Weitere Selects") ?>
+            <textarea name="table[tabledata][tablecopy][select]" placeholder="z.B. COUNT(*) AS `anzahl` ..."><?= htmlReady($table['tabledata']['tablecopy']['select']) ?></textarea>
+        </label>
+
+        <label>
             <?= _("Zusatzklausel") ?>
             <textarea name="table[tabledata][tablecopy][where]" placeholder="WHERE ... GROUP BY ..."><?= htmlReady($table['tabledata']['tablecopy']['where']) ?></textarea>
         </label>
