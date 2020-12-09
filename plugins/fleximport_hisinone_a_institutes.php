@@ -167,10 +167,10 @@ class fleximport_hisinone_a_institutes extends FleximportPlugin
 
     public function mapField($field, $line)
     {
-        $datafield_name = "hio_lid";
+        $datafield_name = "hisinone_lid";
         if ($field === "fakultaets_id") {
             $parent_lid = $line['fakultaet_lid'];
-            if ($parent_lid == FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")) {
+            if (in_array($parent_lid, ['fakultaet', FleximportConfig::get("HISINONE_VIRTUAL_INSTITUT_ROOT_LID")])) {
                 return "fakultaet"; //means that the institut_id should be written into fakultaet_id like it is usual in Stud.IP
             }
             $fakultaet_id = null;
