@@ -3,7 +3,7 @@
       method="post">
 
     <fieldset>
-        <legend><?= _("Basiseinstellungen des Prozess") ?></legend>
+        <legend><?= _("Basiseinstellungen des Prozesses") ?></legend>
 
         <label>
             <?= _("Name") ?>
