@@ -43,4 +43,39 @@ Jetzt sollte die Tabelle ordentlich aussehen und alle Daten würden ordnungsgem�
 
 Die Daten sind jetzt in Stud.IP. Und ganz wichtig dabei: Die IDs der Einrichtungen, die `lid` bzw. `hisinone_lid`, ist für die Einrichtungen eingetragen. Eine Sache ist nach dem Import jetzt noch zu tun: Gehen wir wieder auf das Mapping oben rechts mit dem Kettensymbol. Dort ändern wir wieder in der Tabelle die erste Zeile `institut_id` die Auswahlbox auf *"Von Datenfeld 'hisinone_lid' ermitteln"*. Darunter ist noch eine Auswahlbox, in der wir `lid` auswählen. Damit sagen wir Fleximport, dass wir die Einrichtungen ab jetzt nicht mehr über den Namen identifizieren, denn auch der Name einer Fakultät kann sich ja mal ändern, sondern über die `lid` und wir sagen Fleximport auch, dass diese `lid` sich im Datenfeld `hisinone_lid` der Einrichtung versteckt. Damit hat Fleximport alle Informationen, um die Datensätze aus HisInOne mit den Einrichtungen in Stud.IP zu verknüpfen und weiß immer, was es aktualisieren soll.
 
+## Mapping der Einrichtungsmitarbeiter
+
+Als nächstes können wir die Mitarbeiter:innen der Einrichtungen importieren. Die Einrichtungsdaten müssten ja jetzt korrekt sein. Öffnen Sie *"Prozess bearbeiten"* und wählen Sie im Bereich *"Tabellen aktivieren"* den Haken vor der Tabelle `fleximport_hisinone_c_institute_affiliations` aus und speichern Sie das. Danach sollte die Seite sich neu laden und die Tabelle zu sehen sein. Falls die Daten in der Tabelle fehlen, einfach noch einmal *"Datenabrufen"* klicken.
+
+Es könnte sein, dass die Daten alles in allem schon ganz gut aussehen. Wir wollen aber dennoch noch einmal das Mapping der Daten bearbeiten. Dazu klickt man in der Tabelle `fleximport_hisinone_c_institute_affiliations` oben rechts wieder auf das Kettensymbol. Gleich die zweite Zeile in der Tabelle im Dialog `institut_id` sollte verändert werden. In der ersten Auswahlbox wählt man statt *"Von Fleximport-Fremdschlüssel ermitteln"* jetzt *"Von Datenfeld 'hisinone_lid' ermitteln"* und in der zweiten Auswahlbox dann `institute_lid` aus. Noch einmal speichern. Damit hat man Fleximport gesagt, dass die `lid` für die Institutszuordnung von Mitarbeiter:innen über das Datenfeld `hisinone_lid` gehen soll.
+
+Jetzt sollte die Tabelle auch gut aussehen. Es kann sein, dass einige Datensätze rote Xe haben, also fehlerhaft sind. Selbst bei Referenzdatenbanken von HisInOne kommt es vor, dass Personen an der Supereinrichtung arbeiten, die wir gar nicht in Stud.IP haben wollen. Diese Zuordnung können wir in Stud.IP dann ja gar nicht abbilden. Aber grundsätzlich kann man jetzt noch einmal auf *"Import starten"* klicken. Dann werden die Einrichtungen noch einmal importiert und danach die Einrichtungsmitarbeiter:innen.
+
+## Mapping der Fächer
+
+Den folgenden Teil braucht man nur, falls man die Modulstrukturen in Stud.IP importieren möchte.
+
+Dazu muss man unter *"Prozess bearbeiten"* die Tabellen `fleximport_hisinone_f_studycourses`, `fleximport_hisinone_g_faecher` und `fleximport_hisinone_h_abschluesse` aktivieren. Danach lädt sich die Seite und man kann die Daten erneut abrufen. Falls die letzten beiden Tabellen nicht befüllt werden dadurch, einfach noch einmal bei diesen beiden Tabellen oben rechts jeweils das Zahnrad öffnen und in dem Dialog einmal auf *"Speichern"* klicken. Diese Tabellen müssen dadurch noch einmal initialisiert werden. Sie holen sich ihre Daten aus der ersten Tabelle.
+
+Wirklich importiert wird die erste Tabelle `fleximport_hisinone_f_studycourses` gar nicht. Stattdessen landen die Daten dort in den anderen beiden Tabellen, womit wir in der Lage sind, Fächer und Abschlüsse in Stud.IP zu importieren.
+
+Aber wir müssen auch noch das Mapping einstellen. Zuerst bei `fleximport_hisinone_g_faecher` oben rechts das Kettensymbol für das Mapping klicken. Bei der ersten Zeile `fach_id` sollte stehen *"Von Fachname ermitteln"* und darunter in der Auswahlbox `subject__label`. Das ist relevant, weil wir auch hier wieder vor der Problematik stehen wie bei den Einrichtungen: Wir haben in Stud.IP vermutlich schon Fächer, aber noch nicht die IDs aus HisInOne.
+
+Weiter unten steht die Zeile mit `fleximport_fach_departments`. Dort stellen wir die dazugehörige erste Auswahlbox auf *"Von datenfeld 'hisinone_lid' ermitteln"*. Darunter die Auswahlbox muss `orgunit_lids` zeigen. Das Trennzeichen soll ein Hochstrich `|` sein, es soll synchronisiert werden (wir brauchen kein Template).
+
+In der letzten Zeile sollte schon stehen `fleximport_foreign_key` wird von `subject__id` gemappt. Das ist korrekt und gibt es letztlich die IDs. Die Fächer haben keine Datenfelder. Der Fleximport-Fremdschlüssel bzw. `fleximport_foreign_key` ist eine Art Datenfeld, das an beliebigen Dingen hängen. Klingt super, aber der Nachteil ist, dass nur Fleximport und sonst kein Teil von Stud.IP diese IDs kennt. Aber bei den Fächern ist auch auch nicht so schlimm. Jetzt kann man den Dialog speichern und danach schließen.
+
+Wenn wir schon dabei sind, machen wir dasselbe auch noch einmal für die Abschlüsse bzw. Tabelle `fleximport_hisinone_h_abschluesse` (wieder Kettensymbol klicken, um das Mapping einzustellen).
+
+Dort soll die `abschluss_id` "von Abschlussname ermittelt" werden und zwar aus der Spalte `degree__label`. Unten soll `fleximport_foreign_key` von der Spalte `degree__id` ihre Werte bekommen. Zudem, was wohl schon da stehen sollte, muss `fleximport_abschluss_kategorie` den "festen Wert" `1` bekommen. Das hat technische Gründe. Wenn etwas verändert worden ist, wie immer speichern und dann den Dialog schließen.
+
+Jetzt sollte alles oder zumindest weite Teile der Tabellen für die Fächer und Abschlüsse gut aussehen. Man kann jetzt den Import wieder starten.
+
+Nachdem der Import durchgelaufen ist, sind ja in Stud.IP alle relevanten IDs für Fächer und Abschlüsse vorhanden. Dann wollen wir das Mapping wieder ändern (wieder das Kettensymbol, man kennt es langsam). Bei den Fächern bekommt `fach_id` das neue Mapping *"Von Fleximport-Fremdschlüssel ermitteln"* und die zweite Auswahlbox steht auf `subject__label`. Es gibt noch ein drittes Feld, wo aber grau *"Fach"* stehen sollte. Das ist okay soweit. Speichern und schließen.
+
+Und das gleiche analog für die Abschlüsse. Wieder das Kettensymbol. `abschluss_id` soll *"von Fleximport-Fremdschlüssel ermittelt"* werden mit der Spalte `degree__id`. Speichern und schließen.
+
+Jetzt kann man den Import gerne noch einmal durchlaufen lassen und es sollte sich nichts verändert haben. Der Import der Fächer und Abschlüsse ist jetzt stabil.
+
+## Mapping der Veranstaltungen
 
