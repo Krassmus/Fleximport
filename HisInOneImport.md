@@ -51,7 +51,31 @@ Es könnte sein, dass die Daten alles in allem schon ganz gut aussehen. Wir woll
 
 Jetzt sollte die Tabelle auch gut aussehen. Es kann sein, dass einige Datensätze rote Xe haben, also fehlerhaft sind. Selbst bei Referenzdatenbanken von HisInOne kommt es vor, dass Personen an der Supereinrichtung arbeiten, die wir gar nicht in Stud.IP haben wollen. Diese Zuordnung können wir in Stud.IP dann ja gar nicht abbilden. Aber grundsätzlich kann man jetzt noch einmal auf *"Import starten"* klicken. Dann werden die Einrichtungen noch einmal importiert und danach die Einrichtungsmitarbeiter:innen.
 
-## Mapping der Fächer
+## Mapping der Studierenden
+
+Als nächstes importieren wir die Studierenden, was vielleicht nicht bei jedem Standort wirklich notwendig ist, weil man in Stud.IP ja schon über ein IDM oder LDAP die Studierendendaten bekommen kann. Aber manchmal wünscht man sich dennoch einen regelmäßigen Abgleich der Studierendendaten, anstatt darauf zu hoffen, dass die Personen sich das nächste Mal in Stud.IP anmelden, wodurch die Daten dann aktualisiert werden.
+
+Unter *"Prozess bearbeiten"* kann man die Tabelle `fleximport_hisinone_d_students` aktivieren und dann speichern. Sie sollte jetzt unten auftauchen.
+
+Bevor wir uns um das Mapping kümmern, sollten wir im Reiter *"Konfiguration"* den Wert `HISINONE_GESCHLECHT_MAPPING` eintragen. Da muss man nicht viel nachdenke, der Wert muss gesetzt werden auf:
+
+    M=1
+    W=2
+    D=3
+
+Speichern nicht vergessen. Und wir brauchen auch noch ein Datenfeld für Personen in Stud.IP, das in etwa *"Matrikelnummer"* heißt. Das legen wir an, falls es nicht schon existiert.
+
+Uund jetzt wir können zurück zu unserem Reiter *"HisInOne Import"*. Hier klicken wir bei der neuen Tabelle auf die Kettenglieder oben rechts und wollen damit das Mapping einstellen. Das meiste sollte schon voreingestellt sein. Wichtig ist, dass wir die erste Zeile `user_id` setzen auf *"Von Datenfeld 'Matrikelnummer' ermitteln"*. Die zweite Auswahlbox darunter soll auf `registrationnumber` gesetzt werden. Das bedeutet, dass Fleximport die `registrationnumber`, die HisInOne mitliefert, nimmt und damit schaut, welche Person mit dem Datenfeldeintrag *Marikelnummer* und diesem Wert gibt es denn schon. Und wenn es so eine Person schon gibt, wird keine neue Person angelegt, sondern die bestehende Person aktualisiert (zum Beispiel umbenannt nach Eheschließeung und so weiter). Das setzt allerdings voraus, dass die Studierenden in Stud.IP schon bei dem Datenfeld *"Matrikelnummer"* korrekte Werte haben. Falls dem nicht so sein sollte, müssten die von Hand aktualisiert werden.
+
+Was wir noch im Mapping ändern müssen, ist die Zeile `geschlecht` auf den Wert setzen *"Key-Value: HISINONE_GESCHLECHT_MAPPING"* und in der zweiten Auswahlbox das Feld `gender` auswählen.
+
+Als nächstes müssen wir in der Zeile `Matrikelnummer` (oder wie das Datenfeld für Personen heißt) den Wert `registrationnumber` in der Auswahlbox setzen.
+
+Als letztes sollten wir vermutlich in der letzten Zeile des Mappings den Wert `fleximport_welcome_message` auf *"Keine nachricht versenden"* setzen, damit die neuen Nutzer keine Passwortmails bekommen. Wir gehen davon aus, dass neue Personen irgendwie anders ihre Zugangsdaten über das IDM bekommen.
+
+Jetzt kann man auf *Speichern* klicken, danach die Daten exemplarisch durchschauen. Es werden bestimmt Personen dabei sein, die fehlerhafte Daten haben. Stud.IP braucht zum Beispiel immer zwingend eine Emailadresse. Wir haben noch keine Hochschule gesehen, die HisInOne einsetzt und nur tadellose Datensätze bereitstellt. Irgendwelche kaputten Personendaten sind immer dabei. Aber solange es keine grundsätzlichen Probleme, die alle Datensätze betreffen, gibt, können wir jetzt erneut den *"Import starten"*.
+
+## Mapping der Fächer und Abschlüsse
 
 Den folgenden Teil braucht man nur, falls man die Modulstrukturen in Stud.IP importieren möchte.
 
@@ -79,3 +103,25 @@ Jetzt kann man den Import gerne noch einmal durchlaufen lassen und es sollte sic
 
 ## Mapping der Veranstaltungen
 
+Als Erstes brauchen wir für den Import von Veranstaltungen noch ein weiteres Datenfeld, in dem wir die ID aus HisInOne speichern. Dieses Datenfeld liegt logischerweise an einer Veranstaltung. Und wir nennen das hier einfach `hisinone_id` (also nicht *lid* wie bei den Einrichtungen).
+
+Auch müssen wir den Prozess erneut bearbeiten und die Tabellen `fleximport_hisinone_z_courses`, `fleximport_hisinone_z_individualdates` und `fleximport_hisinone_z_regulardates` aktivieren. Jetzt können wir einmal die Daten abrufen und uns sie anschauen.
+
+Wenn wir mit **regelmäßigen Terminen** arbeiten wollen, ist das grundsätzlich möglich. Allerdings haben die regelmäßigen Termine in HisInOne bestimmte IDs, die man kennen muss. Im Reiter *"Konfiguration"* kann man so einen Eintrag für den Wert `HISINONE_REGULAR_DATETYPES` machen. Auf einem Testserver sieht der Eintrag so aus:
+
+    2=0
+    6=1
+
+Das bedeutet, dass Terminserien mit der ID 2 in HisInOne einem regelmäßigen Termin entspricht, der wöchentlich stattfindet, also die 0 hat. Daher 2=0 (was ja mathematisch meist eine Lüge wäre, ist hier als Zuordnung gemeint). Und die Terminserie mit der ID 6 bekommt den Wert 1 zugeordnet, was in Stud.IP einem zweiwöchentlichen Termin entspricht. Das sind die Werte, die man ohne Probleme abbilden kann. In HisInOne gibt es noch viel mehr Typen von Terminserien. Die muss man aber gar nicht alle hier aufführen. Die Werte hier zu setzen, ist mehr ein Nice-To-Have, damit die Strukturen in Stud.IP schicker aussehen. Eine Terminserie von Termine, die alle am 4. Tag des Monats stattfinden, kann man in Stud.IP nicht direkt abbilden. Fleximport wird aber in jedem Fall die Einteltermine korrekt importieren.
+
+Zurück zu unseren Veranstaltungen! Wir gehen jetzt der Einfachheit halber davon aus, dass diese Veranstaltungen noch gar nicht in unserem Stud.IP existieren und wir alle einfach komplett importieren wollen (falls doch, müssen wir die Datenfelder `hisinone_id` der Veranstaltungen korrekt befüllen, aber das überspringen wir hier). Wir editieren wieder das Mapping der Veranstaltungenrohdaten der Tabelle `fleximport_hisinone_z_courses`. Die erste Zeile `seminar_id` sollte *"von Datenfeld 'hisinone_id' ermittelt"* werden und zwar mit der Spalte (zweite Auswahlbox) `id`. Damit das klappt, muss weiter unten die Zeile `hisinone_id` entsprechenden gesetzt werden auf den Wert `id`. Dadurch lässt sich für Fleximport genau nachvollziehen, welcher Datensatz aus HisInOne zu welcher Veranstaltung in Stud.IP gehört.
+
+Bei der Zeile `fleximport_related_institutes` muss stehen *"Von Datenfeld 'hisinone_lid' ermitteln"*; und die zweite Auswahlbox steht auf `institut_lids`, Trennzeichen `|` und Synchronisation an. Ähnlich weiter oben mit dem Feld / der Zeile `institut_id`, die *"vomm Datenfeld 'hisinone_lid' ermittelt"* wird über das Feld `heimatinstitut_lid`.
+
+Jetzt zu einem kniffligen Teil: Die Zeile `start_time`, die das Startsemester angibt, kann nämlich nicht ganz einfach aus HisInOne ermittelt werden. Im Grunde müssen wir *wissen*, wie die `start_time` lauten soll. Bei der Bearbeitung des Prozesses haben wir ja einen Semesterschlüssel angegeben wie `20211`. Dadurch wissen wir, dass wir hier nur Veranstaltungen eines gewissen Semesters haben. In `start_time` müssen wir den UNIX_TIMESTAMP der ersten Sekunde des besagten Semesters in Stud.IP angeben. Dieser etwas kryptisch anmutende Wert findet sich in der Datenbanktabelle semester_data in der Stud.IP Datenbank. Den *Beginn* kopieren wir uns und füllen ihn hier ein. Wir setzen die erste Auswahlbox auf [[Fester Wert]] mit dem Wert, den wir gerade kopiert haben. In das zweite Feld fügen wir also diesen UNIX_TIMESTAMP des besagten Semesters ein.
+
+Der Rest der Veranstaltungen sollte korrekt sein. Also jetzt nicht das Speichern des Mappings vergessen und wir gehen weiter zum Mapping der Tabelle `fleximport_hisinone_z_individualdates`. Hier müssen wir uns vermutlich nur um eine Zeile kümmern im Mapping - nämlich um `range_id`. Die erste Auswahlbox setzen wir auf *"Von Datenfeld 'hisinone_id' ermitteln'"* (man beachte, dass hier auch das Datenfeld der Einrichtungen mit *lid* auftaucht, wir wollen hier aber das der Veranstaltungen haben, das in der Liste weiter unten stehen müsste). Und in der zweiten Auswahlbox wählen wir `course_id` aus. Speichern nicht vergessen.
+
+Bei der Tabelle `fleximport_hisinone_z_regulardates` machen wir ziemlich genau dasselbe. Wir ändern das Mapping der Zeile `seminar_id` auf *"Von Datenfeld 'hisinone_id' ermitteln"* und dem Wert `course_id`. Aber zudem setzen wir noch die Zeile `cycle` auf den bisher noch nicht verwendeten Wert *"Key-Value: HISINONE_REGULAR_DATETYPES"* und die zweite Auswahlbox auf `rhythm__id`. Damit geben wir an, ob der regelmäßige Termin wöchentlich (0) oder zweiwöchentlich (1) stattfindet. Auch hier bitte speichern.
+
+Jetzt müsste alles gesetzt sein und wir können nach erneutem Testen und Überschauen der Daten und exemplarischem überprüfen der roten Xe als Warnung den Import starten. Die Veranstaltungen sollten danach im System sein mitsammt Lehrenden, regelmäßigen und unregelmäßigen Terminen und den Einrichtungszuordnungen.
