@@ -258,6 +258,12 @@ class FleximportTable extends SimpleORMap {
         if (!$headers) {
             return;
         }
+        foreach ($headers as $header) {
+            if (mb_strpos($header, ';') !== false) {
+                PageLayout::postError(sprintf(_("Der Spaltenname '%s' ist nicht erlaubt. Er darf aus technischen Gründen kein Semikolon beinhalten."), $header));
+                return false;
+            }
+        }
         $db = DBManager::get();
         $this->drop();
         $create_sql = "CREATE TABLE `".addslashes($this->getDBName())."` (";
@@ -280,6 +286,7 @@ class FleximportTable extends SimpleORMap {
         $db->exec($create_sql);
 
         $this->addEntries($headers, $entries);
+        return true;
     }
 
     public function addEntries($headers, $entries = array())

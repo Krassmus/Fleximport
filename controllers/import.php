@@ -79,10 +79,12 @@ class ImportController extends PluginController {
                             $output = $this->mb_convert_encoding_rec($output, "UTF-8", "Windows-1252");
                         }
                         $headline = array_shift($output);
-                        $table->createTable($headline, $output);
+                        $success = $table->createTable($headline, $output);
                     }
                 }
-                PageLayout::postMessage(MessageBox::success(_("CSV-Datei hochgeladen")));
+                if ($success) {
+                    PageLayout::postMessage(MessageBox::success(_("CSV-Datei hochgeladen")));
+                }
             }
 
         }
