@@ -1,7 +1,8 @@
 <?php
 
 
-class AddDurations extends Migration {
+class AddDurations extends Migration
+{
 
     function up()
     {

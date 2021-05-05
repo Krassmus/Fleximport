@@ -1,7 +1,8 @@
 <?php
 
 
-class MoveTables extends Migration {
+class MoveTables extends Migration
+{
 
     function up()
     {
@@ -36,7 +37,7 @@ class MoveTables extends Migration {
                 }
                 if ($changed) {
                     $update_table->execute([
-                        'table_id' => $t,
+                        'table_id' => $t['table_id'],
                         'tabledata' => json_encode($tabledata)
                     ]);
                 }

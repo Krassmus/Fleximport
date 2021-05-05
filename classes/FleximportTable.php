@@ -447,16 +447,18 @@ class FleximportTable extends SimpleORMap {
                         ? explode("-", $item['item_id'])
                         : $item['item_id'];
                     $object = new $import_type($pk);
-                    //logging:
-                    if ($import_type === "User") {
-                        StudipLog::log(
-                            "USER_DEL",
-                            $object->getId(),
-                            NULL,
-                            "Durch Fleximport-Sync der Tabelle ".$this['name'].": " . join(';', $object->toArray('username vorname nachname perms email'))
-                        );
+
+                    if ($import_type === "User" && class_exists("UserManagement")) {
+                        //for users we use the UserManagement class:
+                        try {
+                            $usermanager = new UserManagement($object->getId());
+                            $usermanager->deleteUser();
+                        } catch (Exception $e) {
+                            PageLayout::postError($e->getMessage(), [$e->getTraceAsString()]);
+                        }
                     }
                     $object->delete();
+
                 }
                 $item->delete();
             }
