@@ -448,7 +448,7 @@ class FleximportTable extends SimpleORMap {
                         : $item['item_id'];
                     $object = new $import_type($pk);
 
-                    if ($import_type === "User" && class_exists("UserManagement")) {
+                    if ($import_type === "User" && class_exists("UserManagement") && User::find($object->getId())) {
                         //for users we use the UserManagement class:
                         try {
                             $usermanager = new UserManagement($object->getId());
@@ -457,10 +457,14 @@ class FleximportTable extends SimpleORMap {
                             PageLayout::postError($e->getMessage(), [$e->getTraceAsString()]);
                         }
                     }
-                    $object->delete();
+                    if ($object) {
+                        $object->delete();
+                    }
 
                 }
-                $item->delete();
+                if ($item) {
+                    $item->delete();
+                }
             }
             foreach ($item_ids as $item_id) {
                 $mapped = FleximportMappedItem::findbyItemId($item_id, $this->getId()) ?: new FleximportMappedItem();
