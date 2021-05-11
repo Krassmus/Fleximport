@@ -187,9 +187,8 @@ class FleximportTable extends SimpleORMap {
     {
         switch ($this['tabledata']['server']['type']) {
             case "mssql":
-                setlocale (LC_TIME, 'de_DE'); //to prevent umlauts in datetime objects
                 $extern_db = new PDO(
-                    "dblib:host=".$this['tabledata']['server']['adress'].":".$this['tabledata']['server']['port'].";dbname=".$this['tabledata']['server']['dbname']."",
+                    "dblib:version=7.4;charset=UTF-8;host=".$this['tabledata']['server']['adress'].":".$this['tabledata']['server']['port'].";dbname=".$this['tabledata']['server']['dbname']."",
                     $this['tabledata']['server']['user'],
                     $this['tabledata']['server']['password']
                 );
@@ -201,14 +200,6 @@ class FleximportTable extends SimpleORMap {
                 $columns = $extern_db->query("
                     SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ".$extern_db->quote($this['tabledata']['server']['table'])."
                 ")->fetchAll(PDO::FETCH_COLUMN, 0);
-                foreach ($values as $i => $data) {
-                    foreach ($data as $k => $cell) {
-                        $values[$i][$k] = mb_convert_encoding($cell, 'UTF-8', 'Windows-1252');
-                    }
-                }
-                foreach ($columns as $i => $name) {
-                    $columns[$i] = mb_convert_encoding($name, 'UTF-8', 'Windows-1252');
-                }
                 break;
             default:
             case "mysql":
