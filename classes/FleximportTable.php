@@ -452,9 +452,10 @@ class FleximportTable extends SimpleORMap {
                         //for users we use the UserManagement class:
                         try {
                             $usermanager = new UserManagement($object->getId());
-                            $usermanager->deleteUser();
+                            $success = $usermanager->deleteUser();
                         } catch (Exception $e) {
                             PageLayout::postError($e->getMessage(), [$e->getTraceAsString()]);
+                            $success = false;
                         }
                     }
                     if ($object) {
@@ -481,24 +482,72 @@ class FleximportTable extends SimpleORMap {
 
     public function findDeletableItems($not = array())
     {
-        return FleximportMappedItem::findBySQL(
-            "table_id = :table_id AND item_id NOT IN (:ids)",
-            array(
-                'table_id' => $this->getId(),
-                'ids' => $not ?: ""
-            )
-        );
+        $class = $this['import_type'];
+        if (!$class) {
+            return [];
+        }
+        $obj = new $class();
+        $pk = $this->getTargetPK();
+        $is_multiple_keyed = count($pk) > 1;
+        $meta = $obj->getTableMetadata();
+        $table = $meta['table'];
+        if ($is_multiple_keyed) {
+            return FleximportMappedItem::findBySQL(
+                "`fleximport_mapped_items`.`table_id` = :table_id
+                    AND `fleximport_mapped_items`.`item_id` NOT IN (:ids) "
+                    .($this['sync_constraints'] ? 'AND ('.$this['sync_constraints'].')' : ''),
+                array(
+                    'table_id' => $this->getId(),
+                    'ids' => $not ?: ""
+                )
+            );
+        } else {
+            return FleximportMappedItem::findBySQL(
+                    "INNER JOIN `".addslashes($table)."` ON (`".addslashes($table)."`.`".addslashes($pk[0])."` = `fleximport_mapped_items`.`item_id`) WHERE ".
+                "`fleximport_mapped_items`.`table_id` = :table_id
+                    AND `fleximport_mapped_items`.`item_id` NOT IN (:ids) "
+                    .($this['sync_constraints'] ? 'AND ('.$this['sync_constraints'].')' : ''),
+                array(
+                    'table_id' => $this->getId(),
+                    'ids' => $not ?: ""
+                )
+            );
+        }
     }
 
     public function countDeletableItems($not = array())
     {
-        return FleximportMappedItem::countBySQL(
-            "table_id = :table_id AND item_id NOT IN (:ids)",
-            array(
-                'table_id' => $this->getId(),
-                'ids' => $not ?: ""
-            )
-        );
+        $class = $this['import_type'];
+        if (!$class) {
+            return 0;
+        }
+        $obj = new $class();
+        $pk = $this->getTargetPK();
+        $is_multiple_keyed = count($pk) > 1;
+        $meta = $obj->getTableMetadata();
+        $table = $meta['table'];
+        if ($is_multiple_keyed) {
+            return FleximportMappedItem::countBySQL(
+                "`fleximport_mapped_items`.`table_id` = :table_id
+                    AND `fleximport_mapped_items`.`item_id` NOT IN (:ids) "
+                    .($this['sync_constraints'] ? 'AND ('.$this['sync_constraints'].')' : ''),
+                array(
+                    'table_id' => $this->getId(),
+                    'ids' => $not ?: ""
+                )
+            );
+        } else {
+            return FleximportMappedItem::countBySQL(
+                "INNER JOIN `".addslashes($table)."` ON (`".addslashes($table)."`.`".addslashes($pk[0])."` = `fleximport_mapped_items`.`item_id`) WHERE ".
+                "`fleximport_mapped_items`.`table_id` = :table_id
+                    AND `fleximport_mapped_items`.`item_id` NOT IN (:ids) "
+                    .($this['sync_constraints'] ? 'AND ('.$this['sync_constraints'].')' : ''),
+                array(
+                    'table_id' => $this->getId(),
+                    'ids' => $not ?: ""
+                )
+            );
+        }
     }
 
     public function clearIndicators()

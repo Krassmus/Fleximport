@@ -162,8 +162,17 @@
     </table>
 
     <label>
-        <input type="checkbox" name="table[synchronization]" value="1"<?= $table['synchronization'] ? " checked" : "" ?>>
+        <input type="checkbox"
+               name="table[synchronization]"
+               onChange="$('#sync_constraints').toggle();"
+               value="1"<?= $table['synchronization'] ? " checked" : "" ?>>
         <?= _("Synchronisierung (Importierte Objekte werden beim Update gelöscht, wenn sie beim neuen Import nicht mit mehr auftauchen)") ?>
+    </label>
+
+    <label id="sync_constraints"<?= trim($table['synchronization']) ? '' : ' style="display: none;"' ?>>
+        <?= _("Synchronisationsbedingung: Nur Objekte löschen, die zusätzlich folgende Bedingung erfüllen.") ?>
+        <textarea name="table[sync_constraints]"
+                  placeholder="z.B. `termine`.`date` >= UNIX_TIMESTAMP()"><?= htmlReady($table['sync_constraints']) ?></textarea>
     </label>
 
     <label data-change_hash="<?= htmlReady($table->isInDatabase() ? $table->calculateChangeHash() : "") ?>">
