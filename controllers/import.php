@@ -88,7 +88,11 @@ class ImportController extends PluginController {
             }
 
         }
-        $this->redirect("import/overview/".$process_id);
+        if (Request::isPost() && Request::isAjax()) {
+            $this->render_nothing();
+        } else {
+            $this->redirect("import/overview/" . $process_id);
+        }
     }
 
     public function processfetch_action($process_id)

@@ -99,3 +99,31 @@ STUDIP.Fleximport = {
     }
 };
 
+$(function () {
+    $('.tablecontainer.uploadable').on('dragover dragleave', (event) => {
+        $(event.target).closest('.tablecontainer').toggleClass('hovered', event.type === 'dragover');
+        event.preventDefault();
+    }).on('drop', (event) => {
+        var filelist = event.originalEvent.dataTransfer.files || {};
+        $(event.target).closest('.tablecontainer').toggleClass('hovered', false);
+        let table_id = $(event.target).closest('.tablecontainer').data('table_id');
+        let process_id = $(event.target).closest('form').data('process_id');
+        console.log($(event.target).closest('.tablecontainer').find("input[type=file]"));
+
+        let data = new FormData();
+        data.append('tableupload[' + table_id + ']', filelist[0], "upload.csv");
+
+        $.ajax({
+            url: STUDIP.URLHelper.getURL('plugins.php/fleximport/import/process/' + process_id),
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST'
+        }).done(json => {
+            window.location.reload();
+        });
+
+        event.preventDefault();
+    });
+});

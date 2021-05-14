@@ -2,6 +2,7 @@
     <form action="<?= PluginEngine::getLink($plugin, array(), "import/process/".$process->getId()) ?>"
           method="post"
           enctype="multipart/form-data"
+          data-process_id="<?= htmlReady($process->getId()) ?>"
           id="process_form">
         <? foreach ($tables as $table) : ?>
             <? if ($table['active']) : ?>

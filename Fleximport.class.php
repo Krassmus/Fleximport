@@ -157,4 +157,10 @@ class Fleximport extends StudIPPlugin implements SystemPlugin {
             echo "\nImport ends at ".date("c")."\n";
         }
     }
+
+    public function perform($unconsumed_path)
+    {
+        $this->addStylesheet("assets/fleximport.less");
+        parent::perform($unconsumed_path);
+    }
 }

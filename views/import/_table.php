@@ -1,12 +1,15 @@
 <? if ($table->isInDatabase()) : ?>
     <div id="table_<?= $table->getId() ?>_container"
-         class="tablecontainer"
+         class="tablecontainer <?= ($table['source'] === "csv_upload") ? 'uploadable' : ''?>"
          data-name="<?= htmlReady($table['name']) ?>"
          data-table_id="<?= $table->getId() ?>">
         <?= $this->render_partial("import/_table_content.php", compact("table")) ?>
     </div>
 <? else : ?>
-    <div style="margin-bottom: 50px;" id="table_<?= $table->getId() ?>_container" class="tablecontainer" data-name="<?= htmlReady($table['name']) ?>" data-table_id="<?= $table->getId() ?>">
+    <div style="margin-bottom: 50px;" id="table_<?= $table->getId() ?>_container"
+         class="tablecontainer  <?= ($table['source'] === "csv_upload") ? 'uploadable' : ''?>"
+         data-name="<?= htmlReady($table['name']) ?>"
+         data-table_id="<?= $table->getId() ?>">
         <div style="float: right;">
             <? if (!FleximportConfig::get("DISALLOW_ADMINISTRATION")) : ?>
                 <a href="<?= PluginEngine::getLink($plugin, array(), "setup/table/".$table->getId()) ?>" data-dialog>
@@ -61,7 +64,9 @@
             <label style="cursor: pointer;">
                 <?= Icon::create("upload", "clickable")->asImg(40, array('class' => "text-bottom")) ?>
                 <?= _("CSV-Datei hochladen") ?>
-                <input type="file" name="tableupload[<?= $table->getId() ?>]" onChange="jQuery(this).closest('form').submit();" style="display: none;">
+                <input type="file"
+                       name="tableupload[<?= $table->getId() ?>]"
+                       onChange="jQuery(this).closest('form').submit();" style="display: none;">
             </label>
         <? endif ?>
     </div>

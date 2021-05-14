@@ -45,7 +45,9 @@
                 <? if ($table['source'] === "csv_upload" && !$table->customImportEnabled()) : ?>
                     <label style="cursor: pointer;" title="<?= _("CSV-Datei hochladen") ?>">
                         <?= Icon::create("upload", "clickable")->asImg(20) ?>
-                        <input type="file" name="tableupload[<?= $table->getId() ?>]" onChange="jQuery(this).closest('form').submit();" style="display: none;">
+                        <input type="file"
+                               name="tableupload[<?= $table->getId() ?>]"
+                               onChange="jQuery(this).closest('form').submit();" style="display: none;">
                     </label>
                 <? endif ?>
                 <? if ($table->isInDatabase()) : ?>
