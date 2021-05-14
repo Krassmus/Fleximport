@@ -1,6 +1,6 @@
 pluginname=Fleximport
 pluginclassname=Fleximport
-version=2.0.4
+version=2.0.5
 origin=data-quest
 description=Ein flexibles Grundplugin, um alles mögliche wie Veranstaltungen, Nutzer, Termine, Gruppen und Teilnehmerdaten zu importieren.
 studipMinVersion=4.0

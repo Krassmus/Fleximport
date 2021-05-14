@@ -1,2 +1,2 @@
-"Veranstaltungsnummer";"Name der Veranstaltung";"Dozenten";"Einrichtung";"Ordner"
-"11";"Test-Lehrveranstaltung aus LSF";"test_dozent,test2_dozent";"Test Fakultät";"Hauptorder; Hausaufgaben (HomeworkFolder); Materialien (MaterialFolder)"
+"Veranstaltungsnummer";"Name der Veranstaltung";"Dozenten";"Einrichtung";"Semester";"Ordner"
+"11";"Test-Lehrveranstaltung aus LSF";"test_dozent,test2_dozent";"Test Fakultät";"SoSe 2021";"Hauptorder; Hausaufgaben (HomeworkFolder); Materialien (MaterialFolder)"
