@@ -299,7 +299,11 @@ class FleximportTable extends SimpleORMap {
                 foreach ($headers as $key => $field) {
                     if ($field) {
                         $key < 1 || $insert_sql .= ", ";
-                        $value = trim($line[$key]);
+                        if (is_object($line[$key])) {
+                            $value = json_encode((array) $line[$key]);
+                        } else {
+                            $value = trim($line[$key]);
+                        }
                         $field = strtolower(self::reduceDiakritikaFromIso88591($field));
                         $insert_sql .= "`" . addslashes($field) . "` = " . $db->quote($value) . " ";
                     }

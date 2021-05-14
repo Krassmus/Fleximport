@@ -47,4 +47,19 @@ class FleximportProcess extends SimpleORMap {
         return $config->store();
     }
 
+    /**
+     * Returns the table with the given name from this process.
+     * @param string $name
+     * @return FleximportTable|null
+     */
+    public function getTableByName($name)
+    {
+        foreach ($this->tables as $table) {
+            if ($table['name'] == $name) {
+                return $table;
+            }
+        }
+        return null;
+    }
+
 }
