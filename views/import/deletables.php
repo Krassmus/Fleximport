@@ -8,7 +8,7 @@
             <th>
                 <?= _("Name") ?>
             </th>
-            <? if (in_array($class, array("User", "Course"))) : ?>
+            <? if (in_array($class, array("User", "Course", "CourseMember", "CourseDate", "Statusgruppen"))) : ?>
                 <th></th>
             <? endif ?>
         </tr>
@@ -43,7 +43,7 @@
                     } ?>
                     <?= htmlReady($name ?: _("unbekannt")) ?>
                 </td>
-                <? if (in_array($class, array("User", "Course"))) : ?>
+                <? if (in_array($class, array("User", "Course", "CourseMember", "CourseDate", "Statusgruppen"))) : ?>
                     <td>
                         <? switch ($class) {
                             case "User":
@@ -57,9 +57,6 @@
                                 break;
                             case "CourseDate":
                                 $link = URLHelper::getLink("dispatch.php/course/dates", array('cid' => $item['range_id']));
-                                break;
-                            case "Statusgruppen":
-                                $link = URLHelper::getLink("dispatch.php/course/statusgroups", array('cid' => $item['range_id']));
                                 break;
                             case "Statusgruppen":
                                 $link = URLHelper::getLink("dispatch.php/course/statusgroups", array('cid' => $item['range_id']));
