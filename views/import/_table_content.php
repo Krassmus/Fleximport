@@ -85,14 +85,20 @@
         </tr>
     </thead>
     <tbody>
-    <? $item_ids = array() ?>
+    <? $item_ids = [] ?>
     <? if ($table['display_lines'] !== "ondemand") : ?>
-        <? foreach ($table->fetchLines() as $line) : ?>
+        <?
+        $alllines = $table->fetchLines();
+        foreach ($alllines as $line) {
+            $pk = $table->getPrimaryKeyForLine($line);
+            if ($pk) {
+                $item_ids[] = is_array($pk) ? implode("-", $pk) : $pk;
+            }
+        }
+        ?>
+        <? foreach ($alllines as $line) : ?>
             <?
             $report = $table->checkLine($line);
-            if ($report['pk'] && !$report['errors']) {
-                $item_ids[] = is_array($report['pk']) ? implode("-", $report['pk']) : $report['pk'];
-            }
             if (($displayed_lines >= (int) $limit) && ($limit !== false)) {
                 break;
             }

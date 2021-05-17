@@ -1090,6 +1090,35 @@ class FleximportTable extends SimpleORMap {
         return $data;
     }
 
+    public function getPrimaryKeyForLine($line, $data = null, $pk = null)
+    {
+        $classname = $this['import_type'];
+
+        $output = [
+            'found' => false,
+            'pk' => null,
+            'errors' => ""
+        ];
+        if ($classname && ($classname !== "fleximport_mysql_command") && !class_exists($classname)) {
+            $output['errors'] = sprintf(_("Klasse %s existiert nicht."), $classname);
+            return $output;
+        }
+
+        if ($classname && ($classname !== "fleximport_mysql_command") && class_exists($classname)) {
+            try {
+                if ($data === null) {
+                    $data = $this->getMappedData($line);
+                }
+                if ($pk === null) {
+                    return $this->getPrimaryKey($data);
+                }
+            } catch (Exception $e) {
+                PageLayout::postError("Tabellenmapping ist vermutlich falsch konfiguriert: " . $e->getMessage() . " " . $e->getTraceAsString());
+            }
+        }
+        return null;
+    }
+
     /**
      * @param $line : associative array of raw data
      * @param null $data : only needed for performance if you already have the data
