@@ -30,7 +30,7 @@ class ExportController extends PluginController {
         //remove import_table_primary_key
 
         $output[] = $header;
-        foreach ($this->table->fetchLines() as $line) {
+        foreach ($this->table->getLines() as $line) {
             $output_line = array();
             foreach ($header as $field) {
                 $output_line[] = $line[$field];

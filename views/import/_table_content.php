@@ -88,7 +88,7 @@
     <? $item_ids = [] ?>
     <? if ($table['display_lines'] !== "ondemand") : ?>
         <?
-        $alllines = $table->fetchLines();
+        $alllines = $table->getLines();
         foreach ($alllines as $line) {
             $pk = $table->getPrimaryKeyForLine($line);
             if ($pk) {
@@ -98,39 +98,38 @@
         ?>
         <? foreach ($alllines as $line) : ?>
             <?
-            $report = $table->checkLine($line);
             if (($displayed_lines >= (int) $limit) && ($limit !== false)) {
                 break;
             }
-            if (($count < (int) $limit || $report['errors']) || $limit === false) : ?>
-                <tr>
-                    <td>
-                        <? if ($table['import_type'] && ($table['import_type'] !== "fleximport_mysql_command")) : ?>
-                            <a href="<?= PluginEngine::getLink($plugin, array('table' => $table['name']), "import/targetdetails/".$line['IMPORT_TABLE_PRIMARY_KEY']) ?>" data-dialog>
-                                <? $icon = $report['found'] ? "accept" : "star" ?>
-                                <? if ($report['errors']) : ?>
-                                    <?= Icon::create($icon, "navigation")->asImg(20, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden") : _("Objekt würde neu angelegt werden. Zur Datenvorschau."))) ?>
-                                <? else :?>
-                                    <?= Icon::create($icon, "clickable")->asImg(20, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden und wird geupdated") : _("Objekt wird neu angelegt werden. Zur Datenvorschau."))) ?>
-                                <? endif ?>
-                            </a>
-                        <? elseif ($table['import_type'] === "fleximport_mysql_command") : ?>
-                            <?= Icon::create("question-circle", "info")->asImg(20, array('title' => _("Daten werden über MySQL-Anweisung eventuell importiert."))) ?>
-                        <? endif ?>
-                    </td>
-                    <td>
-                        <? if ($report['errors']) : ?>
-                            <?= Icon::create("decline", "attention")->asImg(20, array('title' => $report['errors'])) ?>
-                        <? endif ?>
-                    </td>
-                    <? foreach ($tableHeader as $column) : ?>
-                        <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY" && (!$table['tabledata']['display_only_columns'] || in_array($column, $table['tabledata']['display_only_columns']))) : ?>
-                            <td><?= htmlReady($line[$column]) ?></td>
-                        <? endif ?>
-                    <? endforeach ?>
-                </tr>
-                <? $displayed_lines++ ?>
-            <? endif ?>
+            $report = $table->checkLine($line);
+            ?>
+            <tr>
+                <td>
+                    <? if ($table['import_type'] && ($table['import_type'] !== "fleximport_mysql_command")) : ?>
+                        <a href="<?= PluginEngine::getLink($plugin, array('table' => $table['name']), "import/targetdetails/".$line['IMPORT_TABLE_PRIMARY_KEY']) ?>" data-dialog>
+                            <? $icon = $report['found'] ? "accept" : "star" ?>
+                            <? if ($report['errors']) : ?>
+                                <?= Icon::create($icon, "navigation")->asImg(20, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden") : _("Objekt würde neu angelegt werden. Zur Datenvorschau."))) ?>
+                            <? else : ?>
+                                <?= Icon::create($icon, "clickable")->asImg(20, array('title' => $report['found'] ? _("Datensatz wurde in Stud.IP gefunden und wird geupdated") : _("Objekt wird neu angelegt werden. Zur Datenvorschau."))) ?>
+                            <? endif ?>
+                        </a>
+                    <? elseif ($table['import_type'] === "fleximport_mysql_command") : ?>
+                        <?= Icon::create("question-circle", "info")->asImg(20, array('title' => _("Daten werden über MySQL-Anweisung eventuell importiert."))) ?>
+                    <? endif ?>
+                </td>
+                <td>
+                    <? if ($report['errors']) : ?>
+                        <?= Icon::create("decline", "attention")->asImg(20, array('title' => $report['errors'])) ?>
+                    <? endif ?>
+                </td>
+                <? foreach ($tableHeader as $column) : ?>
+                    <? if ($column !== "IMPORT_TABLE_PRIMARY_KEY" && (!$table['tabledata']['display_only_columns'] || in_array($column, $table['tabledata']['display_only_columns']))) : ?>
+                        <td><?= htmlReady($line[$column]) ?></td>
+                    <? endif ?>
+                <? endforeach ?>
+            </tr>
+            <? $displayed_lines++ ?>
         <? endforeach ?>
         <? if ($count > $displayed_lines) : ?>
             <tr>

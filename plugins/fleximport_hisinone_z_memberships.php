@@ -39,7 +39,7 @@ class fleximport_hisinone_z_memberships extends FleximportPlugin
         ];
         $memberships = [];
 
-        foreach ($this->table->process->getTableByName("fleximport_hisinone_z_courses")->fetchLines() as $coursedata) {
+        foreach ($this->table->process->getTableByName("fleximport_hisinone_z_courses")->getLines() as $coursedata) {
             $course_id = $coursedata['id'];
             $data = $this->getMembershipsData($course_id);
             if ($data) {

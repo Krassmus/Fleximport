@@ -190,7 +190,7 @@ class ImportController extends PluginController {
         $this->table = FleximportTable::find($table_id);
         $this->class = $this->table['import_type'];
         $item_ids = array();
-        foreach ($this->table->fetchLines() as $line) {
+        foreach ($this->table->getLines() as $line) {
             $report = $this->table->checkLine($line);
             if ($report['pk'] && !$report['errors']) {
                 $item_ids[] = is_array($report['pk']) ? implode("-", $report['pk']) : $report['pk'];

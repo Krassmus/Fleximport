@@ -174,13 +174,22 @@ class FleximportTable extends SimpleORMap {
         }
     }
 
-    public function fetchLines()
+    /**
+     * Returns all lins of the database.
+     * @param bool $as_statement : if true this function returns an array, if false a PDO-statement
+     * @return array|PDOStatement
+     */
+    public function getLines($as_statement = false)
     {
         $statement = DBManager::get()->prepare("
             SELECT * FROM `".addslashes($this->getDBName())."`
         ");
         $statement->execute();
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        if ($as_statement) {
+            return $statement;
+        } else {
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 
     public function fetchDataFromDatabase()
