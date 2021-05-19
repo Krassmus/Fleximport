@@ -1,0 +1,1398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="CurriculumDesignerServiceDefinition" targetNamespace="http://www.his.de/ws/CurriculumDesignerService" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wns="http://www.his.de/ws/CurriculumDesignerService" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <types>
+    <schema elementFormDefault="qualified" targetNamespace="http://www.his.de/ws/CurriculumDesignerService" xmlns="http://www.w3.org/2001/XMLSchema">
+            <complexType abstract="false" name="Veranstaltung">
+                <complexContent>
+                    <extension base="wns:UnitAttribute">
+                        <sequence>
+                            <element name="eventAttributes" type="wns:EventBase"/>
+                            <element minOccurs="0" name="teachingLanguages" nillable="true" type="wns:teachingLanguagesType"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType abstract="false" name="EventBase">
+                <complexContent>
+                    <extension base="wns:EventBaseTranslatable">
+                        <sequence>
+                            <element minOccurs="0" name="eventtype" nillable="true" type="string">
+                                <annotation>
+                                    <documentation>Veranstaltungsart, z.B. Blockveranstaltung, Kurs, Praktikum, Projektgruppe, Projekt, Praktische Übung,
+                                    Seminar, Vorlesung, Vorlesung/Übung, Zusatzübung, Übung See KeyvalueService with valueClass = 'EventtypeValue'. Examples:
+                                    VÜ, V, S, PÜ, PRO, PG, P, Ku, B, ZÜ</documentation>
+                                </annotation>
+                            </element>
+                            <element minOccurs="0" name="frequencyOfOffervalue" nillable="true" type="string">
+                                <annotation>
+                                    <documentation>Informationen zum Turnus von Veranstaltungen. Beispiele: jedes Semester, jedes zweite Semester, nur im
+                                    Wintersemester, ... See KeyvalueService with valueClass = 'FrequencyOfOfferValue'. Examples: jedesSem, 2Sem, WSem, SSem,
+                                    unregel</documentation>
+                                </annotation>
+                            </element>
+                            <element minOccurs="0" name="scheduledGroupSize" nillable="true" type="long">
+                                <annotation>
+                                    <documentation>Geplante Gruppengröße</documentation>
+                                </annotation>
+                            </element>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType abstract="false" name="ReadUnitAttribute">
+                <complexContent>
+                    <extension base="wns:UnitBase">
+                        <sequence>
+                            <element minOccurs="0" name="moduleAttributes" nillable="true" type="wns:ModuleBase"/>
+                            <element minOccurs="0" name="eventAttributes" nillable="true" type="wns:EventBase"/>
+                            <element minOccurs="0" name="examinationAttributes" nillable="true" type="wns:ExaminationBase"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType abstract="false" name="Translation">
+                <sequence>
+                    <element name="unitId" type="long"/>
+                    <element name="unitAttributes" type="wns:UnitAttributeTranslatable"/>
+                    <element minOccurs="0" name="eventAttributes" type="wns:EventBaseTranslatable"/>
+                    <element minOccurs="0" name="examinationAttributes" type="wns:ExaminationBaseTranslatable"/>
+                    <element minOccurs="0" name="moduleAttributes" type="wns:ModuleBaseTranslatable"/>
+                </sequence>
+            </complexType>
+            <complexType abstract="false" name="ExaminationBaseTranslatable">
+                <sequence>
+                    <element minOccurs="0" name="recommendedRequirement" nillable="true" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType abstract="false" name="ResultProtocol">
+                <sequence>
+                    <element name="externalId" type="string"/>
+                    <element minOccurs="0" name="unitId" nillable="true" type="string"/>
+                    <element minOccurs="0" name="operation" nillable="true" type="string"/>
+                    <element minOccurs="0" name="altRelConnectToId" nillable="true" type="string"/>
+                    <element minOccurs="0" name="altRelId" nillable="true" type="string"/>
+                    <element minOccurs="0" name="planRelConnectToId" nillable="true" type="string"/>
+                    <element minOccurs="0" name="planRelId" nillable="true" type="string"/>
+                    <element minOccurs="0" name="error" nillable="true" type="string"/>
+                    <element minOccurs="0" name="relationError" nillable="true" type="string"/>
+                    <element minOccurs="0" name="languageError" nillable="true" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType abstract="false" name="Modul">
+                <complexContent>
+                    <extension base="wns:UnitAttribute">
+                        <sequence>
+                            <element name="moduleAttributes" type="wns:ModuleBase"/>
+                            <element minOccurs="0" name="teachingLanguages" nillable="true" type="wns:teachingLanguagesType"/>
+                            <element minOccurs="0" name="pruefungen" type="wns:pruefungenType"/>
+                            <element minOccurs="0" name="veranstaltungsgruppen" type="wns:veranstaltungsgruppenType">
+                                <annotation>
+                                    <documentation>Diese Veranstaltungensgruppen werden ausschließlich dem modul zugeordnet. Kann auch für reine
+                                    Veranstaltungen genutzt werden mit der Uebergabe eines ElementtypeValues (kElementtype)</documentation>
+                                </annotation>
+                            </element>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType abstract="true" name="UnitBaseTranslatable">
+                <sequence>
+                    <element minOccurs="0" name="shorttext" nillable="true" type="string"/>
+                    <element minOccurs="0" name="defaulttext" type="string"/>
+                    <element minOccurs="0" name="longtext" nillable="true" type="string"/>
+                    <element minOccurs="0" name="elementnr" nillable="true" type="string"/>
+                    <element minOccurs="0" name="comment" nillable="true" type="string"/>
+                    <element minOccurs="0" name="shortcomment" nillable="true" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType abstract="true" name="UnitrelationBase">
+                <sequence>
+                    <element minOccurs="0" name="relationType" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Zuordnungsart See KeyvalueService with valueClass = 'UnitrelationtypeValue'. Examples: AZ, FAZ, PZ, FZ, KA, PL, SZ,
+                            OP, IPA, ABS</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="bonus" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>Bonuspunkte/Credits bei Bestehen</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="malus" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>Maluspunkte bei Nichtbestehen</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="bookingpoints" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>Belegungspunkte (werden üblicherweise von einem Belegpunktekonto abgezogen)</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="recommendedSemester" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>empfohlenes Fachsemester, in dem diese Unit absolviert werden soll</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="reregistrationBlockedSemester" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>Toleranzsemester für die Rückmeldung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="teachingEntitlement" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>Unterrichtsanspruch des Studenten für eine Unit</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="firsttrialSemester" nillable="true" type="long">
+                        <annotation>
+                            <documentation>Fachsemester, bis zu dem versucht werden muß, die Leistung erstmalig zu erbringen (nur für ganze Fachsemester
+                            bekannt)</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="maxAttempts" nillable="true" type="long">
+                        <annotation>
+                            <documentation>maximale Versuchsanzahl</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="maxPassedAttempts" nillable="true" type="long">
+                        <annotation>
+                            <documentation>maximale Anzahl bestandener Versuche, default=1 wenn nicht gefüllt</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="gradingType" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Bewertungsart See KeyvalueService with valueClass = 'GradingTypeValue'. Examples: ALL, Drittelnoten (Lehramt), M,
+                            Abschluss, Abschluss STU, FPNoten, 1N, AO-Noten(1-4);, unbenotet (Lehramt), AO-Konto-Note (0,6-4,0)</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="compulsory" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Pflichtkennzeichen See KeyvalueService with valueClass = 'CompulsoryValue'. Examples: P, WP, W</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="freetrialSemesterlimit" nillable="true" type="long">
+                        <annotation>
+                            <documentation>Zeitperiode (Semester) bis zu dem Freiversuche gewährt werden.</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="generationWeight" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>Gewicht, mit dem die Leistung zu dieser Prüfung in einer Generierung berücksichtigt wird, sofern kein anderes
+                            Gewicht angegeben wurde.</documentation>
+                        </annotation>
+                    </element>
+                </sequence>
+            </complexType>
+            <complexType abstract="false" name="UnitTranslationExt">
+                <sequence>
+                    <element name="extId" type="string">
+                        <annotation>
+                            <documentation>Externe ID</documentation>
+                        </annotation>
+                    </element>
+                    <element name="unitAttributes" type="wns:UnitAttributeTranslatable"/>
+                    <element minOccurs="0" name="eventAttributes" type="wns:EventBaseTranslatable"/>
+                    <element minOccurs="0" name="examinationAttributes" type="wns:ExaminationBaseTranslatable"/>
+                    <element minOccurs="0" name="moduleAttributes" type="wns:ModuleBaseTranslatable"/>
+                </sequence>
+            </complexType>
+            <complexType abstract="false" name="Pruefung">
+                <complexContent>
+                    <extension base="wns:UnitAttribute">
+                        <sequence>
+                            <element name="examinationAttributes" type="wns:ExaminationBase"/>
+                            <element minOccurs="0" name="teachingLanguages" nillable="true" type="wns:teachingLanguagesType"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType abstract="false" name="Konto">
+                <complexContent>
+                    <extension base="wns:UnitAttribute">
+                        <sequence>
+                            <element minOccurs="0" name="konten" type="wns:kontenType"/>
+                            <element minOccurs="0" name="module" type="wns:moduleType"/>
+                            <element minOccurs="0" name="pruefungen" type="wns:pruefungenType"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType abstract="false" name="ModuleBaseTranslatable">
+                <sequence>
+                    <element minOccurs="0" name="compulsoryRequirement" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Zwingende Voraussetzung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="recommendedRequirement" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Empfohlene Voraussetzung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="examinationAchievement" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Zu erbringende Prüfungsleistung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="courseAchievement" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Zu erbringende Studienleistung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="learningTarget" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Lernziele</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="contents" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Inhalte</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="suitableStudyPhase" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Geeignet fuer Studienphase</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="objectiveQualification" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Qualifikationsziel</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="grading" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Benotung, wird normalerweise nicht gefüllt, da Notengebungsart(en) in Zuordnungen stehen</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="creditsRequirement" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Voraussetzungen für die Vergabe von Leistungspunkten</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="teachingMethod" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Lehr- und Lernformen</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="courseSpecialisation" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Studiengangschwerpunkte</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="workload" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Arbeitsaufwand</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="credits" nillable="true" type="string"/>
+                    <element minOccurs="0" name="academicYear" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Studienjahr</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="targetGroup" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Zielgruppe</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="literature" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Literatur</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="duration" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Moduldauer, z.B. 'Drei Semester'</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="classAttendance" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Präsenzzeit</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="independentStudy" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Selbststudium</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="usability" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Verwendbarkeit des Moduls</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="directive" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Eine verpflichtende Anweisung, die ggf. auch in einer Bedingung abgeprüft wird. z.B.: 'Aus den Veranstaltungen 26508
+                            (Customer Relationship Management), 26520 (Operatives CRM) und 26522 (Analytisches CRM) müssen zwei von drei gewählt
+                            werden.'</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="examinationWeight" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Stellenwert der Note für die Endnote/Art u. Gewichtung der Prüfungsleistung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="intendedSemester" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Vorgesehenes Studiensemester, z..B.: 5./6. Semester</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="recommendation" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Empfehlung, z.B.: 'Gute Kenntnisse in Mathematik und Statistik sind hilfreich' oder 'Dieses Modul sollte in der
+                            Reihenfolge 'Programmieren I: Java', 'Grundlagen der Informatik I', 'Grundlagen der Informatik II' absolviert
+                            werden.</documentation>
+                        </annotation>
+                    </element>
+                </sequence>
+            </complexType>
+            <complexType abstract="true" name="UnitBase">
+                <sequence>
+                    <element minOccurs="0" name="kElementtype" type="string">
+                        <annotation>
+                            <documentation>z.B. Modul, Prüfung, Veranstaltung, Konto, Gliederungselement, HZB, Katalog, Eignungsordnung See KeyvalueService
+                            with valueClass = 'ElementtypeValue'. Examples: AO, PO, IO, PRO, H, K, M, P, SL, S</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="uniquename" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Eindeutiger Bezeichner</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="shorttext" nillable="true" type="string"/>
+                    <element minOccurs="0" name="defaulttext" type="string"/>
+                    <element minOccurs="0" name="longtext" nillable="true" type="string"/>
+                    <element minOccurs="0" name="elementnr" nillable="true" type="string"/>
+                    <element minOccurs="0" name="comment" nillable="true" type="string"/>
+                    <element minOccurs="0" name="shortcomment" nillable="true" type="string"/>
+                    <element minOccurs="0" name="defaultlanguageValue" type="string">
+                        <annotation>
+                            <documentation>Defaultsprache, in der die Texte der Unit (Modul/Event) erfaßt wurden See KeyvalueService with valueClass =
+                            'LanguageValue'. Examples: de, la, fr, it, pt, es, tr, hu, bg, en</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="validFrom" nillable="true" type="date"/>
+                    <element minOccurs="0" name="validTo" nillable="true" type="date"/>
+                    <element minOccurs="0" name="hoursPerWeek" nillable="true" type="decimal"/>
+                    <element minOccurs="0" name="bonus" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>Bonuspunkte/Credits bei Bestehen</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="malus" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>Maluspunkte bei Nichtbestehen</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="bookingpoints" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>Belegungspunkte (werden üblicherweise von einem Belegpunktekonto abgezogen)</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="recommendedSemester" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>empfohlenes Fachsemester, in dem diese Unit absolviert werden soll.</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="reregistrationBlockedSemester" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>Toleranzsemester für die Rückmeldung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="firsttrialSemester" nillable="true" type="long">
+                        <annotation>
+                            <documentation>Fachsemester, bis zu dem versucht werden muß, die Leistung erstmalig zu erbringen (nur für ganze Fachsemester
+                            bekannt)</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="maxAttempts" nillable="true" type="long">
+                        <annotation>
+                            <documentation>maximale Versuchsanzahl</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="maxPassedAttempts" nillable="true" type="long">
+                        <annotation>
+                            <documentation>maximale Anzahl bestandener Versuche, default=1 wenn nicht gefüllt</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="gradingType" nillable="true" type="string">
+                        <annotation>
+                            <documentation>See KeyvalueService with valueClass = 'GradingTypeValue'. Examples: ALL, Drittelnoten (Lehramt), M, Abschluss,
+                            Abschluss STU, FPNoten, 1N, AO-Noten(1-4);, unbenotet (Lehramt), AO-Konto-Note (0,6-4,0)</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="compulsory" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Pflichtkennzeichen. See KeyvalueService with valueClass = 'CompulsoryValue'. Examples: P, WP, W</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="freetrialSemesterlimit" nillable="true" type="long">
+                        <annotation>
+                            <documentation>eitperiode (Semester) bis zu dem Freiversuche gewährt werden.</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="generationWeight" nillable="true" type="decimal">
+                        <annotation>
+                            <documentation>Gewicht, mit dem die Leistung zu dieser Prüfung in einer Generierung berücksichtigt wird, sofern kein anderes
+                            Gewicht angegeben wurde.</documentation>
+                        </annotation>
+                    </element>
+                </sequence>
+            </complexType>
+            <complexType abstract="false" name="UnitrelationAttribute">
+                <complexContent>
+                    <extension base="wns:UnitrelationBase">
+                        <sequence/>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType abstract="false" name="ModuleBase">
+                <complexContent>
+                    <extension base="wns:ModuleBaseTranslatable">
+                        <sequence>
+                            <element minOccurs="0" name="attendeeMaximum" nillable="true" type="long">
+                                <annotation>
+                                    <documentation>Maximale Teilnehmeranzahl</documentation>
+                                </annotation>
+                            </element>
+                            <element minOccurs="0" name="frequencyOfOffer" nillable="true" type="string">
+                                <annotation>
+                                    <documentation>Informationen zum Turnus von Modulen. Beispiele: jedes Semester, jedes zweite Semester, nur im
+                                    Wintersemester, ... See KeyvalueService with valueClass = 'FrequencyOfOfferValue'. Examples: jedesSem, 2Sem, WSem, SSem,
+                                    unregel</documentation>
+                                </annotation>
+                            </element>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType abstract="false" name="ExaminationBase">
+                <complexContent>
+                    <extension base="wns:ExaminationBaseTranslatable">
+                        <sequence>
+                            <element minOccurs="0" name="grading" nillable="true" type="string"/>
+                            <element minOccurs="0" name="examform" type="string">
+                                <annotation>
+                                    <documentation>See KeyvalueService with valueClass = 'ExamformValue'. Examples: S, M, K, AU, KO, MO, KD, UDEF, KE,
+                                    2</documentation>
+                                </annotation>
+                            </element>
+                            <element minOccurs="0" name="examinationType" type="string">
+                                <annotation>
+                                    <documentation>See KeyvalueService with valueClass = 'ExaminationTypeValue'. Examples: LN, UDEF, M, ST, SA, AB, AF, BP, BA,
+                                    DA</documentation>
+                                </annotation>
+                            </element>
+                            <element minOccurs="0" name="examWritten" nillable="true" type="long"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType abstract="false" name="UnitAttributeTranslatable">
+                <complexContent>
+                    <extension base="wns:UnitBaseTranslatable">
+                        <sequence/>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType abstract="false" name="VeranstaltungsGruppe">
+                <complexContent>
+                    <extension base="wns:Veranstaltung">
+                        <sequence>
+                            <element minOccurs="0" name="prfExtIds" type="wns:prfExtIdsType"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <complexType abstract="false" name="EventBaseTranslatable">
+                <sequence>
+                    <element minOccurs="0" name="compulsoryRequirement" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Zwingende Voraussetzung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="recommendedRequirement" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Empfohlene Voraussetzung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="examinationAchievement" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Zu erbringende Prüfungsleistung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="courseAchievement" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Zu erbringende Studienleistung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="learningTarget" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Lernziele</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="contents" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Inhalte</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="objectiveQualification" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Qualifikationsziel</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="grading" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Benotung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="workload" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Arbeitsaufwand</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="credits" nillable="true" type="string"/>
+                    <element minOccurs="0" name="academicYear" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Studienjahr</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="targetGroup" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Zielgruppe</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="externOrganizer" nillable="true" type="string"/>
+                    <element minOccurs="0" name="teachingMethod" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Lehr- und Lernformen</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="literature" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Literatur</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="recommendation" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Empfehlung,z.B.: Die Lehrveranstaltung 'Marketing und Konsumentenverhalten“ sollte vorher besucht werden, um die
+                            vermittelten Inhalte besser in den Gesamtkontext des Marketings einordnen zu können' oder 'Eine aktive Teilnahme an den Übungen
+                            wird dringend empfohlen.'</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="usability" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Verwendbarkeit der VeranstaltungVerwendbarkeit der Veranstaltung</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="classAttendance" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Präsenzzeit</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="independentStudy" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Selbststudium</documentation>
+                        </annotation>
+                    </element>
+                    <element minOccurs="0" name="directive" nillable="true" type="string"/>
+                    <element minOccurs="0" name="intendedSemester" nillable="true" type="string">
+                        <annotation>
+                            <documentation>Vorgesehenes Studiensemester, z..B.: 5./6. Semester</documentation>
+                        </annotation>
+                    </element>
+                </sequence>
+            </complexType>
+            <complexType abstract="false" name="UnitAttribute">
+                <complexContent>
+                    <extension base="wns:UnitBase">
+                        <sequence>
+                            <element minOccurs="0" name="parentRelationAttributes" nillable="true" type="wns:UnitrelationAttribute">
+                                <annotation>
+                                    <documentation>Wird nur bei Erstellen und Aktualisieren einer gesamten Struktur ausgewertet.</documentation>
+                                </annotation>
+                            </element>
+                            <element minOccurs="0" name="extId" nillable="true" type="string">
+                                <annotation>
+                                    <documentation>Externe ID</documentation>
+                                </annotation>
+                            </element>
+                            <element minOccurs="0" name="orgunit" nillable="true" type="string">
+                                <annotation>
+                                    <documentation>Uniquename der verantwortlichen Organisationseinheit. Uniquename of Orgunit. See
+                                    OrgunitService201806.</documentation>
+                                </annotation>
+                            </element>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+            <element name="createOrUpdateModuleDescriptionForExistingPO">
+                <complexType>
+                    <sequence>
+                        <element name="unitId" type="long">
+                            <annotation>
+                                <documentation>PO-Element, an dem das Abschlusskonto und die weiteren Strukturen eingehängt werden.</documentation>
+                            </annotation>
+                        </element>
+                        <element name="externalSystem" type="string"/>
+                        <element name="externalTable" type="string"/>
+                        <element name="abschlusskonto" type="wns:Konto"/>
+                        <element name="zusatzkonten" type="wns:zusatzkontenType">
+                            <annotation>
+                                <documentation>Alle enthaltenen Konten sind als Katalogzuordnung der PO zugeordnet.</documentation>
+                            </annotation>
+                        </element>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="createOrUpdateModuleDescriptionForExistingPOResponse">
+                <complexType>
+                    <sequence>
+                        <element name="executionId" nillable="true" type="long"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="deleteUnit">
+                <complexType>
+                    <sequence>
+                        <element name="unitId" type="long"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="deleteUnitResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="translateUnit">
+                <complexType>
+                    <sequence>
+                        <element name="unitId" type="long"/>
+                        <element name="translationLanguage" type="string">
+                            <annotation>
+                                <documentation>Language string ISO-639-1, i.e. 'en', 'de'. See KeyvalueService with valueClass = 'LanguageValue'. Examples: de,
+                                la, fr, it, pt, es, tr, hu, bg, en</documentation>
+                            </annotation>
+                        </element>
+                        <element name="unitAttributes" type="wns:UnitAttributeTranslatable"/>
+                        <element minOccurs="0" name="eventAttributes" type="wns:EventBaseTranslatable"/>
+                        <element minOccurs="0" name="examinationAttributes" type="wns:ExaminationBaseTranslatable"/>
+                        <element minOccurs="0" name="moduleAttributes" type="wns:ModuleBaseTranslatable"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="translateUnitResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="connectParentAndChildUnit">
+                <complexType>
+                    <sequence>
+                        <element name="parentId" type="long"/>
+                        <element name="childId" type="long"/>
+                        <element minOccurs="0" name="unitrelationAttributes" type="wns:UnitrelationAttribute"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="connectParentAndChildUnitResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="translateUnits">
+                <complexType>
+                    <sequence>
+                        <element name="translationLanguage" type="string">
+                            <annotation>
+                                <documentation>Language string ISO-639-1, i.e. 'en', 'de'. See KeyvalueService with valueClass = 'LanguageValue'. Examples: de,
+                                la, fr, it, pt, es, tr, hu, bg, en</documentation>
+                            </annotation>
+                        </element>
+                        <element name="unitsTranslations" type="wns:unitsTranslationsType"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="translateUnitsResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="deleteUnitrelation">
+                <complexType>
+                    <sequence>
+                        <element minOccurs="0" name="parentUnitId" type="long"/>
+                        <element minOccurs="0" name="childUnitId" type="long"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="deleteUnitrelationResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="createNewUnit">
+                <complexType>
+                    <sequence>
+                        <element name="unitAttributes" type="wns:UnitAttribute"/>
+                        <element minOccurs="0" name="eventAttributes" type="wns:EventBase"/>
+                        <element minOccurs="0" name="examinationAttributes" type="wns:ExaminationBase"/>
+                        <element minOccurs="0" name="moduleAttributes" type="wns:ModuleBase"/>
+                        <element minOccurs="0" name="externalSystem" nillable="true" type="string"/>
+                        <element minOccurs="0" name="externalTable" nillable="true" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="createNewUnitResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="translateUnitsExt">
+                <complexType>
+                    <sequence>
+                        <element minOccurs="0" name="externalSystem" type="string"/>
+                        <element minOccurs="0" name="externalTable" type="string"/>
+                        <element name="translationLanguage" type="string">
+                            <annotation>
+                                <documentation>Language string ISO-639-1, i.e. 'en', 'de'. See KeyvalueService with valueClass = 'LanguageValue'. Examples: de,
+                                la, fr, it, pt, es, tr, hu, bg, en</documentation>
+                            </annotation>
+                        </element>
+                        <element name="unitTranslations" type="wns:unitTranslationsType"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="translateUnitsExtResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="readUnitIdByExternalRelation">
+                <complexType>
+                    <sequence>
+                        <element name="externalId" type="string"/>
+                        <element name="externalSystem" type="string"/>
+                        <element name="externalTable" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="readUnitIdByExternalRelationResponse">
+                <complexType>
+                    <sequence>
+                        <element name="unitId" nillable="true" type="long"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="readUnit">
+                <complexType>
+                    <sequence>
+                        <element name="unitId" nillable="true" type="long"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="readUnitResponse">
+                <complexType>
+                    <sequence>
+                        <element name="unitAttributes" nillable="true" type="wns:ReadUnitAttribute"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="updateUnit">
+                <complexType>
+                    <sequence>
+                        <element name="unitId" type="long"/>
+                        <element name="unitAttributes" type="wns:UnitAttribute"/>
+                        <element minOccurs="0" name="eventAttributes" type="wns:EventBase"/>
+                        <element minOccurs="0" name="examinationAttributes" type="wns:ExaminationBase"/>
+                        <element minOccurs="0" name="moduleAttributes" type="wns:ModuleBase"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="updateUnitResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="createModuleVersion">
+                <complexType>
+                    <sequence>
+                        <element name="unitId" type="long"/>
+                        <element name="unitAttributes" type="wns:UnitAttribute"/>
+                        <element minOccurs="0" name="moduleAttributes" type="wns:ModuleBase"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="createModuleVersionResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="readUnitByExternalRelation">
+                <complexType>
+                    <sequence>
+                        <element name="externalId" type="string"/>
+                        <element name="externalSystem" type="string"/>
+                        <element name="externalTable" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="readUnitByExternalRelationResponse">
+                <complexType>
+                    <sequence>
+                        <element name="unitAttributes" nillable="true" type="wns:ReadUnitAttribute"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="createOrUpdateModuleDescriptionForExistingPOCallback">
+                <complexType>
+                    <sequence>
+                        <element name="executionId" type="long"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="createOrUpdateModuleDescriptionForExistingPOCallbackResponse">
+                <complexType>
+                    <sequence>
+                        <element name="results" type="wns:resultsType"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <complexType name="veranstaltungsgruppenType">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="0" name="veranstaltungsgruppe" type="wns:VeranstaltungsGruppe"/>
+                </sequence>
+            </complexType>
+            <complexType name="unitTranslationsType">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="0" name="unitTranslation" type="wns:UnitTranslationExt"/>
+                </sequence>
+            </complexType>
+            <complexType name="moduleType">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="0" name="modul" type="wns:Modul"/>
+                </sequence>
+            </complexType>
+            <complexType name="pruefungenType">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="0" name="pruefung" type="wns:Pruefung"/>
+                </sequence>
+            </complexType>
+            <complexType name="prfExtIdsType">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="0" name="prfExtId" type="string">
+                        <annotation>
+                            <documentation>Externe ID (extId) einer Prüfung. Wenn gesetzt, wird eine Planzuordnung zur Prüfung geschrieben.</documentation>
+                        </annotation>
+                    </element>
+                </sequence>
+            </complexType>
+            <complexType name="resultsType">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="0" name="result" type="wns:ResultProtocol"/>
+                </sequence>
+            </complexType>
+            <complexType name="teachingLanguagesType">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="0" name="teachingLanguage" type="string">
+                        <annotation>
+                            <documentation>Language string ISO-639-1, i.e. 'en', 'de'. See KeyvalueService with valueClass = 'LanguageValue'. Examples: de, la,
+                            fr, it, pt, es, tr, hu, bg, en</documentation>
+                        </annotation>
+                    </element>
+                </sequence>
+            </complexType>
+            <complexType name="zusatzkontenType">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="0" name="zusatzkonto" type="wns:Konto"/>
+                </sequence>
+            </complexType>
+            <complexType name="unitsTranslationsType">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="0" name="unit" type="wns:Translation"/>
+                </sequence>
+            </complexType>
+            <complexType name="kontenType">
+                <sequence>
+                    <element maxOccurs="unbounded" minOccurs="0" name="konto" type="wns:Konto"/>
+                </sequence>
+            </complexType>
+            <element name="ServiceFault">
+                <complexType>
+                    <sequence>
+                        <element maxOccurs="1" minOccurs="0" name="rootCause" type="string"/>
+                        <element name="message" type="string"/>
+                        <element maxOccurs="unbounded" minOccurs="0" name="validationMessage" type="wns:ValidationMessage"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <complexType name="ValidationMessage">
+                <sequence>
+                    <element name="messageType" type="string"/>
+                    <element name="messageKey" type="string"/>
+                    <element maxOccurs="unbounded" minOccurs="0" name="messageParameter" type="string"/>
+                </sequence>
+            </complexType>
+        </schema>
+  </types>
+  <message name="createOrUpdateModuleDescriptionForExistingPO">
+    <part name="parameters" element="wns:createOrUpdateModuleDescriptionForExistingPO">
+    </part>
+  </message>
+  <message name="deleteUnit">
+    <part name="parameters" element="wns:deleteUnit">
+    </part>
+  </message>
+  <message name="translateUnit">
+    <part name="parameters" element="wns:translateUnit">
+    </part>
+  </message>
+  <message name="createOrUpdateModuleDescriptionForExistingPOCallbackResponse">
+    <part name="parameters" element="wns:createOrUpdateModuleDescriptionForExistingPOCallbackResponse">
+    </part>
+  </message>
+  <message name="createOrUpdateModuleDescriptionForExistingPOResponse">
+    <part name="parameters" element="wns:createOrUpdateModuleDescriptionForExistingPOResponse">
+    </part>
+  </message>
+  <message name="translateUnits">
+    <part name="parameters" element="wns:translateUnits">
+    </part>
+  </message>
+  <message name="deleteUnitrelation">
+    <part name="parameters" element="wns:deleteUnitrelation">
+    </part>
+  </message>
+  <message name="readUnitResponse">
+    <part name="parameters" element="wns:readUnitResponse">
+    </part>
+  </message>
+  <message name="translateUnitResponse">
+    <part name="parameters" element="wns:translateUnitResponse">
+    </part>
+  </message>
+  <message name="translateUnitsExt">
+    <part name="parameters" element="wns:translateUnitsExt">
+    </part>
+  </message>
+  <message name="readUnitIdByExternalRelation">
+    <part name="parameters" element="wns:readUnitIdByExternalRelation">
+    </part>
+  </message>
+  <message name="deleteUnitResponse">
+    <part name="parameters" element="wns:deleteUnitResponse">
+    </part>
+  </message>
+  <message name="readUnit">
+    <part name="parameters" element="wns:readUnit">
+    </part>
+  </message>
+  <message name="updateUnit">
+    <part name="parameters" element="wns:updateUnit">
+    </part>
+  </message>
+  <message name="readUnitByExternalRelationResponse">
+    <part name="parameters" element="wns:readUnitByExternalRelationResponse">
+    </part>
+  </message>
+  <message name="createNewUnitResponse">
+    <part name="parameters" element="wns:createNewUnitResponse">
+    </part>
+  </message>
+  <message name="createModuleVersion">
+    <part name="parameters" element="wns:createModuleVersion">
+    </part>
+  </message>
+  <message name="translateUnitsResponse">
+    <part name="parameters" element="wns:translateUnitsResponse">
+    </part>
+  </message>
+  <message name="translateUnitsExtResponse">
+    <part name="parameters" element="wns:translateUnitsExtResponse">
+    </part>
+  </message>
+  <message name="createOrUpdateModuleDescriptionForExistingPOCallback">
+    <part name="parameters" element="wns:createOrUpdateModuleDescriptionForExistingPOCallback">
+    </part>
+  </message>
+  <message name="connectParentAndChildUnit">
+    <part name="parameters" element="wns:connectParentAndChildUnit">
+    </part>
+  </message>
+  <message name="connectParentAndChildUnitResponse">
+    <part name="parameters" element="wns:connectParentAndChildUnitResponse">
+    </part>
+  </message>
+  <message name="readUnitIdByExternalRelationResponse">
+    <part name="parameters" element="wns:readUnitIdByExternalRelationResponse">
+    </part>
+  </message>
+  <message name="createModuleVersionResponse">
+    <part name="parameters" element="wns:createModuleVersionResponse">
+    </part>
+  </message>
+  <message name="createNewUnit">
+    <part name="parameters" element="wns:createNewUnit">
+    </part>
+  </message>
+  <message name="updateUnitResponse">
+    <part name="parameters" element="wns:updateUnitResponse">
+    </part>
+  </message>
+  <message name="deleteUnitrelationResponse">
+    <part name="parameters" element="wns:deleteUnitrelationResponse">
+    </part>
+  </message>
+  <message name="ServiceFault">
+    <part name="serviceFault" element="wns:ServiceFault">
+    </part>
+  </message>
+  <message name="readUnitByExternalRelation">
+    <part name="parameters" element="wns:readUnitByExternalRelation">
+    </part>
+  </message>
+  <portType name="CurriculumDesignerServicePortType">
+    <operation name="createOrUpdateModuleDescriptionForExistingPO">
+<documentation>SECURED BY [(cs.sys.ws.USE_ASYNC) and (cs.sys.ws.USE_ASYNC) and (cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:createOrUpdateModuleDescriptionForExistingPO">
+    </input>
+      <output message="wns:createOrUpdateModuleDescriptionForExistingPOResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="deleteUnit">
+<documentation>Prüfungsordnungs-Element löschen SECURED BY [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:deleteUnit">
+    </input>
+      <output message="wns:deleteUnitResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="translateUnit">
+<documentation>Übersetzungen zu einem Prüfungsordnungs-Element anlegen oder ändern SECURED BY
+            [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:translateUnit">
+    </input>
+      <output message="wns:translateUnitResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="connectParentAndChildUnit">
+<documentation>Prüfungsordnungs-Elemente miteinander verknüpfen SECURED BY [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:connectParentAndChildUnit">
+    </input>
+      <output message="wns:connectParentAndChildUnitResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="translateUnits">
+<documentation>Übersetzungen von mehreren Prüfungsordnungs-Elementen anlegen oder ändern SECURED BY
+            [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:translateUnits">
+    </input>
+      <output message="wns:translateUnitsResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="deleteUnitrelation">
+<documentation>Beziehung zwischen Prüfungsordnungs-Elementen löschen SECURED BY [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:deleteUnitrelation">
+    </input>
+      <output message="wns:deleteUnitrelationResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="createNewUnit">
+<documentation>neues Prüfungsordnungs-Element anlegen SECURED BY [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:createNewUnit">
+    </input>
+      <output message="wns:createNewUnitResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="translateUnitsExt">
+<documentation>Übersetzungen von mehreren Prüfungsordnungs-Elementen anlegen oder ändern, über externe Systemverknüpfung SECURED BY
+            [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:translateUnitsExt">
+    </input>
+      <output message="wns:translateUnitsExtResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="readUnitIdByExternalRelation">
+<documentation>ID des Prüfungsordnungs-Element aus der external relation SECURED BY
+            [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:readUnitIdByExternalRelation">
+    </input>
+      <output message="wns:readUnitIdByExternalRelationResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="readUnit">
+<documentation>Prüfungsordnungs-Element anzeigen SECURED BY [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:readUnit">
+    </input>
+      <output message="wns:readUnitResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="updateUnit">
+<documentation>Prüfungsordnungs-Element ändern SECURED BY [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:updateUnit">
+    </input>
+      <output message="wns:updateUnitResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="createModuleVersion">
+<documentation>Neue Modulversion anlegen SECURED BY [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:createModuleVersion">
+    </input>
+      <output message="wns:createModuleVersionResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="readUnitByExternalRelation">
+<documentation>Prüfungsordnungs-Element anzeigen SECURED BY [(cm.exa.curricula.EDIT_CURRICULA_ELEMENTS_ALL)]</documentation>
+      <input message="wns:readUnitByExternalRelation">
+    </input>
+      <output message="wns:readUnitByExternalRelationResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+    <operation name="createOrUpdateModuleDescriptionForExistingPOCallback">
+<documentation>SECURED BY [(cs.sys.ws.USE_ASYNC) and (cs.sys.ws.USE_ASYNC)]</documentation>
+      <input message="wns:createOrUpdateModuleDescriptionForExistingPOCallback">
+    </input>
+      <output message="wns:createOrUpdateModuleDescriptionForExistingPOCallbackResponse">
+    </output>
+      <fault name="serviceFault" message="wns:ServiceFault">
+    </fault>
+    </operation>
+  </portType>
+  <binding name="CurriculumDesignerServiceBinding" type="wns:CurriculumDesignerServicePortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="createOrUpdateModuleDescriptionForExistingPO">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/createOrUpdateModuleDescriptionForExistingPO"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="deleteUnit">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/deleteUnit"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="translateUnit">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/translateUnit"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="connectParentAndChildUnit">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/connectParentAndChildUnit"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="translateUnits">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/translateUnits"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="deleteUnitrelation">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/deleteUnitrelation"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="createNewUnit">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/createNewUnit"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="translateUnitsExt">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/translateUnitsExt"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="readUnitIdByExternalRelation">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/readUnitIdByExternalRelation"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="readUnit">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/readUnit"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="updateUnit">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/updateUnit"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="createModuleVersion">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/createModuleVersion"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="readUnitByExternalRelation">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/readUnitByExternalRelation"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="createOrUpdateModuleDescriptionForExistingPOCallback">
+      <soap:operation soapAction="http://www.his.de/ws/CurriculumDesignerService/createOrUpdateModuleDescriptionForExistingPOCallback"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="serviceFault">
+        <soap:fault name="serviceFault" use="literal"/>
+      </fault>
+    </operation>
+  </binding>
+  <service name="CurriculumDesignerService">
+<documentation>Funktionalitäten zum Bearbeiten von Prüfungsordnungen per Webservices</documentation>
+    <port name="CurriculumDesignerServicePort" binding="wns:CurriculumDesignerServiceBinding">
+      <soap:address location="https://hisinone-test.zvw.uni-goettingen.de/qisserver/services2/CurriculumDesignerService"/>
+      <!-- <soap:address location="http://localhost/qisserver/services2/CurriculumDesignerService"/> -->
+    </port>
+    <wsp:PolicyReference URI="#UsernameToken"/>
+  </service>
+    <wsp:Policy wsu:Id="UsernameToken" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy/>
+                        </sp:UsernameToken>
+                    </wsp:Policy>
+                </sp:SupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+</definitions>
+
