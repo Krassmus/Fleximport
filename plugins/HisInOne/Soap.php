@@ -5,11 +5,12 @@ namespace HisInOne;
 class Soap
 {
 
-    static protected $instance = null;
+    static protected $instance = [];
 
-    static public function get()
+    static public function get($wsdl = null)
     {
-        if (!self::$instance) {
+        $wsdl = $wsdl ?: 'HISINONE_WSDL_URL';
+        if (!self::$instance[$wsdl]) {
             $context = stream_context_create([
                 'ssl' => [
                     'verify_peer' => false,
@@ -18,7 +19,8 @@ class Soap
                 ]
             ]);
 
-            self::$instance = new SoapClient(\FleximportConfig::get("HISINONE_WSDL_URL"), array(
+            
+            self::$instance[$wsdl] = new SoapClient(\FleximportConfig::get($wsdl), array(
                 'connection_timeout' => 1, //Zeit für den Verbindungsaufbau
                 'trace' => true,
                 'exceptions' => 0,
@@ -35,11 +37,11 @@ class Soap
                 'Security',
                 $headerbody
             );
-            self::$instance->__setSoapHeaders($soapHeaders);
-            if (is_soap_fault(self::$instance)) {
-                throw new Exception("SOAP-Error: " . self::$instance);
+            self::$instance[$wsdl]->__setSoapHeaders($soapHeaders);
+            if (is_soap_fault(self::$instance[$wsdl])) {
+                throw new Exception("SOAP-Error: " . self::$instance[$wsdl]);
             }
         }
-        return self::$instance;
+        return self::$instance[$wsdl];
     }
 }
