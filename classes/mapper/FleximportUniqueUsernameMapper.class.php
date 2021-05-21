@@ -26,7 +26,7 @@ class FleximportUniqueUsernameMapper implements FleximportMapper
         if (!User::findByUsername($value)) {
             return $value;
         }
-        $i = 0;
+        $i = 1;
         do {
             $i++;
         } while(User::findByUsername($value.$i));
