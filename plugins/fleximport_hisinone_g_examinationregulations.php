@@ -50,7 +50,7 @@ class fleximport_hisinone_g_examinationregulations extends FleximportPlugin
     {
         $unit_ids = [];
         $studycourse_table = FleximportTable::findOneBySQL('name = ?', ['fleximport_hisinone_f_studycourses']);
-        foreach ($studycourse_table->fetchLines() as $line) {
+        foreach ($studycourse_table->getLines() as $line) {
             if ($line['unitid']) {
                 $unit_ids[$line['id']] = explode('|', $line['unitid']);
             }
