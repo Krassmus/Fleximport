@@ -135,15 +135,6 @@ class fleximport_hisinone_g_examinationregulations extends FleximportPlugin
             $this->fl_data[$data_id]['parent_elementtype__key'] = $this->objects[$parent_id]['elementtype__key'];
             $this->fl_data[$data_id]['studip_position'] = $this->position[$parent_data_id][$value]++;
         }
-
-        if ($value == 'K') {
-            if ($this->objects[$parent_id]['elementtype__key'] == 'K') {
-                $this->fl_data[$data_id]['concat_label'] .= $this->objects[$parent_id]['concat_label'];
-            }
-            $this->fl_data[$data_id]['concat_label'] .= $this->fl_data[$data_id]['defaulttext'];
-        } else {
-            $this->fl_data[$data_id]['concat_label'] = '';
-        }
     }
 
 }

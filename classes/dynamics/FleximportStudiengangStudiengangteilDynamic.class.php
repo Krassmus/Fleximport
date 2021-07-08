@@ -7,7 +7,7 @@ class FleximportStudiengangStudiengangteilDynamic extends FleximportDynamic
     {
         return array(
             'Studiengang' => array('fleximport_studiengangteil' => _('Zugeordnete Studiengangteile')),
-            'StudiengangFlexImport' => array('fleximport_responsible_institute' => _('Verantwortliche Einrichtung des Moduls')),
+            'StudiengangFlexImport' => array('fleximport_studiengangteil' => _('Zugeordnete Studiengangteile')),
         );
     }
 
