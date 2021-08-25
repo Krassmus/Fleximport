@@ -38,7 +38,7 @@ class FleximportCourseRelatedInstitutesDynamic extends FleximportDynamic
             foreach (array_diff($old_institutes, $value) as $institut_id) {
                 $delete = DBManager::get()->prepare("
                     DELETE FROM seminar_inst
-                    WHERE seminar_id = :seminar_id,
+                    WHERE seminar_id = :seminar_id
                         AND institut_id = :institut_id
                 ");
                 $delete->execute(array(

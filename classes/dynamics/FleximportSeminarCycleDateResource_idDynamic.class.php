@@ -45,7 +45,7 @@ class FleximportSeminarCycleDateResource_idDynamic extends FleximportDynamic
                         }
                     }
                 }
-            } else {
+            } elseif($date->room_booking) {
                 $date->room_booking->delete();
             }
         }
