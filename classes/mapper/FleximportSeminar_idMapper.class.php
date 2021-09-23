@@ -10,7 +10,7 @@ class FleximportSeminar_idMapper implements FleximportMapper
 
     public function possibleFieldnames()
     {
-        return array("seminar_id", "range_id");
+        return array("seminar_id", "range_id", "parent_course", "course_id");
     }
 
     public function possibleFormats()
