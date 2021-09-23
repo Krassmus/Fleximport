@@ -719,6 +719,13 @@ class FleximportTable extends SimpleORMap {
                     }
                     restoreLanguage();
                 }
+                if ($object->course->parent_course) {
+                    $parent = new Seminar($object->course->parent_course);
+                    $parent->addMember(
+                        $object['user_id'],
+                        $object['status']
+                    );
+                }
                 break;
             case "User":
                 if (($output['found'] === false) && ($this['tabledata']['simplematching']['fleximport_welcome_message']['column'] !== "none")) {
