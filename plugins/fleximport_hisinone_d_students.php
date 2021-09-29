@@ -38,7 +38,14 @@ class fleximport_hisinone_d_students extends FleximportPlugin
         }
         //var_dump($response->findActiveStudentsResponse->students->student); die();
         list($fields, $data) = \HisInOne\DataMapper::getData($response->findActiveStudentsResponse->students->student);
-        $fields[] = "degreeprograms_json";
+        $fields[] = "degreeprograms_subjectnumber_courseofstudyid_studysemester";
+        foreach ($response->findActiveStudentsResponse->students->student as $index => $student) {
+            $degreeprograms = [];
+            foreach ($student->degreePrograms->degreeProgram as $dp_data) {
+                $degreeprograms[] = $dp_data->subjectnumber." ".$dp_data->courseOfStudyId." ".$dp_data->studysemester;
+            }
+            $data[$index][] = implode("|", $degreeprograms);
+        }
         $max = $response->findActiveStudentsResponse->countAll;
         $this->table->createTable($fields, $data);
 
@@ -55,10 +62,13 @@ class fleximport_hisinone_d_students extends FleximportPlugin
                 return false;
             }
             list($fields, $data) = \HisInOne\DataMapper::getData($response->findActiveStudentsResponse->students->student);
-            $fields[] = "degreeprograms_json";
-            foreach ($data as $i => $d) {
-                $d[] = "";
-                $data[$i] = $d;
+            $fields[] = "degreeprograms_subjectnumber_courseofstudyid_studysemester";
+            foreach ($response->findActiveStudentsResponse->students->student as $index => $student) {
+                $degreeprograms = [];
+                foreach ($student->degreePrograms->degreeProgram as $dp_data) {
+                    $degreeprograms[] = $dp_data->subjectnumber." ".$dp_data->courseOfStudyId." ".$dp_data->studysemester;
+                }
+                $data[$index][] = implode("|", $degreeprograms);
             }
             $this->table->addEntries($fields, $data);
         }
