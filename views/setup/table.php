@@ -172,7 +172,7 @@
     <label id="sync_constraints"<?= trim($table['synchronization']) ? '' : ' style="display: none;"' ?>>
         <?= _("Synchronisationsbedingung: Nur Objekte löschen, die zusätzlich folgende Bedingung erfüllen.") ?>
         <textarea name="table[sync_constraints]"
-                  placeholder="z.B. `termine`.`date` >= UNIX_TIMESTAMP()"><?= htmlReady($table['sync_constraints']) ?></textarea>
+                  placeholder="z.B. `termine`.`date` >= UNIX_TIMESTAMP()"><?= $table->isNew() ? "" : htmlReady($table['sync_constraints']) ?></textarea>
     </label>
 
     <label data-change_hash="<?= htmlReady($table->isInDatabase() ? $table->calculateChangeHash() : "") ?>">
