@@ -8,7 +8,9 @@ class FleximportCourseChecker implements FleximportChecker {
         $errors = "";
         if ($virtualobject->isNew()) {
             if (!$data['fleximport_dozenten'] || !count($data['fleximport_dozenten'])) {
-                $errors .= "Dozent kann nicht gemapped werden. ";
+                if (!$data['fleximport_nn_dozent'] && !User::find($data['fleximport_nn_dozent'])) {
+                    $errors .= "Dozent kann nicht gemapped werden. ";
+                }
             } else {
                 $exist = false;
                 foreach ((array) $data['fleximport_dozenten'] as $dozent_id) {
@@ -18,7 +20,9 @@ class FleximportCourseChecker implements FleximportChecker {
                     }
                 }
                 if (!$exist) {
-                    $errors .= "Angegebene Dozenten sind nicht im System vorhanden. ";
+                    if (!$data['fleximport_nn_dozent'] && !User::find($data['fleximport_nn_dozent'])) {
+                        $errors .= "Angegebene Dozenten sind nicht im System vorhanden. ";
+                    }
                 } else {
                     if ($GLOBALS['SEM_CLASS'][$GLOBALS['SEM_TYPE'][$virtualobject['status']]['class']]['only_inst_user']) {
                         $statement = DBManager::get()->prepare("

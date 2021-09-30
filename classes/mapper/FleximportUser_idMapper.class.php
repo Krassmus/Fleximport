@@ -10,7 +10,7 @@ class FleximportUser_idMapper implements FleximportMapper
 
     public function possibleFieldnames()
     {
-        return array("user_id", "range_id", "fleximport_dozenten");
+        return array("user_id", "range_id", "fleximport_dozenten", "fleximport_nn_dozent");
     }
 
     public function possibleFormats()
