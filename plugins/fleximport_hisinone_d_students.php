@@ -38,7 +38,7 @@ class fleximport_hisinone_d_students extends FleximportPlugin
         }
         //var_dump($response->findActiveStudentsResponse->students->student); die();
         list($fields, $data) = \HisInOne\DataMapper::getData($response->findActiveStudentsResponse->students->student);
-        $fields[] = "degreeprograms_subjectnumber_courseofstudyid_studysemester";
+        $fields[] = "user_studiengang";
         foreach ($response->findActiveStudentsResponse->students->student as $index => $student) {
             $data[$index][] = $this->getCourseOfStudy($student);
         }
