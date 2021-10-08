@@ -40,11 +40,7 @@ class fleximport_hisinone_d_students extends FleximportPlugin
         list($fields, $data) = \HisInOne\DataMapper::getData($response->findActiveStudentsResponse->students->student);
         $fields[] = "degreeprograms_subjectnumber_courseofstudyid_studysemester";
         foreach ($response->findActiveStudentsResponse->students->student as $index => $student) {
-            $degreeprograms = [];
-            foreach ($student->degreePrograms->degreeProgram as $dp_data) {
-                $degreeprograms[] = $dp_data->subjectnumber." ".$dp_data->courseOfStudyId." ".$dp_data->studysemester;
-            }
-            $data[$index][] = implode("|", $degreeprograms);
+            $data[$index][] = $this->getCourseOfStudy($student);
         }
         $max = $response->findActiveStudentsResponse->countAll;
         $this->table->createTable($fields, $data);
@@ -64,11 +60,7 @@ class fleximport_hisinone_d_students extends FleximportPlugin
             list($fields, $data) = \HisInOne\DataMapper::getData($response->findActiveStudentsResponse->students->student);
             $fields[] = "degreeprograms_subjectnumber_courseofstudyid_studysemester";
             foreach ($response->findActiveStudentsResponse->students->student as $index => $student) {
-                $degreeprograms = [];
-                foreach ($student->degreePrograms->degreeProgram as $dp_data) {
-                    $degreeprograms[] = $dp_data->subjectnumber." ".$dp_data->courseOfStudyId." ".$dp_data->studysemester;
-                }
-                $data[$index][] = implode("|", $degreeprograms);
+                $data[$index][] = $this->getCourseOfStudy($student);
             }
             $this->table->addEntries($fields, $data);
         }
@@ -77,6 +69,36 @@ class fleximport_hisinone_d_students extends FleximportPlugin
     public function getDescription()
     {
         return "Holt sich die Studierendendaten aus HisInOne.";
+    }
+
+    protected function getCourseOfStudy($student)
+    {
+        $degreeprograms = [];
+        foreach ($student->degreePrograms->degreeProgram as $dp_data) {
+            //$dp_data->courseOfStudyId ist in der Tabelle  fleximport_hisinone_f_studycourses die Spalte id (anscheinend)
+
+            $fleximport_hisinone_f_studycourses = $this->table->process->getTableByName('fleximport_hisinone_f_studycourses');
+            if ($fleximport_hisinone_f_studycourses && $fleximport_hisinone_f_studycourses->isInDatabase()) {
+                $courseofstudy_statement = DBManager::get()->prepare("
+                        SELECT *
+                        FROM `".addslashes($fleximport_hisinone_f_studycourses->getDBName())."`
+                        WHERE `id` = :courseofstudyid
+                        LIMIT 1
+                    ");
+                $courseofstudy_statement->execute([
+                    'courseofstudyid' => $dp_data->courseOfStudyId
+                ]);
+                $data = $courseofstudy_statement->fetch(PDO::FETCH_ASSOC);
+                if ($data) {
+                    $degreeprograms[] = $data['subject__label'] . ": " . $data['degree__label'] . ": " . max(1, floor($dp_data->studysemester));
+                } else {
+                    $degreeprograms[] = 'Unbestimmbar '.$dp_data->courseOfStudyId;
+                }
+            } else {
+                $degreeprograms[] = $dp_data->courseOfStudyId." ".$dp_data->studysemester;
+            }
+        }
+        return implode("|", $degreeprograms);
     }
 
     /*protected function mapStudentData($data)
