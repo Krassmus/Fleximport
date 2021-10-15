@@ -297,19 +297,37 @@ class fleximport_hisinone_z_courses extends FleximportPlugin
 
     protected function getCoursesData($termkey)
     {
+        $limit = 100;
+        $offset = 0;
+        $data = new stdClass();
+        $data->course = [];
         $soap = \HisInOne\Soap::get();
-        $response = $soap->__soapCall("findCoursesOfTerm", array(
-            array('termKey' => $termkey)
-        ));
+        do {
+
+            $response = $soap->__soapCall("findCoursesOfTerm", [
+                ['termKey' => $termkey,
+                 'limit'   => $limit,
+                 'offset'  => $offset]
+            ]);
         if (is_a($response, "SoapFault")) {
-            PageLayout::postError("[findCoursesOfTerm termKey=".$termkey."] ".$response->getMessage());
+            PageLayout::postError("[findCoursesOfTerm termKey=" . $termkey . ", limit=" . $limit . ", offset=" . $offset . "] " . $response->getMessage());
             return false;
         }
 
-        return $response->findCoursesOfTermResponse;
+        if (isset($response->findCoursesOfTermResponse->course)) {
+            if (is_array($response->findCoursesOfTermResponse->course)) {
+                $data->course = array_merge($data->course, $response->findCoursesOfTermResponse->course);
+            } else {
+                $data->course[] = $response->findCoursesOfTermResponse->course;
+            }
+        }
+        $offset += $limit;
+    } while (isset($response->findCoursesOfTermResponse->course));
+        return $data;
     }
 
-    public function getDescription()
+
+public function getDescription()
     {
         return "Holt sich die Veranstaltungsdaten aus HisInOne.";
     }
